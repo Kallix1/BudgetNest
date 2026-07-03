@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Бюджети — BudgetNest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/dashboard.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+  body.dashboard-body {
+    display: flex !important;
+    align-items: stretch !important;
+    min-height: 100vh !important;
+    margin: 0;
+    background: var(--bg-void);
+  }
+</style>
+</head>
+<body class="dashboard-body">
+
+<div class="bg-glow"></div>
+<div class="bg-grid"></div>
+
+<nav class="navbar">
+  <div class="nav-left">
+    <div class="brand-mark">BudgetNest</div>
+    <div class="nav-links">
+      <a href="dashboard.html" class="nav-link">Табло</a>
+      <a href="transactions.html" class="nav-link">Транзакции</a>
+      <a href="budgets.html" class="nav-link active">Бюджети</a>
+      <a href="settings.html" class="nav-link">Настройки</a>
+      <a href="admin.html" class="nav-link" id="admin-nav-link" style="display:none;">Админ</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <span class="household-pill" id="household-name">…</span>
+    <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Смяна на тема">🌙</button>
+    <button class="btn-ghost" onclick="handleSignOut()">Изход</button>
+  </div>
+</nav>
+
+<main class="dashboard-main" id="page-main" style="display:none;">
+
+  <div class="page-header">
+    <h1>Бюджети</h1>
+    <span class="hint" id="budgets-month-label" style="color: var(--text-secondary); font-size: 13px;"></span>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      Месечни лимити по категория
+      <span class="hint">разходни категории</span>
+    </div>
+    <div id="budgets-list">
+      <div class="empty-state">Зареждане…</div>
+    </div>
+  </div>
+
+</main>
+
+<div id="app-toast-container" style="position: fixed; top: 24px; right: 24px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; align-items: flex-end;"></div>
+
+<script>
+  function showToast(message, type) {
+    const container = document.getElementById('app-toast-container');
+    const toast = document.createElement('div');
+    const palette = {
+      error:   { bg: '#7F1D1D', border: '#EF4444' },
+      success: { bg: '#14532D', border: '#22C55E' },
+      info:    { bg: '#1E3A5F', border: '#3B82F6' },
+    };
+    const c = palette[type] || palette.info;
+    toast.style.cssText = `background:${c.bg}; border:1px solid ${c.border}; color:#fff; padding:14px 18px; border-radius:10px; font-family:'Inter',sans-serif; font-size:13px; font-weight:500; box-shadow:0 8px 24px rgba(0,0,0,0.35); max-width:340px; line-height:1.45;`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.style.transition = 'opacity 0.3s ease';
+      toast.style.opacity = '0';
+      setTimeout(() => toast.remove(), 300);
+    }, 4200);
+  }
+</script>
+
+<script>
+  // ===== Тъмна тема =====
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    const btn = document.getElementById('theme-toggle-btn');
+    if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+    localStorage.setItem('budgetnest-theme', theme);
+  }
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme') || 'light';
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  }
+  applyTheme(localStorage.getItem('budgetnest-theme') || 'light');
+
+  // ===== Supabase конфигурация =====
+  const SUPABASE_URL = 'https://fvorpmajvrsxrwtscmwk.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_KmFRXFvW-wCf5LJXMgHejQ__3CH2PB7';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const ADMIN_EMAILS = ['choko2009vr@gmail.com']; // <-- замени с истинския си имейл
+
+  let currentUser = null;
+  let currentHouseholdId = null;
+  let expenseCategories = [];
+  let budgetsByCategory = {}; // category_id -> { id, monthly_limit }
+  let spentByCategory = {};   // category_id -> сума похарчено този месец
+
+  const eur = (n) => (Number(n) || 0).toLocaleString('bg-BG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+
+  // ===== Escaping на потребителски текст преди вмъкване в innerHTML =====
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  // ===== Init flow =====
+  (async function init() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) { window.location.href = 'login.html'; return; }
+    currentUser = session.user;
+
+    if (ADMIN_EMAILS.map(e => e.toLowerCase()).includes((currentUser.email || '').toLowerCase())) {
+      document.getElementById('admin-nav-link').style.display = 'flex';
+    }
+
+    const { data: memberships, error } = await supabaseClient
+      .from('household_members')
+      .select('household_id, households(name)')
+      .eq('user_id', currentUser.id)
+      .limit(1);
+
+    if (error) { console.error(error); return; }
+
+    if (!memberships || memberships.length === 0) {
+      window.location.href = 'dashboard.html';
+      return;
+    }
+
+    currentHouseholdId = memberships[0].household_id;
+    document.getElementById('household-name').textContent = memberships[0].households.name;
+    document.getElementById('page-main').style.display = 'block';
+
+    const monthNames = ['януари','февруари','март','април','май','юни','юли','август','септември','октомври','ноември','декември'];
+    const now = new Date();
+    document.getElementById('budgets-month-label').textContent = monthNames[now.getMonth()] + ' ' + now.getFullYear();
+
+    await loadData();
+    renderBudgets();
+  })();
+
+  // ===== Зареждане на категории, бюджети и текущи разходи =====
+  async function loadData() {
+    const { data: cats, error: catError } = await supabaseClient
+      .from('categories')
+      .select('*')
+      .eq('household_id', currentHouseholdId)
+      .eq('type', 'expense')
+      .order('name');
+
+    if (catError) { console.error(catError); return; }
+    expenseCategories = cats || [];
+
+    const { data: budgets, error: budgetError } = await supabaseClient
+      .from('budgets')
+      .select('*')
+      .eq('household_id', currentHouseholdId);
+
+    if (budgetError) { console.error(budgetError); return; }
+    budgetsByCategory = {};
+    (budgets || []).forEach(b => { budgetsByCategory[b.category_id] = b; });
+
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
+    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().slice(0, 10);
+
+    const { data: txs, error: txError } = await supabaseClient
+      .from('transactions')
+      .select('category_id, amount')
+      .eq('household_id', currentHouseholdId)
+      .gte('transaction_date', monthStart)
+      .lte('transaction_date', monthEnd);
+
+    if (txError) { console.error(txError); return; }
+    spentByCategory = {};
+    (txs || []).forEach(t => {
+      spentByCategory[t.category_id] = (spentByCategory[t.category_id] || 0) + Number(t.amount);
+    });
+  }
+
+  // ===== Рендиране на списъка =====
+  function renderBudgets() {
+    const container = document.getElementById('budgets-list');
+
+    if (!expenseCategories.length) {
+      container.innerHTML = '<div class="empty-state">Все още няма разходни категории.</div>';
+      return;
+    }
+
+    container.innerHTML = expenseCategories.map(cat => {
+      const budget = budgetsByCategory[cat.id];
+      const limit = budget ? Number(budget.monthly_limit) : 0;
+      const spent = spentByCategory[cat.id] || 0;
+      const hasLimit = !!budget && limit > 0;
+      const pct = hasLimit ? Math.min((spent / limit) * 100, 100) : 0;
+      const isOver = hasLimit && spent > limit;
+
+      const statsHtml = hasLimit
+        ? `<div class="budget-stats">
+             <span>Похарчено: <b>${eur(spent)}</b></span>
+             <span class="${isOver ? 'over-label' : ''}">${isOver ? 'Надвишен лимит' : 'Лимит'}: <b>${eur(limit)}</b></span>
+           </div>`
+        : `<div class="budget-stats">
+             <span>Похарчено този месец: <b>${eur(spent)}</b></span>
+             <span class="budget-no-limit">Без зададен лимит</span>
+           </div>`;
+
+      const trackHtml = hasLimit
+        ? `<div class="compare-track"><div class="compare-fill ${isOver ? 'over' : ''}" style="width:${pct}%"></div></div>`
+        : '';
+
+      return `
+        <div class="budget-row" data-category="${cat.id}">
+          <div class="budget-head">
+            <div class="budget-cat">
+              <span class="budget-cat-icon">${escapeHtml(cat.icon) || '💰'}</span>
+              ${escapeHtml(cat.name)}
+            </div>
+            <div class="budget-controls">
+              <input type="number" class="budget-input" id="budget-input-${cat.id}" min="0" step="0.01"
+                     placeholder="Лимит €" value="${budget ? limit : ''}">
+              <button type="button" class="budget-save-btn" onclick="saveBudget('${cat.id}')">Запази</button>
+              ${budget ? `<button type="button" class="budget-clear-btn" onclick="clearBudget('${cat.id}')">Изчисти</button>` : ''}
+            </div>
+          </div>
+          ${trackHtml}
+          ${statsHtml}
+        </div>`;
+    }).join('');
+  }
+
+  // ===== Запазване на лимит (upsert) =====
+  async function saveBudget(categoryId) {
+    const input = document.getElementById('budget-input-' + categoryId);
+    const value = parseFloat(input.value);
+
+    if (isNaN(value) || value <= 0) {
+      showToast('Въведете валидна сума за лимит.', 'error');
+      return;
+    }
+
+    const { error } = await supabaseClient
+      .from('budgets')
+      .upsert(
+        { household_id: currentHouseholdId, category_id: categoryId, monthly_limit: value },
+        { onConflict: 'household_id,category_id' }
+      );
+
+    if (error) {
+      showToast('Грешка: ' + error.message, 'error');
+      return;
+    }
+
+    await loadData();
+    renderBudgets();
+  }
+
+  // ===== Изчистване на лимит =====
+  async function clearBudget(categoryId) {
+    const { error } = await supabaseClient
+      .from('budgets')
+      .delete()
+      .eq('household_id', currentHouseholdId)
+      .eq('category_id', categoryId);
+
+    if (error) {
+      showToast('Грешка: ' + error.message, 'error');
+      return;
+    }
+
+    await loadData();
+    renderBudgets();
+  }
+
+  // ===== Изход =====
+  async function handleSignOut() {
+    await supabaseClient.auth.signOut();
+    window.location.href = 'login.html';
+  }
+</script>
+
+</body>
+</html>

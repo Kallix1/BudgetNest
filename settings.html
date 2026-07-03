@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Настройки — BudgetNest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/dashboard.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+  body.dashboard-body {
+    display: flex !important;
+    align-items: stretch !important;
+    min-height: 100vh !important;
+    margin: 0;
+    background: var(--bg-void);
+  }
+  .member-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .member-row:last-child { border-bottom: none; }
+  .member-info { display: flex; align-items: center; gap: 12px; }
+  .member-avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--surface-alt);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Fraunces', serif; font-weight: 600; font-size: 15px;
+    color: var(--heading-accent); flex-shrink: 0;
+  }
+  .member-name { font-weight: 600; color: var(--text-primary); font-size: 14px; }
+  .member-email { font-size: 12px; color: var(--text-dim); }
+  .member-role {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.04em; padding: 4px 10px; border-radius: 999px;
+    background: var(--surface-alt); color: var(--text-secondary);
+  }
+  .member-role.owner { color: var(--nest-gold-accent); background: rgba(212,175,55,0.15); }
+  .member-remove {
+    font-family: 'Inter', sans-serif; font-size: 12px; color: #DC2626;
+    background: none; border: none; cursor: pointer; text-decoration: underline;
+    margin-left: 14px;
+  }
+  .invite-row { display: flex; gap: 10px; margin-top: 16px; }
+  .invite-row input { flex: 1; }
+  .pending-invite-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .pending-invite-row:last-child { border-bottom: none; }
+  .pending-invite-email { font-size: 13px; color: var(--text-secondary); }
+  .pending-invite-tag {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.04em; padding: 3px 8px; border-radius: 999px;
+    background: rgba(212,175,55,0.15); color: var(--nest-gold-accent);
+    margin-left: 10px;
+  }
+  .pending-invite-cancel {
+    font-family: 'Inter', sans-serif; font-size: 12px; color: #DC2626;
+    background: none; border: none; cursor: pointer; text-decoration: underline;
+    margin-left: 14px;
+  }
+</style>
+</head>
+<body class="dashboard-body">
+
+<div class="bg-glow"></div>
+<div class="bg-grid"></div>
+
+<nav class="navbar">
+  <div class="nav-left">
+    <div class="brand-mark">BudgetNest</div>
+    <div class="nav-links">
+      <a href="dashboard.html" class="nav-link">Табло</a>
+      <a href="transactions.html" class="nav-link">Транзакции</a>
+      <a href="budgets.html" class="nav-link">Бюджети</a>
+      <a href="settings.html" class="nav-link active">Настройки</a>
+      <a href="admin.html" class="nav-link" id="admin-nav-link" style="display:none;">Админ</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <span class="household-pill" id="household-name-pill">…</span>
+    <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Смяна на тема">🌙</button>
+    <button class="btn-ghost" onclick="handleSignOut()">Изход</button>
+  </div>
+</nav>
+
+<main class="dashboard-main" id="page-main" style="display:none;">
+
+  <div class="page-header">
+    <h1>Настройки</h1>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Име на домакинството</div>
+    <div class="invite-row">
+      <div class="field" style="flex:1;">
+        <input type="text" id="household-name-input" placeholder="Име на домакинството">
+      </div>
+      <button type="button" class="budget-save-btn" onclick="handleRenameHousehold()">Запази</button>
+    </div>
+    <div class="status-msg" id="household-name-status" style="margin-top: 10px;"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      Членове
+      <span class="hint" id="members-count-label"></span>
+    </div>
+    <div id="members-list">
+      <div class="empty-state">Зареждане…</div>
+    </div>
+
+    <div id="pending-invites-wrap" style="display:none; margin-top: 18px;">
+      <div class="card-title" style="font-size: 13px;">Чакащи покани</div>
+      <div id="pending-invites-list"></div>
+    </div>
+
+    <div id="invite-section">
+      <div class="invite-row">
+        <div class="field" style="flex:1;">
+          <input type="email" id="invite-email-input" placeholder="имейл на вече регистриран потребител">
+        </div>
+        <button type="button" class="budget-save-btn" onclick="handleInviteMember()">Добави</button>
+      </div>
+      <div class="status-msg" id="invite-status" style="margin-top: 10px;"></div>
+      <p style="font-size: 12px; color: var(--text-dim); margin-top: 10px; line-height: 1.5;">
+        Поканеният ще види молба за потвърждение при следващия си вход в BudgetNest — независимо дали вече има акаунт, или тепърва ще се регистрира.
+      </p>
+    </div>
+  </div>
+
+</main>
+
+<div class="overlay" id="app-confirm-overlay" style="display:none; z-index: 9999;">
+  <div class="overlay-card" style="max-width: 420px; text-align: center; padding: 30px;">
+    <div style="font-size: 40px; margin-bottom: 15px;">⚠️</div>
+    <h3 id="app-confirm-title" style="margin-bottom: 10px; font-family: 'Space Grotesk', sans-serif; font-size: 20px; color: var(--text-primary);">Потвърждение</h3>
+    <p id="app-confirm-message" style="color: var(--text-secondary); margin-bottom: 25px; font-size: 14px; line-height: 1.5;"></p>
+    <div style="display: flex; gap: 12px; justify-content: center;">
+      <button type="button" id="app-confirm-cancel-btn" style="flex: 1; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: var(--text-secondary); background: var(--surface-alt); border: 1px solid var(--border-soft); border-radius: 10px; padding: 12px; cursor: pointer;">Отказ</button>
+      <button type="button" id="app-confirm-ok-btn" style="flex: 1; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: #FFFFFF; background: #EF4444; border: 1px solid #DC2626; border-radius: 10px; padding: 12px; cursor: pointer;">Да, продължи</button>
+    </div>
+  </div>
+</div>
+
+<div id="app-toast-container" style="position: fixed; top: 24px; right: 24px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; align-items: flex-end;"></div>
+
+<script>
+  // ===== Toast съобщения (заместват alert()) =====
+  function showToast(message, type) {
+    const container = document.getElementById('app-toast-container');
+    const toast = document.createElement('div');
+    const palette = {
+      error:   { bg: '#7F1D1D', border: '#EF4444' },
+      success: { bg: '#14532D', border: '#22C55E' },
+      info:    { bg: '#1E3A5F', border: '#3B82F6' },
+    };
+    const c = palette[type] || palette.info;
+    toast.style.cssText = `background:${c.bg}; border:1px solid ${c.border}; color:#fff; padding:14px 18px; border-radius:10px; font-family:'Inter',sans-serif; font-size:13px; font-weight:500; box-shadow:0 8px 24px rgba(0,0,0,0.35); max-width:340px; line-height:1.45;`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.style.transition = 'opacity 0.3s ease';
+      toast.style.opacity = '0';
+      setTimeout(() => toast.remove(), 300);
+    }, 4200);
+  }
+
+  // ===== Модал за потвърждение (замества confirm()) =====
+  function showConfirm(message, title) {
+    return new Promise((resolve) => {
+      document.getElementById('app-confirm-title').textContent = title || 'Потвърждение';
+      document.getElementById('app-confirm-message').textContent = message;
+      const overlay = document.getElementById('app-confirm-overlay');
+      overlay.style.display = 'flex';
+
+      const okBtn = document.getElementById('app-confirm-ok-btn');
+      const cancelBtn = document.getElementById('app-confirm-cancel-btn');
+
+      function cleanup(result) {
+        overlay.style.display = 'none';
+        okBtn.removeEventListener('click', onOk);
+        cancelBtn.removeEventListener('click', onCancel);
+        resolve(result);
+      }
+      function onOk() { cleanup(true); }
+      function onCancel() { cleanup(false); }
+
+      okBtn.addEventListener('click', onOk);
+      cancelBtn.addEventListener('click', onCancel);
+    });
+  }
+</script>
+
+<script>
+  // ===== Тъмна тема =====
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    const btn = document.getElementById('theme-toggle-btn');
+    if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+    localStorage.setItem('budgetnest-theme', theme);
+  }
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme') || 'light';
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  }
+  applyTheme(localStorage.getItem('budgetnest-theme') || 'light');
+
+  // ===== Supabase конфигурация =====
+  const SUPABASE_URL = 'https://fvorpmajvrsxrwtscmwk.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_KmFRXFvW-wCf5LJXMgHejQ__3CH2PB7';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const ADMIN_EMAILS = ['choko2009vr@gmail.com']; // <-- замени с истинския си имейл
+
+  let currentUser = null;
+  let currentHouseholdId = null;
+  let isOwner = false;
+  let members = [];
+  let pendingInvites = [];
+
+  // ===== Escaping на потребителски текст преди вмъкване в innerHTML =====
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function setStatus(elId, message, type) {
+    const el = document.getElementById(elId);
+    el.textContent = message;
+    el.className = 'status-msg' + (type ? ' ' + type : '');
+  }
+
+  // ===== Init flow =====
+  (async function init() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) { window.location.href = 'login.html'; return; }
+    currentUser = session.user;
+
+    if (ADMIN_EMAILS.map(e => e.toLowerCase()).includes((currentUser.email || '').toLowerCase())) {
+      document.getElementById('admin-nav-link').style.display = 'flex';
+    }
+
+    const { data: memberships, error } = await supabaseClient
+      .from('household_members')
+      .select('household_id, role, households(name)')
+      .eq('user_id', currentUser.id)
+      .limit(1);
+
+    if (error) { console.error(error); return; }
+
+    if (!memberships || memberships.length === 0) {
+      window.location.href = 'dashboard.html';
+      return;
+    }
+
+    currentHouseholdId = memberships[0].household_id;
+    isOwner = memberships[0].role === 'owner';
+
+    document.getElementById('household-name-pill').textContent = memberships[0].households.name;
+    document.getElementById('household-name-input').value = memberships[0].households.name;
+    document.getElementById('page-main').style.display = 'block';
+
+    if (!isOwner) {
+      document.getElementById('invite-section').style.display = 'none';
+    }
+
+    await loadMembers();
+    if (isOwner) await loadPendingInvites();
+  })();
+
+  // ===== Преименуване на домакинство =====
+  async function handleRenameHousehold() {
+    const name = document.getElementById('household-name-input').value.trim();
+    if (!name) {
+      setStatus('household-name-status', 'Името не може да е празно.', 'error');
+      return;
+    }
+
+    setStatus('household-name-status', 'Запазване…', '');
+
+    const { error } = await supabaseClient
+      .from('households')
+      .update({ name })
+      .eq('id', currentHouseholdId);
+
+    if (error) {
+      setStatus('household-name-status', 'Грешка: ' + error.message, 'error');
+      return;
+    }
+
+    document.getElementById('household-name-pill').textContent = name;
+    setStatus('household-name-status', 'Запазено ✓', 'success');
+    setTimeout(() => setStatus('household-name-status', '', ''), 2000);
+  }
+
+  // ===== Зареждане на членовете =====
+  async function loadMembers() {
+    const { data, error } = await supabaseClient
+      .from('household_members')
+      .select('id, user_id, role, profiles(email, full_name)')
+      .eq('household_id', currentHouseholdId)
+      .order('role');
+
+    if (error) {
+      console.error(error);
+      document.getElementById('members-list').innerHTML =
+        '<div class="empty-state" style="color:#DC2626;">Грешка при зареждане: ' + error.message + '</div>';
+      return;
+    }
+    members = data || [];
+    renderMembers();
+  }
+
+  function initials(name, email) {
+    const source = (name && name.trim()) ? name : (email || '?');
+    return source.trim().slice(0, 2).toUpperCase();
+  }
+
+  function renderMembers() {
+    const container = document.getElementById('members-list');
+    document.getElementById('members-count-label').textContent = members.length + (members.length === 1 ? ' член' : ' членове');
+
+    container.innerHTML = members.map(m => {
+      const name = m.profiles?.full_name || m.profiles?.email || 'Неизвестен потребител';
+      const email = m.profiles?.email || '';
+      const canRemove = isOwner && m.role !== 'owner' && m.user_id !== currentUser.id;
+
+      return `
+        <div class="member-row">
+          <div class="member-info">
+            <div class="member-avatar">${escapeHtml(initials(m.profiles?.full_name, m.profiles?.email))}</div>
+            <div>
+              <div class="member-name">${escapeHtml(name)}</div>
+              <div class="member-email">${escapeHtml(email)}</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center;">
+            <span class="member-role ${m.role === 'owner' ? 'owner' : ''}">${m.role === 'owner' ? 'Собственик' : 'Член'}</span>
+            ${canRemove ? `<button class="member-remove" onclick="handleRemoveMember('${m.id}')">Премахни</button>` : ''}
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // ===== Покана на потребител по имейл =====
+  // Винаги записваме покана в household_invites — независимо дали
+  // имейлът вече има акаунт. Присъединяването се случва само след като
+  // поканеният потребител го потвърди сам при следващо влизане в таблото.
+  async function handleInviteMember() {
+    const email = document.getElementById('invite-email-input').value.trim().toLowerCase();
+    if (!email) {
+      setStatus('invite-status', 'Въведете имейл.', 'error');
+      return;
+    }
+
+    if (email === currentUser.email.toLowerCase()) {
+      setStatus('invite-status', 'Не можете да поканите себе си.', 'error');
+      return;
+    }
+
+    if (members.some(m => (m.profiles?.email || '').toLowerCase() === email)) {
+      setStatus('invite-status', 'Този потребител вече е член на домакинството.', 'error');
+      return;
+    }
+
+    setStatus('invite-status', 'Изпращане на покана…', '');
+
+    const { error: inviteError } = await supabaseClient
+      .from('household_invites')
+      .upsert(
+        { household_id: currentHouseholdId, email, invited_by: currentUser.id },
+        { onConflict: 'household_id,email' }
+      );
+
+    if (inviteError) {
+      setStatus('invite-status', 'Грешка: ' + inviteError.message, 'error');
+      return;
+    }
+
+    document.getElementById('invite-email-input').value = '';
+    setStatus('invite-status', 'Поканата е изпратена ✓ Ще бъде потвърдена при следващия вход на потребителя.', 'success');
+    await loadPendingInvites();
+  }
+
+  // ===== Зареждане на чакащи покани (само за owner) =====
+  async function loadPendingInvites() {
+    const { data, error } = await supabaseClient
+      .from('household_invites')
+      .select('id, email, created_at')
+      .eq('household_id', currentHouseholdId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    pendingInvites = data || [];
+    renderPendingInvites();
+  }
+
+  function renderPendingInvites() {
+    const wrap = document.getElementById('pending-invites-wrap');
+    const container = document.getElementById('pending-invites-list');
+
+    if (!pendingInvites.length) {
+      wrap.style.display = 'none';
+      container.innerHTML = '';
+      return;
+    }
+
+    wrap.style.display = 'block';
+    container.innerHTML = pendingInvites.map(inv => `
+      <div class="pending-invite-row">
+        <div>
+          <span class="pending-invite-email">${escapeHtml(inv.email)}</span>
+          <span class="pending-invite-tag">Чака регистрация</span>
+        </div>
+        <button class="pending-invite-cancel" onclick="handleCancelInvite('${inv.id}')">Отмени</button>
+      </div>`).join('');
+  }
+
+  // ===== Отмяна на чакаща покана =====
+  async function handleCancelInvite(inviteId) {
+    const ok = await showConfirm('Сигурни ли сте, че искате да отмените тази покана?', 'Отмяна на покана');
+    if (!ok) return;
+
+    const { error } = await supabaseClient
+      .from('household_invites')
+      .delete()
+      .eq('id', inviteId);
+
+    if (error) {
+      showToast('Грешка: ' + error.message, 'error');
+      return;
+    }
+
+    showToast('Поканата е отменена', 'success');
+    await loadPendingInvites();
+  }
+
+  // ===== Премахване на член =====
+  async function handleRemoveMember(membershipId) {
+    const ok = await showConfirm('Сигурни ли сте, че искате да премахнете този член от домакинството?', 'Премахване на член');
+    if (!ok) return;
+
+    const { error } = await supabaseClient
+      .from('household_members')
+      .delete()
+      .eq('id', membershipId);
+
+    if (error) {
+      showToast('Грешка: ' + error.message, 'error');
+      return;
+    }
+
+    showToast('Членът е премахнат', 'success');
+    await loadMembers();
+  }
+
+  // ===== Изход =====
+  async function handleSignOut() {
+    await supabaseClient.auth.signOut();
+    window.location.href = 'login.html';
+  }
+</script>
+
+</body>
+</html>

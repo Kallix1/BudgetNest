@@ -1,0 +1,408 @@
+/* ============================================
+   БЮДЖЕТ ТРАКЕР — Светла корпоративна тема (BudgetNest)
+   ============================================ */
+
+:root {
+  --bg-void: #F4F6F8;
+  --bg-panel: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --border-soft: #E2E8F0;
+
+  /* Допълнителни повърхности (за инпути, hover фонове, ленти) */
+  --surface-alt: #F8FAFC;
+  --input-bg: #FFFFFF;
+  --input-border: #CBD5E1;
+  --track-bg: #EDF2F7;
+
+  /* Фирмени цветове от логото BudgetNest */
+  --nest-green-dark: #1A3326;   /* Дълбоко горско зелено */
+  --nest-green-mid: #254A37;    /* Основно зелено */
+  --nest-green-light: #366A4F;  /* Светло зелено */
+  --nest-gold: #D4AF37;         /* Златно от логото */
+  --nest-gold-accent: #C5A028;  /* Тъмно златно за бутони */
+
+  /* Текст */
+  --text-primary: #1A202C;
+  --text-secondary: #4A5568;
+  --text-dim: #718096;
+
+  /* Системни цветове */
+  --color-income: #254A37;
+  --color-expense: #E53E3E;
+
+  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+  --btn-shadow: 0 4px 10px rgba(197, 160, 40, 0.2);
+
+  /* Акцентен цвят за заглавия на карти — четим и в двете теми */
+  --heading-accent: #1A3326;
+}
+
+/* ===== Тъмна тема ===== */
+[data-theme="dark"] {
+  --bg-void: #0F1E17;
+  --bg-panel: #16261D;
+  --bg-card: #1C2E23;
+  --border-soft: rgba(255, 255, 255, 0.08);
+
+  --surface-alt: #223528;
+  --input-bg: #16261D;
+  --input-border: #34493C;
+  --track-bg: #223528;
+
+  --nest-green-dark: #0C1912;
+  --nest-green-mid: #3E7A5A;
+  --nest-green-light: #56916D;
+  --nest-gold: #E3C067;
+  --nest-gold-accent: #D4AF37;
+
+  --text-primary: #F1F5F1;
+  --text-secondary: #A9BDAF;
+  --text-dim: #6E8577;
+
+  --color-income: #6FCF97;
+  --color-expense: #FF8A8A;
+
+  --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --btn-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+
+  --heading-accent: #8FCDA8;
+}
+
+body { transition: background-color 0.25s ease, color 0.25s ease; }
+.page, .card, .summary-card, .overlay-card, .form-side, .brand-side, .navbar,
+.field input, .field select, button.submit {
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Контраст на brand текста в тъмна тема — светлите цветове от gradienta
+   на светлата тема (тъмнозелено -> злато) стават почти невидими на тъмен фон */
+[data-theme="dark"] .brand-mark {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .brand-headline {
+  background: linear-gradient(120deg, var(--text-primary) 0%, var(--nest-green-light) 55%, var(--nest-gold) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* ===== Бутон за тъмна тема ===== */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: 1px solid var(--border-soft);
+  background: var(--bg-panel);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 17px;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+  flex-shrink: 0;
+}
+
+.theme-toggle:hover {
+  color: var(--nest-gold-accent);
+  border-color: var(--nest-gold-accent);
+  transform: translateY(-1px);
+}
+
+.theme-toggle:active {
+  transform: scale(0.9);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { height: 100%; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg-void);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Изчистен фон без неонови петна */
+.bg-glow {
+  display: none;
+}
+
+/* Деликатна сива мрежа за фин акцент */
+.bg-grid {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.015) 1px, transparent 1px);
+  background-size: 44px 44px;
+  pointer-events: none;
+}
+
+/* ===== Страница Вход / Регистрация ===== */
+.page {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 960px;
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-soft);
+  border-radius: 20px;
+  overflow: hidden;
+  min-height: 580px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+  animation: fadeUp 0.6s ease both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Ляво брандирано каре */
+.brand-side {
+  padding: 56px 46px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  background:
+    radial-gradient(circle at 20% 15%, rgba(37,74,55,0.04), transparent 55%),
+    radial-gradient(circle at 85% 85%, rgba(212,175,55,0.06), transparent 55%),
+    var(--bg-panel);
+  border-right: 1px solid var(--border-soft);
+}
+
+.brand-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: none;
+  color: var(--nest-green-dark);
+}
+
+.brand-mark::before {
+  content: "🌱";
+  font-size: 16px;
+}
+
+.brand-headline {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-top: 30px;
+  background: linear-gradient(120deg, var(--nest-green-dark) 0%, var(--nest-green-mid) 60%, var(--nest-gold-accent) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.brand-sub {
+  margin-top: 18px;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  max-width: 32ch;
+}
+
+.brand-stat {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: var(--text-secondary);
+  border-top: 1px solid var(--border-soft);
+  padding-top: 20px;
+  line-height: 1.7;
+}
+
+.brand-stat b {
+  color: var(--nest-green-mid);
+  font-weight: 600;
+}
+
+/* Дясно каре с формите */
+.form-side {
+  padding: 56px 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: var(--bg-panel);
+}
+
+.tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 34px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  padding: 5px;
+}
+
+.tab {
+  flex: 1;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px 0;
+  border-radius: 8px;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.tab.active {
+  color: #FFFFFF;
+  background: var(--nest-green-mid);
+}
+
+.form-side form {
+  display: none;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-side form.active {
+  display: flex;
+  animation: fadeUp 0.35s ease both;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.field input {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  color: var(--text-primary);
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 10px;
+  padding: 13px 14px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.field input:focus {
+  border-color: var(--nest-green-mid);
+  box-shadow: 0 0 0 3px rgba(37, 74, 55, 0.1);
+}
+
+.field input::placeholder {
+  color: #94A3B8;
+}
+
+.row-inline {
+  display: flex;
+  justify-content: flex-end;
+  font-size: 13px;
+}
+
+.row-inline a {
+  color: var(--nest-green-mid);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.row-inline a:hover {
+  color: var(--heading-accent);
+  text-decoration: underline;
+}
+
+button.submit {
+  margin-top: 6px;
+  position: relative;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--nest-green-dark);
+  background: linear-gradient(120deg, #EAD493, var(--nest-gold));
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+  padding: 15px 20px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+  box-shadow: var(--btn-shadow);
+}
+
+button.submit:hover {
+  transform: translateY(-1px);
+  background: linear-gradient(120deg, #EAD493, var(--nest-gold-accent));
+  box-shadow: 0 6px 14px rgba(197, 160, 40, 0.35);
+}
+
+button.submit:active {
+  transform: translateY(0);
+}
+
+button.submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.status-msg {
+  font-size: 13px;
+  min-height: 18px;
+  line-height: 1.5;
+}
+
+.status-msg.error   { color: #DC2626; font-weight: 500; }
+.status-msg.success { color: var(--nest-green-mid); font-weight: 500; }
+
+.fine-print {
+  margin-top: 26px;
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+@media (max-width: 720px) {
+  .page { grid-template-columns: 1fr; }
+  .brand-side {
+    padding: 40px 32px;
+    border-right: none;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .brand-headline { font-size: 30px; }
+  .form-side { padding: 40px 32px; }
+}
+
+@media (max-width: 420px) {
+  body { padding: 0; align-items: flex-start; }
+  .page { border-radius: 0; min-height: 100vh; }
+  .brand-side { padding: 32px 22px; }
+  .form-side { padding: 32px 22px; }
+  .brand-headline { font-size: 26px; }
+  .brand-stat { font-size: 12px; }
+  .theme-toggle { top: 16px !important; right: 16px !important; }
+}

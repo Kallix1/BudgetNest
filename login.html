@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Влизане — Бюджет</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+<div class="bg-grid"></div>
+
+<button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Смяна на тема" style="position: fixed; top: 24px; right: 24px; z-index: 5;">🌙</button>
+
+<div class="page">
+  <div class="brand-side">
+    <div>
+      <div class="brand-mark">Бюджет · Домакинство</div>
+      <div class="brand-headline">Всяко евро,<br>под контрол.</div>
+      <p class="brand-sub">Споделен бюджет за домакинството ви — без абонамент, без ограничения за брой членове.</p>
+    </div>
+    <div class="brand-stat">
+      Средно домакинство в България харчи <b>~434.60 €</b> месечно за храна — виж как се сравняваш след вход.
+    </div>
+  </div>
+
+  <div class="form-side">
+    <div class="tabs">
+      <button class="tab active" id="tab-login" onclick="switchTab('login')">Вход</button>
+      <button class="tab" id="tab-signup" onclick="switchTab('signup')">Регистрация</button>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <form id="form-login" class="active" onsubmit="handleLogin(event)">
+      <div class="field">
+        <label for="login-email">Имейл</label>
+        <input type="email" id="login-email" placeholder="ime@poshta.bg" required>
+      </div>
+      <div class="field">
+        <label for="login-password">Парола</label>
+        <input type="password" id="login-password" placeholder="••••••••" required>
+      </div>
+      <div class="row-inline">
+        <a href="#" onclick="handleForgotPassword(event)">Забравена парола?</a>
+      </div>
+      <div class="status-msg" id="login-status"></div>
+      <button type="submit" class="submit" id="login-submit">Влез в акаунта</button>
+    </form>
+
+    <!-- SIGNUP FORM -->
+    <form id="form-signup" onsubmit="handleSignup(event)">
+      <div class="field">
+        <label for="signup-name">Име</label>
+        <input type="text" id="signup-name" placeholder="Име и фамилия" required>
+      </div>
+      <div class="field">
+        <label for="signup-email">Имейл</label>
+        <input type="email" id="signup-email" placeholder="ime@poshta.bg" required>
+      </div>
+      <div class="field">
+        <label for="signup-password">Парола</label>
+        <input type="password" id="signup-password" placeholder="Поне 6 символа" minlength="6" required>
+      </div>
+      <div class="status-msg" id="signup-status"></div>
+      <button type="submit" class="submit" id="signup-submit">Създай акаунт</button>
+    </form>
+
+    <p class="fine-print">Регистрирайки се, приемате данните ви да се пазят само за да управлявате бюджета на домакинството си. Всички суми се показват в евро (EUR).</p>
+  </div>
+</div>
+
+<script>
+  // ===== Тъмна тема =====
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    const btn = document.getElementById('theme-toggle-btn');
+    if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+    localStorage.setItem('budgetnest-theme', theme);
+  }
+
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme') || 'light';
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  }
+
+  applyTheme(localStorage.getItem('budgetnest-theme') || 'light');
+
+  // ===== Supabase конфигурация =====
+  const SUPABASE_URL = 'https://fvorpmajvrsxrwtscmwk.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_KmFRXFvW-wCf5LJXMgHejQ__3CH2PB7';
+
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // ===== Табове =====
+  function switchTab(tab) {
+    document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+    document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+    document.getElementById('form-login').classList.toggle('active', tab === 'login');
+    document.getElementById('form-signup').classList.toggle('active', tab === 'signup');
+  }
+
+  function setStatus(elId, message, type) {
+    const el = document.getElementById(elId);
+    el.textContent = message;
+    el.className = 'status-msg' + (type ? ' ' + type : '');
+  }
+
+  // ===== Вход =====
+  async function handleLogin(event) {
+    event.preventDefault();
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    const btn = document.getElementById('login-submit');
+
+    btn.disabled = true;
+    setStatus('login-status', 'Влизане…', '');
+
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+    btn.disabled = false;
+
+    if (error) {
+      setStatus('login-status', 'Грешен имейл или парола.', 'error');
+      return;
+    }
+
+    setStatus('login-status', 'Успешен вход. Пренасочване…', 'success');
+    window.location.href = 'dashboard.html';
+  }
+
+  // ===== Регистрация =====
+  async function handleSignup(event) {
+    event.preventDefault();
+    const name = document.getElementById('signup-name').value.trim();
+    const email = document.getElementById('signup-email').value.trim();
+    const password = document.getElementById('signup-password').value;
+    const btn = document.getElementById('signup-submit');
+
+    btn.disabled = true;
+    setStatus('signup-status', 'Създаване на акаунт…', '');
+
+    const { data, error } = await supabaseClient.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: name }
+      }
+    });
+
+    btn.disabled = false;
+
+    if (error) {
+      setStatus('signup-status', 'Грешка: ' + error.message, 'error');
+      return;
+    }
+
+    setStatus('signup-status', 'Регистрацията е успешна! Проверете имейла си за потвърждение.', 'success');
+  }
+
+  // ===== Забравена парола =====
+  async function handleForgotPassword(event) {
+    event.preventDefault();
+    const email = document.getElementById('login-email').value.trim();
+
+    if (!email) {
+      setStatus('login-status', 'Въведете имейл, за да изпратим линк за възстановяване.', 'error');
+      return;
+    }
+
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
+
+    if (error) {
+      setStatus('login-status', 'Грешка: ' + error.message, 'error');
+      return;
+    }
+
+    setStatus('login-status', 'Изпратихме линк за възстановяване на паролата.', 'success');
+  }
+
+  // ===== Ако вече е логнат, пренасочи директно =====
+  (async () => {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (session) {
+      window.location.href = 'dashboard.html';
+    }
+  })();
+</script>
+
+</body>
+</html>

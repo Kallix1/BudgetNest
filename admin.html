@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Админ панел — BudgetNest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/dashboard.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+  body.dashboard-body {
+    display: flex !important;
+    align-items: stretch !important;
+    min-height: 100vh !important;
+    margin: 0;
+    background: var(--bg-void);
+  }
+</style>
+</head>
+<body class="dashboard-body">
+
+<div class="bg-glow"></div>
+<div class="bg-grid"></div>
+
+<nav class="navbar">
+  <div class="nav-left">
+    <div class="brand-mark">BudgetNest</div>
+    <div class="nav-links">
+      <a href="dashboard.html" class="nav-link">Табло</a>
+      <a href="transactions.html" class="nav-link">Транзакции</a>
+      <a href="budgets.html" class="nav-link">Бюджети</a>
+      <a href="settings.html" class="nav-link">Настройки</a>
+      <a href="admin.html" class="nav-link active">Админ</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Смяна на тема">🌙</button>
+    <button class="btn-ghost" onclick="handleSignOut()">Изход</button>
+  </div>
+</nav>
+
+<main class="dashboard-main" id="page-main" style="display:none;">
+
+  <div class="page-header">
+    <h1>Админ панел</h1>
+    <span class="hint" style="color: var(--text-secondary); font-size: 13px;">Общ преглед на всички потребители и домакинства</span>
+  </div>
+
+  <div class="summary-row" id="stats-row">
+    <div class="summary-card">
+      <div class="summary-label">Потребители</div>
+      <div class="summary-value" id="stat-users">—</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Домакинства</div>
+      <div class="summary-value" id="stat-households">—</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Транзакции общо</div>
+      <div class="summary-value" id="stat-transactions">—</div>
+    </div>
+  </div>
+
+  <div class="summary-row">
+    <div class="summary-card">
+      <div class="summary-label">Нови потребители (7 дни)</div>
+      <div class="summary-value" id="stat-new-users">—</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Транзакции (30 дни)</div>
+      <div class="summary-value" id="stat-tx-30d">—</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Приходи / Разходи общо</div>
+      <div class="summary-value" style="font-size: 20px;" id="stat-income-expense">—</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      Потребители
+      <span class="hint" id="users-count-hint"></span>
+    </div>
+    <div class="admin-table-wrap">
+      <table class="admin-table" id="users-table">
+        <thead>
+          <tr>
+            <th>Имейл</th>
+            <th>Име</th>
+            <th>Регистриран на</th>
+            <th>Домакинства</th>
+            <th>Транзакции</th>
+          </tr>
+        </thead>
+        <tbody id="users-tbody">
+          <tr><td colspan="5" style="color: var(--text-dim);">Зареждане…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      Домакинства
+      <span class="hint" id="households-count-hint"></span>
+    </div>
+    <div class="admin-table-wrap">
+      <table class="admin-table" id="households-table">
+        <thead>
+          <tr>
+            <th>Име</th>
+            <th>Създадено на</th>
+            <th>Членове</th>
+            <th>Транзакции</th>
+            <th>Приходи</th>
+            <th>Разходи</th>
+          </tr>
+        </thead>
+        <tbody id="households-tbody">
+          <tr><td colspan="6" style="color: var(--text-dim);">Зареждане…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<div class="card" id="no-access-card" style="display:none; max-width: 480px; margin: 80px auto; text-align:center;">
+  <div style="font-size: 40px; margin-bottom: 12px;">🔒</div>
+  <div class="card-title" style="justify-content:center;">Нямате достъп до тази страница</div>
+  <p style="color: var(--text-secondary); font-size: 14px;">Тази страница е достъпна само за администратори.</p>
+  <div style="margin-top: 18px;"><a href="dashboard.html" style="color: var(--nest-gold-accent); font-weight:600;">← Обратно към таблото</a></div>
+</div>
+
+<script>
+  // ===== Тъмна тема =====
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    const btn = document.getElementById('theme-toggle-btn');
+    if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+    localStorage.setItem('budgetnest-theme', theme);
+  }
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme') || 'light';
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  }
+  applyTheme(localStorage.getItem('budgetnest-theme') || 'light');
+
+  // ===== Supabase конфигурация =====
+  const SUPABASE_URL = 'https://fvorpmajvrsxrwtscmwk.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_KmFRXFvW-wCf5LJXMgHejQ__3CH2PB7';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // ⚠️ Тук е само за показване/скриване на линка "Админ" в менюто на
+  // другите страници. Реалната защита на данните е чрез is_admin() в SQL —
+  // дори човек, който редактира този списък в браузъра, не може да
+  // прочете чужди данни, ако имейлът му не е в is_admin() в базата.
+  const ADMIN_EMAILS = ['choko2009vr@gmail.com']; // <-- замени с истинския си имейл
+
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  const eur = (n) => (Number(n) || 0).toLocaleString('bg-BG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+  const fmtDate = (iso) => new Date(iso).toLocaleDateString('bg-BG', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+  (async function init() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) { window.location.href = 'login.html'; return; }
+
+    const email = (session.user.email || '').toLowerCase();
+    if (!ADMIN_EMAILS.map(e => e.toLowerCase()).includes(email)) {
+      document.getElementById('no-access-card').style.display = 'block';
+      return;
+    }
+
+    document.getElementById('page-main').style.display = 'block';
+    await loadStats();
+    await loadUsers();
+    await loadHouseholds();
+  })();
+
+  async function loadStats() {
+    const { data, error } = await supabaseClient.rpc('admin_get_stats');
+    if (error) {
+      console.error(error);
+      document.getElementById('no-access-card').style.display = 'block';
+      document.getElementById('page-main').style.display = 'none';
+      return;
+    }
+    document.getElementById('stat-users').textContent = data.total_users;
+    document.getElementById('stat-households').textContent = data.total_households;
+    document.getElementById('stat-transactions').textContent = data.total_transactions;
+    document.getElementById('stat-new-users').textContent = data.new_users_7d;
+    document.getElementById('stat-tx-30d').textContent = data.transactions_30d;
+    document.getElementById('stat-income-expense').textContent =
+      eur(data.total_income) + ' / ' + eur(data.total_expense);
+  }
+
+  async function loadUsers() {
+    const { data, error } = await supabaseClient.rpc('admin_list_users');
+    if (error) { console.error(error); return; }
+
+    document.getElementById('users-count-hint').textContent = (data || []).length + ' общо';
+
+    const tbody = document.getElementById('users-tbody');
+    if (!data || !data.length) {
+      tbody.innerHTML = '<tr><td colspan="5" style="color: var(--text-dim);">Няма данни.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = data.map(u => `
+      <tr>
+        <td>${escapeHtml(u.email)}</td>
+        <td>${escapeHtml(u.full_name) || '—'}</td>
+        <td>${fmtDate(u.created_at)}</td>
+        <td>${u.household_count}</td>
+        <td>${u.transaction_count}</td>
+      </tr>`).join('');
+  }
+
+  async function loadHouseholds() {
+    const { data, error } = await supabaseClient.rpc('admin_list_households');
+    if (error) { console.error(error); return; }
+
+    document.getElementById('households-count-hint').textContent = (data || []).length + ' общо';
+
+    const tbody = document.getElementById('households-tbody');
+    if (!data || !data.length) {
+      tbody.innerHTML = '<tr><td colspan="6" style="color: var(--text-dim);">Няма данни.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = data.map(h => `
+      <tr>
+        <td>${escapeHtml(h.name)}</td>
+        <td>${fmtDate(h.created_at)}</td>
+        <td>${h.member_count}</td>
+        <td>${h.transaction_count}</td>
+        <td>${eur(h.total_income)}</td>
+        <td>${eur(h.total_expense)}</td>
+      </tr>`).join('');
+  }
+
+  async function handleSignOut() {
+    await supabaseClient.auth.signOut();
+    window.location.href = 'login.html';
+  }
+</script>
+
+</body>
+</html>

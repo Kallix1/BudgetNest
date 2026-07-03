@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Незабавно автоматично пренасочване към login.html -->
+    <meta http-equiv="refresh" content="0; url=login.html">
+    <title>Пренасочване към BudgetNest...</title>
+    
+    <!-- Вграждане на шрифтовете от твоя бранд -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Интеграция на фирмените цветове от BudgetNest */
+        :root {
+            --bg-void: #F4F6F8;
+            --bg-panel: #FFFFFF;
+            --border-soft: #E2E8F0;
+            --nest-green-dark: #1A3326;
+            --nest-green-mid: #254A37;
+            --nest-gold-accent: #C5A028;
+            --text-secondary: #4A5568;
+        }
+
+        /* Автоматична поддръжка на Dark Mode, ако системата на потребителя е тъмна */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-void: #0F1E17;
+                --bg-panel: #16261D;
+                --border-soft: rgba(255, 255, 255, 0.08);
+                --nest-green-dark: #0C1912;
+                --nest-green-mid: #3E7A5A;
+                --nest-gold-accent: #D4AF37;
+                --text-secondary: #A9BDAF;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-void);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        /* Деликатна сива мрежа като в основния дизайн */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background-image:
+                linear-gradient(rgba(0, 0, 0, 0.01) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 0, 0, 0.01) 1px, transparent 1px);
+            background-size: 44px 44px;
+            pointer-events: none;
+        }
+
+        .redirect-card {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 440px;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-soft);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.04);
+            animation: fadeUp 0.5s ease both;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .brand-mark {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: var(--nest-green-mid);
+            margin-bottom: 20px;
+        }
+
+        .brand-mark::before {
+            content: "🌱";
+            font-size: 16px;
+        }
+
+        /* Лек, елегантен индикатор за зареждане */
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 2.5px solid var(--border-soft);
+            border-top-color: var(--nest-gold-accent);
+            border-radius: 50%;
+            margin: 0 auto 24px auto;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 22px;
+            color: var(--nest-green-dark);
+            margin-bottom: 12px;
+        }
+
+        p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        a {
+            color: var(--nest-gold-accent);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-grid"></div>
+
+    <div class="redirect-card">
+        <div class="brand-mark">BudgetNest</div>
+        <div class="spinner"></div>
+        <h1>Пренасочване...</h1>
+        <p>Зареждаме страницата за вход. Ако не бъдете пренасочени автоматично, <a href="login.html">натиснете тук</a>.</p>
+    </div>
+
+</body>
+</html>
