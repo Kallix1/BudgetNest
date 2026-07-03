@@ -143,11 +143,13 @@
     btn.disabled = true;
     setStatus('signup-status', 'Създаване на акаунт…', '');
 
+    const redirectUrl = new URL('email-confirmed.html', window.location.href).href;
     const { data, error } = await supabaseClient.auth.signUp({
       email,
       password,
       options: {
-        data: { full_name: name }
+        data: { full_name: name },
+        emailRedirectTo: redirectUrl
       }
     });
 
@@ -171,7 +173,8 @@
       return;
     }
 
-    const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
+    const redirectUrl = new URL('reset-password.html', window.location.href).href;
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo: redirectUrl });
 
     if (error) {
       setStatus('login-status', 'Грешка: ' + error.message, 'error');
@@ -179,6 +182,12 @@
     }
 
     setStatus('login-status', 'Изпратихме линк за възстановяване на паролата.', 'success');
+  }
+
+  // ===== Защитна мрежа: ако Supabase поради грешна конфигурация върне
+  // recovery токъна тук вместо на reset-password.html, прехвърляме го ръчно =====
+  if (window.location.hash.includes('type=recovery')) {
+    window.location.href = 'reset-password.html' + window.location.hash;
   }
 
   // ===== Ако вече е логнат, пренасочи директно =====

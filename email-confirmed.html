@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Имейлът е потвърден — BudgetNest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+<div class="bg-grid"></div>
+
+<button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Смяна на тема" style="position: fixed; top: 24px; right: 24px; z-index: 5;">🌙</button>
+
+<div class="page" style="grid-template-columns: 1fr; max-width: 460px;">
+  <div class="form-side" style="padding: 56px 48px; text-align: center; align-items: center;">
+    <div class="brand-mark" style="margin-bottom: 28px; justify-content: center;">BudgetNest</div>
+
+    <div id="confirm-loading">
+      <p style="color: var(--text-secondary); font-size: 14px;">Потвърждаване…</p>
+    </div>
+
+    <div id="confirm-success" style="display:none;">
+      <div style="font-size: 44px; margin-bottom: 14px;">🌱</div>
+      <h2 style="font-family:'Fraunces',serif; font-size: 24px; color: var(--heading-accent); margin-bottom: 12px;">Имейлът е потвърден!</h2>
+      <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.6; margin-bottom: 26px;">
+        Акаунтът ви в BudgetNest вече е активен. Можете да влезете и да започнете да управлявате бюджета на домакинството си.
+      </p>
+      <a href="dashboard.html" class="submit" style="display:block; text-align:center; text-decoration:none;">Към таблото</a>
+    </div>
+
+    <div id="confirm-fallback" style="display:none;">
+      <h2 style="font-family:'Fraunces',serif; font-size: 22px; color: var(--heading-accent); margin-bottom: 12px;">Готово</h2>
+      <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.6; margin-bottom: 26px;">
+        Ако имейлът ви вече е потвърден, влезте с имейл и парола отдолу.
+      </p>
+      <a href="login.html" class="submit" style="display:block; text-align:center; text-decoration:none;">Обратно към входа</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ===== Тъмна тема =====
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    const btn = document.getElementById('theme-toggle-btn');
+    if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+    localStorage.setItem('budgetnest-theme', theme);
+  }
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme') || 'light';
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  }
+  applyTheme(localStorage.getItem('budgetnest-theme') || 'light');
+
+  // ===== Supabase конфигурация =====
+  const SUPABASE_URL = 'https://fvorpmajvrsxrwtscmwk.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_KmFRXFvW-wCf5LJXMgHejQ__3CH2PB7';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  function showState(state) {
+    document.getElementById('confirm-loading').style.display = state === 'loading' ? 'block' : 'none';
+    document.getElementById('confirm-success').style.display = state === 'success' ? 'block' : 'none';
+    document.getElementById('confirm-fallback').style.display = state === 'fallback' ? 'block' : 'none';
+  }
+
+  // Supabase-js автоматично парсва потвърждаващия токън от URL хеша при зареждане
+  // и издава сесия, ако потвърждението е минало успешно.
+  (async function init() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    setTimeout(() => {
+      showState(session ? 'success' : 'fallback');
+    }, 900);
+  })();
+</script>
+
+</body>
+</html>
