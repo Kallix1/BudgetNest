@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/dashboard.css">
+<script src="nav.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -27,8 +28,13 @@
 
 <nav class="navbar">
   <div class="nav-left">
-    <div class="brand-mark">BudgetNest</div>
-    <div class="nav-links">
+    <div class="nav-left-header">
+      <div class="brand-mark">BudgetNest</div>
+      <button class="nav-toggle" type="button" aria-label="Меню" aria-expanded="false" aria-controls="nav-links" onclick="toggleNav(this)">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="nav-links" id="nav-links">
       <a href="dashboard.html" class="nav-link">Табло</a>
       <a href="transactions.html" class="nav-link active">Транзакции</a>
       <a href="budgets.html" class="nav-link">Бюджети</a>
