@@ -331,11 +331,18 @@
       .replace(/'/g, '&#39;');
   }
 
-  function setTxType(type) {
-    currentTxType = type;
-    document.querySelectorAll('.type-btn').forEach(b => b.classList.toggle('active', b.dataset.type === type));
-    populateCategorySelect();
+function setTxType(type) {
+  currentTxType = type;
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.toggle('active', b.dataset.type === type));
+  
+  // Смяна на placeholder-а според типа транзакция
+  const descInput = document.getElementById('tx-description');
+  if (descInput) {
+    descInput.placeholder = type === 'expense' ? 'напр. Пазар от Kaufland' : 'напр. Бонус или Заплата';
   }
+  
+  populateCategorySelect();
+}
 
   function populateCategorySelect() {
     const select = document.getElementById('tx-category');
