@@ -63,7 +63,16 @@
       </div>
       <div class="field">
         <label for="signup-password">Парола</label>
-        <input type="password" id="signup-password" placeholder="Поне 6 символа" minlength="6" required>
+        <input type="password" id="signup-password" placeholder="Поне 6 символа" minlength="6" required oninput="updatePasswordStrength(this.value)">
+        <div id="pw-strength-wrap" style="display:none; margin-top:8px;">
+          <div style="display:flex; gap:5px;">
+            <div class="pw-bar" style="flex:1; height:5px; border-radius:3px; background:var(--border-soft); transition:background 0.2s;"></div>
+            <div class="pw-bar" style="flex:1; height:5px; border-radius:3px; background:var(--border-soft); transition:background 0.2s;"></div>
+            <div class="pw-bar" style="flex:1; height:5px; border-radius:3px; background:var(--border-soft); transition:background 0.2s;"></div>
+            <div class="pw-bar" style="flex:1; height:5px; border-radius:3px; background:var(--border-soft); transition:background 0.2s;"></div>
+          </div>
+          <div id="pw-strength-label" style="font-size:12px; margin-top:5px; color:var(--text-dim);"></div>
+        </div>
       </div>
       <div class="status-msg" id="signup-status"></div>
       <button type="submit" class="submit" id="signup-submit">Създай акаунт</button>
@@ -130,6 +139,34 @@
 
     setStatus('login-status', 'Успешен вход. Пренасочване…', 'success');
     window.location.href = 'dashboard.html';
+  }
+
+  // ===== Сила на паролата =====
+  function updatePasswordStrength(pw) {
+    const wrap = document.getElementById('pw-strength-wrap');
+    const bars = document.querySelectorAll('.pw-bar');
+    const label = document.getElementById('pw-strength-label');
+    if (!pw) { wrap.style.display = 'none'; return; }
+    wrap.style.display = 'block';
+
+    let score = 0;
+    if (pw.length >= 6) score++;
+    if (pw.length >= 10) score++;
+    if (/[A-ZА-Я]/.test(pw) && /[a-zа-я]/.test(pw)) score++;
+    if (/\d/.test(pw) && /[^A-Za-zА-Яа-я0-9]/.test(pw)) score++;
+    score = Math.min(score, 4);
+
+    const levels = [
+      { c: '#E53E3E', t: 'Слаба' },
+      { c: '#E53E3E', t: 'Слаба' },
+      { c: '#DD8500', t: 'Средна' },
+      { c: '#3E9C6A', t: 'Добра' },
+      { c: '#2F855A', t: 'Силна' },
+    ];
+    const lvl = levels[score];
+    bars.forEach((b, i) => { b.style.background = i < score ? lvl.c : 'var(--border-soft)'; });
+    label.textContent = pw.length < 6 ? 'Паролата трябва да е поне 6 символа' : ('Сила: ' + lvl.t);
+    label.style.color = pw.length < 6 ? '#E53E3E' : lvl.c;
   }
 
   // ===== Регистрация =====

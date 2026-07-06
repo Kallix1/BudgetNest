@@ -1,155 +1,335 @@
 <!DOCTYPE html>
 <html lang="bg">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Незабавно автоматично пренасочване към login.html -->
-    <meta http-equiv="refresh" content="0; url=login.html">
-    <title>Пренасочване към BudgetNest...</title>
-    
-    <!-- Вграждане на шрифтовете от твоя бранд -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BudgetNest — семейният бюджет на едно място</title>
+<meta name="description" content="BudgetNest е споделен семеен бюджет: следете приходи и разходи в евро, задавайте месечни лимити по категория и вижте къде отиват парите ви — заедно, в реално време.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-void: #F4F6F8;
+    --bg-panel: #FFFFFF;
+    --border-soft: #E2E8F0;
+    --nest-green-dark: #1A3326;
+    --nest-green-mid: #254A37;
+    --nest-green-light: #366A4F;
+    --nest-gold: #D4AF37;
+    --nest-gold-accent: #C5A028;
+    --text-primary: #1A202C;
+    --text-secondary: #4A5568;
+    --text-dim: #718096;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-void: #0F1E17;
+      --bg-panel: #16261D;
+      --border-soft: rgba(255,255,255,0.08);
+      --nest-green-dark: #0C1912;
+      --nest-green-mid: #3E7A5A;
+      --nest-green-light: #56916D;
+      --nest-gold: #E3C067;
+      --nest-gold-accent: #D4AF37;
+      --text-primary: #F1F5F1;
+      --text-secondary: #A9BDAF;
+      --text-dim: #6E8577;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-void);
+    color: var(--text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  a { text-decoration: none; color: inherit; }
 
-    <style>
-        /* Интеграция на фирмените цветове от BudgetNest */
-        :root {
-            --bg-void: #F4F6F8;
-            --bg-panel: #FFFFFF;
-            --border-soft: #E2E8F0;
-            --nest-green-dark: #1A3326;
-            --nest-green-mid: #254A37;
-            --nest-gold-accent: #C5A028;
-            --text-secondary: #4A5568;
-        }
+  /* ===== Header ===== */
+  header {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 24px;
+    background: color-mix(in srgb, var(--bg-void) 85%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 20px; }
+  .logo-mark {
+    width: 30px; height: 30px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--nest-green-mid), var(--nest-green-light));
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .header-actions { display: flex; align-items: center; gap: 10px; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px;
+    padding: 10px 20px; border-radius: 10px; cursor: pointer;
+    border: 1px solid transparent; transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+  }
+  .btn-ghost { background: transparent; color: var(--text-primary); border-color: var(--border-soft); }
+  .btn-ghost:hover { background: var(--bg-panel); }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--nest-gold), var(--nest-gold-accent));
+    color: #1A1200;
+    box-shadow: 0 4px 14px rgba(197,160,40,0.28);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(197,160,40,0.38); }
 
-        /* Автоматична поддръжка на Dark Mode, ако системата на потребителя е тъмна */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-void: #0F1E17;
-                --bg-panel: #16261D;
-                --border-soft: rgba(255, 255, 255, 0.08);
-                --nest-green-dark: #0C1912;
-                --nest-green-mid: #3E7A5A;
-                --nest-gold-accent: #D4AF37;
-                --text-secondary: #A9BDAF;
-            }
-        }
+  /* ===== Hero ===== */
+  .hero {
+    max-width: 1100px; margin: 0 auto; padding: 80px 24px 60px;
+    text-align: center; position: relative;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 600; color: var(--nest-green-light);
+    background: color-mix(in srgb, var(--nest-green-light) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--nest-green-light) 30%, transparent);
+    padding: 6px 14px; border-radius: 999px; margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-family: 'Fraunces', serif; font-weight: 600;
+    font-size: clamp(34px, 6vw, 60px); line-height: 1.1;
+    letter-spacing: -0.02em; margin-bottom: 20px;
+  }
+  .hero h1 .accent {
+    background: linear-gradient(120deg, var(--nest-green-light), var(--nest-gold));
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero p {
+    font-size: clamp(16px, 2.2vw, 19px); color: var(--text-secondary);
+    max-width: 620px; margin: 0 auto 34px;
+  }
+  .hero-cta { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .btn-lg { padding: 14px 30px; font-size: 16px; border-radius: 12px; }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+  /* ===== Mock preview ===== */
+  .preview {
+    max-width: 900px; margin: 60px auto 0; padding: 0 24px;
+  }
+  .preview-window {
+    background: var(--bg-panel); border: 1px solid var(--border-soft);
+    border-radius: 18px; overflow: hidden;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.12);
+  }
+  .preview-bar {
+    display: flex; align-items: center; gap: 7px;
+    padding: 12px 16px; border-bottom: 1px solid var(--border-soft);
+  }
+  .preview-dot { width: 11px; height: 11px; border-radius: 50%; }
+  .preview-body { padding: 26px; display: grid; gap: 16px; }
+  .stat-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .stat-card {
+    background: var(--bg-void); border: 1px solid var(--border-soft);
+    border-radius: 12px; padding: 16px;
+  }
+  .stat-card .lbl { font-size: 12px; color: var(--text-dim); margin-bottom: 6px; }
+  .stat-card .val { font-size: 22px; font-weight: 700; font-family: 'Fraunces', serif; }
+  .bar-row { display: flex; align-items: center; gap: 12px; }
+  .bar-name { font-size: 13px; color: var(--text-secondary); width: 90px; flex-shrink: 0; }
+  .bar-track { flex: 1; height: 9px; background: var(--border-soft); border-radius: 999px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--nest-green-mid), var(--nest-green-light)); }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-void);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-        }
+  /* ===== Features ===== */
+  section { padding: 70px 24px; }
+  .section-inner { max-width: 1100px; margin: 0 auto; }
+  .section-title {
+    text-align: center; font-family: 'Fraunces', serif; font-weight: 600;
+    font-size: clamp(26px, 4vw, 38px); margin-bottom: 12px; letter-spacing: -0.01em;
+  }
+  .section-sub { text-align: center; color: var(--text-secondary); max-width: 560px; margin: 0 auto 46px; }
+  .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+  .feature {
+    background: var(--bg-panel); border: 1px solid var(--border-soft);
+    border-radius: 16px; padding: 28px; transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .feature:hover { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(0,0,0,0.08); }
+  .feature-icon {
+    width: 46px; height: 46px; border-radius: 12px; font-size: 22px;
+    display: flex; align-items: center; justify-content: center; margin-bottom: 16px;
+    background: color-mix(in srgb, var(--nest-green-light) 14%, transparent);
+  }
+  .feature h3 { font-size: 18px; margin-bottom: 8px; }
+  .feature p { font-size: 14.5px; color: var(--text-secondary); }
 
-        /* Деликатна сива мрежа като в основния дизайн */
-        .bg-grid {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            background-image:
-                linear-gradient(rgba(0, 0, 0, 0.01) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 0, 0, 0.01) 1px, transparent 1px);
-            background-size: 44px 44px;
-            pointer-events: none;
-        }
+  /* ===== Steps ===== */
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; }
+  .step { text-align: center; }
+  .step-num {
+    width: 44px; height: 44px; border-radius: 50%; margin: 0 auto 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Fraunces', serif; font-weight: 700; font-size: 18px;
+    color: #1A1200; background: linear-gradient(135deg, var(--nest-gold), var(--nest-gold-accent));
+  }
+  .step h3 { font-size: 17px; margin-bottom: 6px; }
+  .step p { font-size: 14px; color: var(--text-secondary); }
 
-        .redirect-card {
-            position: relative;
-            z-index: 1;
-            width: 100%;
-            max-width: 440px;
-            background: var(--bg-panel);
-            border: 1px solid var(--border-soft);
-            border-radius: 20px;
-            padding: 40px;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.04);
-            animation: fadeUp 0.5s ease both;
-        }
+  /* ===== CTA band ===== */
+  .cta-band {
+    max-width: 900px; margin: 0 auto; text-align: center;
+    background: linear-gradient(135deg, var(--nest-green-dark), var(--nest-green-mid));
+    border-radius: 24px; padding: 56px 32px; color: #fff;
+  }
+  .cta-band h2 { font-family: 'Fraunces', serif; font-weight: 600; font-size: clamp(24px, 4vw, 34px); margin-bottom: 12px; }
+  .cta-band p { color: rgba(255,255,255,0.85); margin-bottom: 28px; max-width: 480px; margin-left: auto; margin-right: auto; }
 
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(12px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
+  /* ===== Footer ===== */
+  footer {
+    border-top: 1px solid var(--border-soft); padding: 32px 24px; margin-top: 40px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+    font-size: 13px; color: var(--text-dim);
+  }
+  .footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
+  .footer-links a:hover { color: var(--text-primary); }
 
-        .brand-mark {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            font-weight: 700;
-            letter-spacing: 0.05em;
-            color: var(--nest-green-mid);
-            margin-bottom: 20px;
-        }
-
-        .brand-mark::before {
-            content: "🌱";
-            font-size: 16px;
-        }
-
-        /* Лек, елегантен индикатор за зареждане */
-        .spinner {
-            width: 24px;
-            height: 24px;
-            border: 2.5px solid var(--border-soft);
-            border-top-color: var(--nest-gold-accent);
-            border-radius: 50%;
-            margin: 0 auto 24px auto;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        h1 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 22px;
-            color: var(--nest-green-dark);
-            margin-bottom: 12px;
-        }
-
-        p {
-            font-size: 14px;
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-
-        a {
-            color: var(--nest-gold-accent);
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.2s ease;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-    </style>
+  @media (max-width: 640px) {
+    .stat-cards { grid-template-columns: 1fr; }
+    .hero { padding-top: 50px; }
+    section { padding: 50px 20px; }
+  }
+</style>
 </head>
 <body>
 
-    <div class="bg-grid"></div>
+<header>
+  <a href="index.html" class="logo">
+    <span class="logo-mark">🌱</span>
+    BudgetNest
+  </a>
+  <div class="header-actions">
+    <a href="login.html" class="btn btn-ghost">Вход</a>
+    <a href="login.html" class="btn btn-primary">Създай акаунт</a>
+  </div>
+</header>
 
-    <div class="redirect-card">
-        <div class="brand-mark">BudgetNest</div>
-        <div class="spinner"></div>
-        <h1>Пренасочване...</h1>
-        <p>Зареждаме страницата за вход. Ако не бъдете пренасочени автоматично, <a href="login.html">натиснете тук</a>.</p>
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">🇧🇬 Създадено за български семейства · в евро</div>
+  <h1>Семейният бюджет,<br><span class="accent">най-сетне на едно място</span></h1>
+  <p>
+    BudgetNest събира приходите и разходите на цялото домакинство в общ, споделен бюджет.
+    Задавайте месечни лимити, следете тенденциите си и вижте точно къде отиват парите ви — заедно, в реално време.
+  </p>
+  <div class="hero-cta">
+    <a href="login.html" class="btn btn-primary btn-lg">Започни безплатно</a>
+    <a href="#features" class="btn btn-ghost btn-lg">Виж как работи</a>
+  </div>
+</div>
+
+<!-- PREVIEW MOCK -->
+<div class="preview">
+  <div class="preview-window">
+    <div class="preview-bar">
+      <span class="preview-dot" style="background:#FF5F57;"></span>
+      <span class="preview-dot" style="background:#FEBC2E;"></span>
+      <span class="preview-dot" style="background:#28C840;"></span>
     </div>
+    <div class="preview-body">
+      <div class="stat-cards">
+        <div class="stat-card"><div class="lbl">Приходи</div><div class="val" style="color:var(--nest-green-light);">2 450 €</div></div>
+        <div class="stat-card"><div class="lbl">Разходи</div><div class="val" style="color:#E53E3E;">1 883 €</div></div>
+        <div class="stat-card"><div class="lbl">Остават</div><div class="val">567 €</div></div>
+      </div>
+      <div style="display:grid; gap:12px; margin-top:4px;">
+        <div class="bar-row"><span class="bar-name">🛒 Храна</span><div class="bar-track"><div class="bar-fill" style="width:78%;"></div></div></div>
+        <div class="bar-row"><span class="bar-name">🏠 Жилище</span><div class="bar-track"><div class="bar-fill" style="width:62%;"></div></div></div>
+        <div class="bar-row"><span class="bar-name">🚗 Транспорт</span><div class="bar-track"><div class="bar-fill" style="width:41%;"></div></div></div>
+        <div class="bar-row"><span class="bar-name">🎬 Забавления</span><div class="bar-track"><div class="bar-fill" style="width:28%;"></div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-inner">
+    <h2 class="section-title">Всичко за домашните финанси</h2>
+    <p class="section-sub">Прости, но мощни инструменти, които правят проследяването на парите лесно за цялото семейство.</p>
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">👨‍👩‍👧</div>
+        <h3>Споделено домакинство</h3>
+        <p>Поканете партньор или член на семейството и водете общ бюджет. Всеки вижда своя принос в реално време.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🎯</div>
+        <h3>Месечни лимити</h3>
+        <p>Задайте лимит за всяка категория и следете колко ви остава. Приложението ви предупреждава, преди да прекалите.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">📈</div>
+        <h3>Тенденции във времето</h3>
+        <p>Вижте как се движат разходите ви месец след месец и открийте къде можете да спестите.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🥧</div>
+        <h3>Разбивка по категория</h3>
+        <p>Нагледни диаграми показват точно за какво отиват парите ви — без ровене в квитанции.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🇧🇬</div>
+        <h3>Сравнение със средното</h3>
+        <p>Разберете как разходите ви се сравняват със средните за българско домакинство.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">📤</div>
+        <h3>Експорт на данни</h3>
+        <p>Изтеглете транзакциите си като CSV файл по всяко време — вашите данни са си ваши.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section style="background:var(--bg-panel); border-block:1px solid var(--border-soft);">
+  <div class="section-inner">
+    <h2 class="section-title">Как работи</h2>
+    <p class="section-sub">Три стъпки до пълен контрол над семейния бюджет.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Създай домакинство</h3>
+        <p>Регистрирайте се и създайте своето домакинство за секунди.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Покани семейството</h3>
+        <p>Добавете членове по имейл, за да водите бюджета заедно.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Следи и планирай</h3>
+        <p>Записвайте приходи и разходи и оставете BudgetNest да върши сметките.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section>
+  <div class="cta-band">
+    <h2>Готови да поемете контрол?</h2>
+    <p>Присъединете се към семействата, които вече знаят точно къде отиват парите им.</p>
+    <a href="login.html" class="btn btn-primary btn-lg">Създай безплатен акаунт</a>
+  </div>
+</section>
+
+<footer>
+  <div class="logo" style="font-size:16px;">
+    <span class="logo-mark" style="width:24px;height:24px;font-size:13px;">🌱</span>
+    BudgetNest
+  </div>
+  <div class="footer-links">
+    <a href="#features">Функции</a>
+    <a href="login.html">Вход</a>
+    <a href="privacy.html">Поверителност</a>
+  </div>
+  <div>© 2026 BudgetNest · Ученически проект, ППМГ „Акад. Иван Ценов", Враца</div>
+</footer>
 
 </body>
 </html>

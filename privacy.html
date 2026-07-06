@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Поверителност — BudgetNest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-void:#F4F6F8; --bg-panel:#FFFFFF; --border-soft:#E2E8F0;
+    --nest-green-mid:#254A37; --nest-green-light:#366A4F; --nest-gold-accent:#C5A028;
+    --text-primary:#1A202C; --text-secondary:#4A5568; --text-dim:#718096;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-void:#0F1E17; --bg-panel:#16261D; --border-soft:rgba(255,255,255,0.08);
+      --nest-green-mid:#3E7A5A; --nest-green-light:#56916D; --nest-gold-accent:#D4AF37;
+      --text-primary:#F1F5F1; --text-secondary:#A9BDAF; --text-dim:#6E8577;
+    }
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Inter',sans-serif; background:var(--bg-void); color:var(--text-primary); line-height:1.7; }
+  a { color:var(--nest-green-light); }
+  header {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 24px; border-bottom:1px solid var(--border-soft);
+  }
+  .logo { display:flex; align-items:center; gap:8px; font-weight:700; font-size:19px; text-decoration:none; color:inherit; }
+  .logo-mark { width:28px; height:28px; border-radius:8px; background:linear-gradient(135deg,var(--nest-green-mid),var(--nest-green-light)); display:flex; align-items:center; justify-content:center; }
+  main { max-width:760px; margin:0 auto; padding:50px 24px 80px; }
+  h1 { font-family:'Fraunces',serif; font-weight:600; font-size:36px; margin-bottom:8px; }
+  .updated { color:var(--text-dim); font-size:14px; margin-bottom:36px; }
+  h2 { font-size:20px; margin:32px 0 10px; }
+  p, li { color:var(--text-secondary); font-size:15px; }
+  ul { padding-left:22px; margin:8px 0; }
+  li { margin-bottom:6px; }
+  .back { display:inline-block; margin-top:40px; color:var(--nest-green-light); font-weight:600; text-decoration:none; }
+  .note { background:var(--bg-panel); border:1px solid var(--border-soft); border-radius:12px; padding:18px 20px; margin:24px 0; font-size:14px; }
+</style>
+</head>
+<body>
+<header>
+  <a href="index.html" class="logo"><span class="logo-mark">🌱</span> BudgetNest</a>
+  <a href="login.html" style="text-decoration:none; color:var(--text-secondary); font-weight:600; font-size:14px;">Вход →</a>
+</header>
+<main>
+  <h1>Политика за поверителност</h1>
+  <div class="updated">Последна актуализация: юли 2026 г.</div>
+
+  <div class="note">
+    <strong>Накратко:</strong> BudgetNest е ученически проект. Съхраняваме само данните, нужни на приложението да работи,
+    не ги продаваме на никого и можете да ги изтеглите или изтриете по всяко време.
+  </div>
+
+  <h2>Какви данни събираме</h2>
+  <ul>
+    <li><strong>Данни за акаунта</strong> — имейл адрес и име, които предоставяте при регистрация.</li>
+    <li><strong>Финансови записи</strong> — транзакциите, категориите и бюджетите, които въвеждате сами.</li>
+    <li><strong>Данни за домакинството</strong> — името на домакинството и членовете, които поканите.</li>
+  </ul>
+
+  <h2>Как използваме данните</h2>
+  <p>
+    Данните се използват единствено за да функционира приложението: за да ви показваме бюджета,
+    да изчисляваме статистиките и да позволяваме споделянето между членовете на едно домакинство.
+    Не използваме данните ви за реклама и не ги споделяме с трети страни.
+  </p>
+
+  <h2>Кой вижда данните ви</h2>
+  <p>
+    Финансовите ви записи са видими само за вас и за членовете на вашето домакинство.
+    Достъпът е защитен на ниво база данни (Row Level Security), така че никой външен потребител
+    не може да достъпи чужди данни.
+  </p>
+
+  <h2>Съхранение и сигурност</h2>
+  <p>
+    Данните се съхраняват в Supabase (PostgreSQL). Паролите никога не се пазят в явен вид —
+    удостоверяването се извършва през сигурната система на Supabase Auth.
+  </p>
+
+  <h2>Вашите права</h2>
+  <ul>
+    <li>Да изтеглите транзакциите си като CSV файл от страницата „Транзакции".</li>
+    <li>Да редактирате или изтриете всеки свой запис по всяко време.</li>
+    <li>Да поискате изтриване на акаунта си, като се свържете с екипа.</li>
+  </ul>
+
+  <h2>Контакт</h2>
+  <p>
+    Този проект е разработен с учебна цел от ученици на ППМГ „Акад. Иван Ценов" – Враца.
+    За въпроси относно данните си, свържете се с екипа на проекта.
+  </p>
+
+  <a href="index.html" class="back">← Обратно към началото</a>
+</main>
+</body>
+</html>

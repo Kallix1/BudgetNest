@@ -333,6 +333,97 @@ body.dashboard-body {
   padding: 30px 0;
 }
 
+/* ===== Банер за бюджетни предупреждения (табло) ===== */
+.budget-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-bottom: 24px;
+  border: 1px solid transparent;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.budget-alert.over {
+  background: rgba(229, 62, 62, 0.10);
+  border-color: rgba(229, 62, 62, 0.35);
+  color: #C53030;
+}
+.budget-alert.near {
+  background: rgba(197, 160, 40, 0.10);
+  border-color: rgba(197, 160, 40, 0.35);
+  color: var(--nest-gold-accent);
+}
+.budget-alert .alert-icon { font-size: 20px; line-height: 1; flex-shrink: 0; }
+.budget-alert .alert-body { flex: 1; min-width: 0; }
+.budget-alert .alert-title { font-weight: 700; margin-bottom: 3px; }
+.budget-alert .alert-text { color: var(--text-secondary); }
+.budget-alert a.alert-link {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  white-space: nowrap;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+/* ===== Skeleton loaders (докато данните се зареждат) ===== */
+@keyframes skeleton-shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+.skeleton {
+  background: var(--surface-alt);
+  background-image: linear-gradient(
+    90deg,
+    var(--surface-alt) 0px,
+    var(--border-soft) 60px,
+    var(--surface-alt) 120px
+  );
+  background-size: 200px 100%;
+  background-repeat: no-repeat;
+  border-radius: 6px;
+  animation: skeleton-shimmer 1.3s ease-in-out infinite;
+  display: inline-block;
+}
+.skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 8px;
+  border-bottom: 1px solid var(--border-soft);
+}
+.skeleton-row:last-child { border-bottom: none; }
+.skeleton-circle { width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0; }
+.skeleton-lines { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 7px; }
+.skeleton-line { height: 11px; }
+.skeleton-line.short { width: 40%; }
+.skeleton-line.medium { width: 65%; }
+.skeleton-amount { width: 64px; height: 14px; flex-shrink: 0; }
+
+/* Празно състояние с призив за действие */
+.empty-state-rich {
+  text-align: center;
+  padding: 34px 20px;
+  color: var(--text-dim);
+}
+.empty-state-rich .emoji { font-size: 34px; display: block; margin-bottom: 10px; }
+.empty-state-rich .title { font-size: 15px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; }
+.empty-state-rich .sub { font-size: 13px; margin-bottom: 16px; }
+.empty-state-rich a.cta-link {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--nest-gold-accent);
+  text-decoration: none;
+  border: 1px solid var(--border-soft);
+  padding: 8px 16px;
+  border-radius: 999px;
+  transition: background 0.2s ease;
+}
+.empty-state-rich a.cta-link:hover { background: var(--surface-alt); }
+
 /* ===== Сравнение на разходите ===== */
 .compare-row {
   margin-bottom: 16px;

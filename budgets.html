@@ -6,9 +6,9 @@
 <title>Бюджети — BudgetNest</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=4">
-<link rel="stylesheet" href="css/dashboard.css?v=4">
-<script src="nav.js?v=4" defer></script>
+<link rel="stylesheet" href="css/style.css?v=5">
+<link rel="stylesheet" href="css/dashboard.css?v=5">
+<script src="nav.js?v=5" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -19,6 +19,32 @@
     margin: 0;
     background: var(--bg-void);
   }
+  .budget-badge {
+    font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 999px;
+    margin-left: 8px; vertical-align: middle;
+  }
+  .budget-badge.ok   { background: rgba(37,74,55,0.12);  color: var(--color-income); }
+  .budget-badge.near { background: rgba(221,133,0,0.15);  color: #B7791F; }
+  .budget-badge.over { background: rgba(229,62,62,0.14);  color: #E53E3E; }
+  [data-theme="dark"] .budget-badge.near { color: #F6C065; }
+
+  .budget-warn {
+    font-size: 12.5px; font-weight: 500; margin-top: 8px;
+    padding: 8px 12px; border-radius: 8px;
+  }
+  .budget-warn.near { background: rgba(221,133,0,0.1);  color: #B7791F; border: 1px solid rgba(221,133,0,0.3); }
+  .budget-warn.over { background: rgba(229,62,62,0.1);  color: #E53E3E; border: 1px solid rgba(229,62,62,0.3); }
+  [data-theme="dark"] .budget-warn.near { color: #F6C065; }
+
+  .compare-fill.near { background: linear-gradient(90deg, #DD8500, #F6AD55) !important; }
+
+  .budget-summary-pill {
+    font-size: 12.5px; font-weight: 600; padding: 6px 14px; border-radius: 999px;
+  }
+  .budget-summary-pill.ok   { background: rgba(37,74,55,0.12); color: var(--color-income); }
+  .budget-summary-pill.near { background: rgba(221,133,0,0.15); color: #B7791F; }
+  .budget-summary-pill.over { background: rgba(229,62,62,0.14); color: #E53E3E; }
+  [data-theme="dark"] .budget-summary-pill.near { color: #F6C065; }
 </style>
 </head>
 <body class="dashboard-body">
@@ -62,8 +88,11 @@
       Месечни лимити по категория
       <span class="hint">разходни категории</span>
     </div>
+    <div id="budgets-summary" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;"></div>
     <div id="budgets-list">
-      <div class="empty-state">Зареждане…</div>
+      <div class="skeleton-row"><span class="skeleton skeleton-circle"></span><span class="skeleton-lines"><span class="skeleton skeleton-line medium"></span><span class="skeleton skeleton-line short"></span></span></div>
+      <div class="skeleton-row"><span class="skeleton skeleton-circle"></span><span class="skeleton-lines"><span class="skeleton skeleton-line medium"></span><span class="skeleton skeleton-line short"></span></span></div>
+      <div class="skeleton-row"><span class="skeleton skeleton-circle"></span><span class="skeleton-lines"><span class="skeleton skeleton-line medium"></span><span class="skeleton skeleton-line short"></span></span></div>
     </div>
   </div>
 
@@ -219,8 +248,19 @@
       const limit = budget ? Number(budget.monthly_limit) : 0;
       const spent = spentByCategory[cat.id] || 0;
       const hasLimit = !!budget && limit > 0;
-      const pct = hasLimit ? Math.min((spent / limit) * 100, 100) : 0;
+      const rawPct = hasLimit ? (spent / limit) * 100 : 0;
+      const pct = hasLimit ? Math.min(rawPct, 100) : 0;
       const isOver = hasLimit && spent > limit;
+      const isNear = hasLimit && !isOver && rawPct >= 80; // предупреждение при 80%+
+
+      let badge = '';
+      if (isOver) {
+        badge = `<span class="budget-badge over">⚠ ${Math.round(rawPct)}%</span>`;
+      } else if (isNear) {
+        badge = `<span class="budget-badge near">${Math.round(rawPct)}%</span>`;
+      } else if (hasLimit) {
+        badge = `<span class="budget-badge ok">${Math.round(rawPct)}%</span>`;
+      }
 
       const statsHtml = hasLimit
         ? `<div class="budget-stats">
@@ -232,9 +272,14 @@
              <span class="budget-no-limit">Без зададен лимит</span>
            </div>`;
 
+      const fillClass = isOver ? 'over' : (isNear ? 'near' : '');
       const trackHtml = hasLimit
-        ? `<div class="compare-track"><div class="compare-fill ${isOver ? 'over' : ''}" style="width:${pct}%"></div></div>`
+        ? `<div class="compare-track"><div class="compare-fill ${fillClass}" style="width:${pct}%"></div></div>`
         : '';
+
+      const warnHtml = isOver
+        ? `<div class="budget-warn over">Надхвърлихте лимита с ${eur(spent - limit)}.</div>`
+        : (isNear ? `<div class="budget-warn near">Наближавате лимита — остават ${eur(limit - spent)}.</div>` : '');
 
       return `
         <div class="budget-row" data-category="${cat.id}">
@@ -242,6 +287,7 @@
             <div class="budget-cat">
               <span class="budget-cat-icon">${escapeHtml(cat.icon) || '💰'}</span>
               ${escapeHtml(cat.name)}
+              ${badge}
             </div>
             <div class="budget-controls">
               <input type="number" class="budget-input" id="budget-input-${cat.id}" min="0" step="0.01"
@@ -252,8 +298,36 @@
           </div>
           ${trackHtml}
           ${statsHtml}
+          ${warnHtml}
         </div>`;
     }).join('');
+
+    // Обобщение най-отгоре
+    renderBudgetSummary();
+  }
+
+  function renderBudgetSummary() {
+    const labelEl = document.getElementById('budgets-summary');
+    if (!labelEl) return;
+    let over = 0, near = 0;
+    expenseCategories.forEach(cat => {
+      const budget = budgetsByCategory[cat.id];
+      if (!budget) return;
+      const limit = Number(budget.monthly_limit);
+      if (limit <= 0) return;
+      const spent = spentByCategory[cat.id] || 0;
+      const pct = (spent / limit) * 100;
+      if (spent > limit) over++;
+      else if (pct >= 80) near++;
+    });
+    if (over === 0 && near === 0) {
+      labelEl.innerHTML = '<span class="budget-summary-pill ok">✓ Всички лимити са под контрол</span>';
+    } else {
+      const parts = [];
+      if (over) parts.push(`<span class="budget-summary-pill over">⚠ ${over} надвишен${over === 1 ? '' : 'и'} лимит${over === 1 ? '' : 'а'}</span>`);
+      if (near) parts.push(`<span class="budget-summary-pill near">${near} близо до лимита</span>`);
+      labelEl.innerHTML = parts.join(' ');
+    }
   }
 
   // ===== Запазване на лимит (upsert) =====

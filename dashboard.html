@@ -6,9 +6,9 @@
 <title>Табло — Бюджет</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght=500;600;700&family=Inter:wght=400;500;600;700&family=IBM+Plex+Mono:wght=400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=4">
-<link rel="stylesheet" href="css/dashboard.css?v=4">
-<script src="nav.js?v=4" defer></script>
+<link rel="stylesheet" href="css/style.css?v=5">
+<link rel="stylesheet" href="css/dashboard.css?v=5">
+<script src="nav.js?v=5" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 
@@ -90,6 +90,8 @@
       <div class="summary-value balance" id="summary-balance">0.00 €</div>
     </div>
   </div>
+
+  <div id="budget-alert-banner" style="display:none;"></div>
 
   <div class="content-grid">
     <div>
@@ -212,7 +214,9 @@
       <div class="card">
         <div class="card-title">Последни транзакции</div>
         <div class="tx-list" id="tx-list">
-          <div class="empty-state">Зареждане…</div>
+          <div class="skeleton-row"><span class="skeleton skeleton-circle"></span><span class="skeleton-lines"><span class="skeleton skeleton-line medium"></span><span class="skeleton skeleton-line short"></span></span><span class="skeleton skeleton-amount"></span></div>
+          <div class="skeleton-row"><span class="skeleton skeleton-circle"></span><span class="skeleton-lines"><span class="skeleton skeleton-line medium"></span><span class="skeleton skeleton-line short"></span></span><span class="skeleton skeleton-amount"></span></div>
+          <div class="skeleton-row"><span class="skeleton skeleton-circle"></span><span class="skeleton-lines"><span class="skeleton skeleton-line medium"></span><span class="skeleton skeleton-line short"></span></span><span class="skeleton skeleton-amount"></span></div>
         </div>
 
         <div class="tx-nav" id="tx-nav" style="display: none; align-items: center; justify-content: center; gap: 20px; margin-top: 20px; border-top: 1px solid var(--border-soft); padding-top: 15px;">
@@ -222,6 +226,18 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- Тенденция по месеци (последните 6 месеца) -->
+  <div class="card" style="margin-top: 24px;">
+    <div class="card-title">
+      Тенденция по месеци
+      <span class="hint">приходи и разходи, последните 6 месеца</span>
+    </div>
+    <div id="trend-wrap" style="position: relative; height: 260px; margin-top: 8px;">
+      <canvas id="trend-chart"></canvas>
+    </div>
+    <div class="empty-state" id="trend-empty" style="display:none;">Нужни са данни поне от два месеца, за да се покаже тенденция.</div>
   </div>
 
 </main>
@@ -311,6 +327,7 @@
   let categories = [];
   let currentTxType = 'expense';
   let dashboardChart = null;
+  let trendChart = null;
   let currentChartViewType = 'expense';
   let allTransactions = [];
   let editingTransactionId = null;
@@ -331,18 +348,11 @@
       .replace(/'/g, '&#39;');
   }
 
-function setTxType(type) {
-  currentTxType = type;
-  document.querySelectorAll('.type-btn').forEach(b => b.classList.toggle('active', b.dataset.type === type));
-  
-  // Смяна на placeholder-а според типа транзакция
-  const descInput = document.getElementById('tx-description');
-  if (descInput) {
-    descInput.placeholder = type === 'expense' ? 'напр. Пазар от Kaufland' : 'напр. Бонус или Заплата';
+  function setTxType(type) {
+    currentTxType = type;
+    document.querySelectorAll('.type-btn').forEach(b => b.classList.toggle('active', b.dataset.type === type));
+    populateCategorySelect();
   }
-  
-  populateCategorySelect();
-}
 
   function populateCategorySelect() {
     const select = document.getElementById('tx-category');
@@ -566,6 +576,155 @@ function setTxType(type) {
     renderChart(txs);
     renderRecentTransactions(txs);
     await renderComparison(txs);
+    await loadTrend();
+    await loadBudgetAlerts(txs);
+  }
+
+  // ===== Банер: категории близо до / над лимита този месец =====
+  async function loadBudgetAlerts(txs) {
+    const banner = document.getElementById('budget-alert-banner');
+    if (!banner) return;
+
+    const { data: budgets, error } = await supabaseClient
+      .from('budgets')
+      .select('category_id, monthly_limit')
+      .eq('household_id', currentHouseholdId);
+
+    if (error) { console.error(error); banner.style.display = 'none'; return; }
+    if (!budgets || !budgets.length) { banner.style.display = 'none'; return; }
+
+    // Сумираме похарченото по категория този месец (само разходи)
+    const spent = {};
+    (txs || []).forEach(t => {
+      if (t.categories?.type === 'income') return;
+      spent[t.category_id] = (spent[t.category_id] || 0) + (Number(t.amount) || 0);
+    });
+
+    let overCount = 0, nearCount = 0;
+    budgets.forEach(b => {
+      const limit = Number(b.monthly_limit) || 0;
+      if (limit <= 0) return;
+      const s = spent[b.category_id] || 0;
+      const pct = (s / limit) * 100;
+      if (s > limit) overCount++;
+      else if (pct >= 80) nearCount++;
+    });
+
+    if (!overCount && !nearCount) { banner.style.display = 'none'; return; }
+
+    const isOver = overCount > 0;
+    const cls = isOver ? 'over' : 'near';
+    const icon = isOver ? '⚠️' : '🔔';
+    let title, text;
+
+    if (isOver) {
+      title = `${overCount} ${overCount === 1 ? 'категория надвиши' : 'категории надвишиха'} лимита`;
+      text = nearCount
+        ? `Още ${nearCount} ${nearCount === 1 ? 'категория е близо' : 'категории са близо'} до лимита си.`
+        : 'Прегледайте разходите си, за да върнете бюджета под контрол.';
+    } else {
+      title = `${nearCount} ${nearCount === 1 ? 'категория е близо' : 'категории са близо'} до лимита`;
+      text = 'Наближавате зададените месечни лимити.';
+    }
+
+    banner.innerHTML = `
+      <div class="budget-alert ${cls}">
+        <span class="alert-icon">${icon}</span>
+        <div class="alert-body">
+          <div class="alert-title">${title}</div>
+          <div class="alert-text">${text}</div>
+        </div>
+        <a class="alert-link" href="budgets.html">Виж бюджетите →</a>
+      </div>`;
+    banner.style.display = 'block';
+  }
+
+  // ===== Тенденция по месеци (последните 6 месеца) =====
+  async function loadTrend() {
+    const now = new Date();
+    // Начало на прозореца: първи ден на месеца преди 5 месеца
+    const windowStart = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+    const startStr = windowStart.toISOString().slice(0, 10);
+
+    const { data: txs, error } = await supabaseClient
+      .from('transactions')
+      .select('amount, transaction_date, categories(type)')
+      .eq('household_id', currentHouseholdId)
+      .gte('transaction_date', startStr);
+
+    if (error) { console.error(error); return; }
+
+    // Подготвяме 6 месечни кофи
+    const monthNamesShort = ['яну','фев','мар','апр','май','юни','юли','авг','сеп','окт','ное','дек'];
+    const buckets = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      buckets.push({
+        key: d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'),
+        label: monthNamesShort[d.getMonth()] + ' ' + String(d.getFullYear()).slice(2),
+        income: 0,
+        expense: 0,
+      });
+    }
+    const byKey = {};
+    buckets.forEach(b => { byKey[b.key] = b; });
+
+    (txs || []).forEach(t => {
+      const key = String(t.transaction_date).slice(0, 7); // YYYY-MM
+      const b = byKey[key];
+      if (!b) return;
+      if (t.categories?.type === 'income') b.income += Number(t.amount) || 0;
+      else b.expense += Number(t.amount) || 0;
+    });
+
+    const hasAnyData = buckets.some(b => b.income > 0 || b.expense > 0);
+    const wrap = document.getElementById('trend-wrap');
+    const empty = document.getElementById('trend-empty');
+    if (!hasAnyData) {
+      wrap.style.display = 'none';
+      empty.style.display = 'block';
+      return;
+    }
+    wrap.style.display = 'block';
+    empty.style.display = 'none';
+
+    const styles = getComputedStyle(document.documentElement);
+    const incomeColor = (styles.getPropertyValue('--color-income') || '#254A37').trim();
+    const expenseColor = '#E53E3E';
+    const gridColor = (styles.getPropertyValue('--border-soft') || 'rgba(0,0,0,0.08)').trim();
+    const textColor = (styles.getPropertyValue('--text-secondary') || '#4A5568').trim();
+
+    if (trendChart) trendChart.destroy();
+    trendChart = new Chart(document.getElementById('trend-chart'), {
+      type: 'bar',
+      data: {
+        labels: buckets.map(b => b.label),
+        datasets: [
+          { label: 'Приходи', data: buckets.map(b => Math.round(b.income)), backgroundColor: incomeColor, borderRadius: 6, maxBarThickness: 26 },
+          { label: 'Разходи', data: buckets.map(b => Math.round(b.expense)), backgroundColor: expenseColor, borderRadius: 6, maxBarThickness: 26 },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'top', labels: { color: textColor, usePointStyle: true, boxWidth: 8, padding: 16, font: { family: 'Inter', size: 12 } } },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => ctx.dataset.label + ': ' + (ctx.parsed.y || 0).toLocaleString('bg-BG') + ' €',
+            },
+          },
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: textColor, font: { family: 'Inter', size: 12 } } },
+          y: {
+            beginAtZero: true,
+            grid: { color: gridColor },
+            ticks: { color: textColor, font: { family: 'Inter', size: 11 }, callback: (v) => v.toLocaleString('bg-BG') + ' €' },
+          },
+        },
+      },
+    });
   }
 
   function renderSummary(txs) {
@@ -652,7 +811,7 @@ function setTxType(type) {
     const pageLabel = document.getElementById('tx-page-label');
     
     if (!txs || !txs.length) {
-      list.innerHTML = '<div class="empty-state">Все още няма транзакции този месец.</div>';
+      list.innerHTML = '<div class="empty-state-rich"><span class="emoji">🌱</span><span class="title">Все още няма транзакции този месец</span><span class="sub">Започнете да следите бюджета си — добавете първия си приход или разход.</span><a class="cta-link" href="transactions.html">Добави транзакция →</a></div>';
       nav.style.display = 'none';
       return;
     }
