@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Отзиви — BudgetNest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/dashboard.css">
+<script src="nav.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+  body.dashboard-body {
+    display: flex !important;
+    align-items: stretch !important;
+    min-height: 100vh !important;
+    margin: 0;
+    background: var(--bg-void);
+  }
+
+  /* ===== Интро секция ===== */
+  .reviews-intro {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .reviews-intro p {
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.65;
+    margin: 0;
+  }
+  .reviews-intro p strong { color: var(--text-primary); }
+
+  /* ===== Звезди (избор) ===== */
+  .star-picker {
+    display: flex;
+    gap: 6px;
+    margin: 4px 0 2px;
+  }
+  .star-btn {
+    background: none;
+    border: none;
+    font-size: 30px;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--border-soft);
+    transition: transform 0.12s ease, color 0.12s ease;
+    padding: 2px;
+  }
+  .star-btn:hover { transform: scale(1.15); }
+  .star-btn.filled { color: var(--nest-gold-accent, #C5A028); }
+
+  /* ===== Форма ===== */
+  .review-textarea {
+    width: 100%;
+    min-height: 110px;
+    resize: vertical;
+    background: var(--bg-void);
+    border: 1px solid var(--border-soft);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--text-primary);
+    line-height: 1.55;
+    outline: none;
+    box-sizing: border-box;
+  }
+  .review-textarea:focus { border-color: var(--nest-gold-accent, #C5A028); }
+  .char-counter {
+    font-size: 12px;
+    color: var(--text-dim, var(--text-secondary));
+    text-align: right;
+    margin-top: 4px;
+  }
+
+  /* ===== Статус на моя отзив ===== */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+  }
+  .status-badge.pending  { background: rgba(197,160,40,0.12); color: var(--nest-gold-accent, #C5A028); border-color: rgba(197,160,40,0.4); }
+  .status-badge.approved { background: rgba(34,197,94,0.12);  color: #16A34A; border-color: rgba(34,197,94,0.4); }
+  .status-badge.rejected { background: rgba(239,68,68,0.12);  color: #DC2626; border-color: rgba(239,68,68,0.4); }
+
+  /* ===== Списък с одобрени отзиви ===== */
+  .reviews-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+  }
+  .review-card {
+    background: var(--bg-void);
+    border: 1px solid var(--border-soft);
+    border-radius: 14px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .review-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .review-author {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+  .review-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--nest-green-mid, #254A37);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .review-author-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .review-date {
+    font-size: 12px;
+    color: var(--text-dim, var(--text-secondary));
+    flex-shrink: 0;
+  }
+  .review-stars {
+    color: var(--nest-gold-accent, #C5A028);
+    font-size: 15px;
+    letter-spacing: 2px;
+  }
+  .review-stars .empty { color: var(--border-soft); }
+  .review-text {
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+  .mine-tag {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--nest-gold-accent, #C5A028);
+  }
+</style>
+</head>
+<body class="dashboard-body">
+
+<div class="bg-glow"></div>
+<div class="bg-grid"></div>
+
+<nav class="navbar">
+  <div class="nav-left">
+    <div class="nav-left-header">
+      <div class="brand-mark">BudgetNest</div>
+      <button class="nav-toggle" type="button" aria-label="Меню" aria-expanded="false" aria-controls="nav-links" onclick="toggleNav(this)">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="nav-links" id="nav-links">
+      <a href="dashboard.html" class="nav-link">Табло</a>
+      <a href="transactions.html" class="nav-link">Транзакции</a>
+      <a href="budgets.html" class="nav-link">Бюджети</a>
+      <a href="reviews.html" class="nav-link active">Отзиви</a>
+      <a href="settings.html" class="nav-link">Настройки</a>
+      <a href="admin.html" class="nav-link" id="admin-nav-link" style="display:none;">Админ</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Смяна на тема">🌙</button>
+    <button class="btn-ghost" onclick="handleSignOut()">Изход</button>
+  </div>
+</nav>
+
+<main class="dashboard-main" id="page-main" style="display:none;">
+
+  <div class="page-header">
+    <h1>Отзиви</h1>
+    <span class="hint" style="color: var(--text-secondary); font-size: 13px;">какво казват потребителите за BudgetNest</span>
+  </div>
+
+  <!-- Интро + форма -->
+  <div class="card">
+    <div class="card-title">
+      Споделете мнението си
+      <span class="hint">отнема по-малко от минута</span>
+    </div>
+    <div class="reviews-intro">
+      <p>
+        BudgetNest се развива благодарение на хората, които го използват всеки ден.
+        <strong>Вашата обратна връзка е най-ценният ни инструмент</strong> — тя ни показва кое работи добре
+        и кое можем да направим още по-удобно за вашето домакинство.
+      </p>
+      <p>
+        Харесва ли ви таблото? Липсва ли ви функция? Разкажете ни! Всеки отзив минава
+        през кратка проверка от екипа ни, преди да бъде публикуван на тази страница.
+      </p>
+    </div>
+
+    <div id="review-form-wrap" style="margin-top: 18px;">
+      <div style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px;">Вашата оценка</div>
+      <div class="star-picker" id="star-picker" aria-label="Оценка от 1 до 5 звезди"></div>
+
+      <div style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin: 12px 0 6px;">Вашият коментар</div>
+      <textarea id="review-content" class="review-textarea" maxlength="600"
+        placeholder="Напр. „Ползваме BudgetNest с цялото семейство от два месеца и вече знаем точно за какво отиват парите ни…“"></textarea>
+      <div class="char-counter"><span id="char-count">0</span> / 600 (минимум 10 символа)</div>
+
+      <div style="display: flex; align-items: center; gap: 14px; margin-top: 12px; flex-wrap: wrap;">
+        <button class="btn-primary-sm" id="submit-review-btn" onclick="submitReview()">Изпрати за одобрение</button>
+        <span id="my-review-status"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Одобрени отзиви -->
+  <div class="card">
+    <div class="card-title">
+      Одобрени отзиви
+      <span class="hint" id="reviews-count-hint"></span>
+    </div>
+    <div class="reviews-grid" id="reviews-list">
+      <div class="empty-state">Зареждане…</div>
+    </div>
+  </div>
+
+</main>
+
+<div id="app-toast-container" style="position: fixed; top: 24px; right: 24px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; align-items: flex-end;"></div>
+
+<script>
+  function showToast(message, type) {
+    const container = document.getElementById('app-toast-container');
+    const toast = document.createElement('div');
+    const palette = {
+      error:   { bg: '#7F1D1D', border: '#EF4444' },
+      success: { bg: '#14532D', border: '#22C55E' },
+      info:    { bg: '#1E3A5F', border: '#3B82F6' },
+    };
+    const c = palette[type] || palette.info;
+    toast.style.cssText = `background:${c.bg}; border:1px solid ${c.border}; color:#fff; padding:14px 18px; border-radius:10px; font-family:'Inter',sans-serif; font-size:13px; font-weight:500; box-shadow:0 8px 24px rgba(0,0,0,0.35); max-width:340px; line-height:1.45;`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.style.transition = 'opacity 0.3s ease';
+      toast.style.opacity = '0';
+      setTimeout(() => toast.remove(), 300);
+    }, 4200);
+  }
+</script>
+
+<script>
+  // ===== Тъмна тема =====
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    const btn = document.getElementById('theme-toggle-btn');
+    if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+    localStorage.setItem('budgetnest-theme', theme);
+  }
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme') || 'light';
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  }
+  applyTheme(localStorage.getItem('budgetnest-theme') || 'light');
+
+  // ===== Supabase конфигурация =====
+  const SUPABASE_URL = 'https://fvorpmajvrsxrwtscmwk.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_KmFRXFvW-wCf5LJXMgHejQ__3CH2PB7';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // Само за показване на линка "Админ" в менюто — реалната защита е в SQL (is_admin())
+  const ADMIN_EMAILS = ['choko2009vr@gmail.com'];
+
+  let currentUser = null;
+  let myDisplayName = '';
+  let selectedRating = 0;
+  let myReview = null; // съществуващият отзив на потребителя (ако има)
+
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  const fmtDate = (iso) => new Date(iso).toLocaleDateString('bg-BG', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const initials = (name) => {
+    const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+    if (!parts.length) return '?';
+    return parts.slice(0, 2).map(p => p[0].toUpperCase()).join('');
+  };
+  const starsHtml = (rating) => {
+    let s = '';
+    for (let i = 1; i <= 5; i++) {
+      s += i <= rating ? '★' : '<span class="empty">★</span>';
+    }
+    return s;
+  };
+
+  // ===== Инициализация =====
+  (async function init() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) { window.location.href = 'login.html'; return; }
+    currentUser = session.user;
+
+    const email = (currentUser.email || '').toLowerCase();
+    if (ADMIN_EMAILS.map(e => e.toLowerCase()).includes(email)) {
+      document.getElementById('admin-nav-link').style.display = 'flex';
+    }
+
+    document.getElementById('page-main').style.display = 'block';
+
+    renderStarPicker();
+    setupCharCounter();
+
+    // Име за показване — от profiles, с резервен вариант от имейла
+    try {
+      const { data: profile } = await supabaseClient
+        .from('profiles')
+        .select('full_name, email')
+        .eq('id', currentUser.id)
+        .single();
+      myDisplayName = profile?.full_name || (profile?.email || currentUser.email || '').split('@')[0] || 'Потребител';
+    } catch (_) {
+      myDisplayName = (currentUser.email || '').split('@')[0] || 'Потребител';
+    }
+
+    await loadMyReview();
+    await loadApprovedReviews();
+  })();
+
+  // ===== Звезди =====
+  function renderStarPicker() {
+    const wrap = document.getElementById('star-picker');
+    wrap.innerHTML = '';
+    for (let i = 1; i <= 5; i++) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'star-btn' + (i <= selectedRating ? ' filled' : '');
+      btn.textContent = '★';
+      btn.setAttribute('aria-label', i + ' от 5 звезди');
+      btn.onclick = () => { selectedRating = i; renderStarPicker(); };
+      wrap.appendChild(btn);
+    }
+  }
+
+  function setupCharCounter() {
+    const ta = document.getElementById('review-content');
+    const counter = document.getElementById('char-count');
+    ta.addEventListener('input', () => { counter.textContent = ta.value.length; });
+  }
+
+  // ===== Моят отзив =====
+  async function loadMyReview() {
+    const { data, error } = await supabaseClient
+      .from('reviews')
+      .select('*')
+      .eq('user_id', currentUser.id)
+      .maybeSingle();
+
+    if (error) { console.error(error); return; }
+    myReview = data || null;
+
+    const statusEl = document.getElementById('my-review-status');
+    const btn = document.getElementById('submit-review-btn');
+
+    if (!myReview) {
+      statusEl.innerHTML = '';
+      btn.textContent = 'Изпрати за одобрение';
+      return;
+    }
+
+    // Попълваме формата със съществуващия отзив
+    selectedRating = myReview.rating;
+    renderStarPicker();
+    const ta = document.getElementById('review-content');
+    ta.value = myReview.content;
+    document.getElementById('char-count').textContent = ta.value.length;
+    btn.textContent = 'Обнови отзива';
+
+    const labels = {
+      pending:  '⏳ Изчаква одобрение',
+      approved: '✓ Одобрен и публикуван',
+      rejected: '✗ Отхвърлен — може да го редактирате и изпратите отново',
+    };
+    statusEl.innerHTML = `<span class="status-badge ${myReview.status}">${labels[myReview.status] || myReview.status}</span>`;
+  }
+
+  async function submitReview() {
+    const content = document.getElementById('review-content').value.trim();
+
+    if (!selectedRating) { showToast('Моля, изберете оценка (брой звезди).', 'error'); return; }
+    if (content.length < 10) { showToast('Коментарът трябва да е поне 10 символа.', 'error'); return; }
+    if (content.length > 600) { showToast('Коментарът може да е най-много 600 символа.', 'error'); return; }
+
+    const btn = document.getElementById('submit-review-btn');
+    btn.disabled = true;
+
+    // Нов или редактиран отзив винаги тръгва като 'pending' —
+    // това го изисква и RLS политиката в базата.
+    const { error } = await supabaseClient
+      .from('reviews')
+      .upsert({
+        user_id: currentUser.id,
+        author_name: myDisplayName,
+        rating: selectedRating,
+        content: content,
+        status: 'pending',
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'user_id' });
+
+    btn.disabled = false;
+
+    if (error) {
+      console.error(error);
+      showToast('Възникна грешка при изпращането. Опитайте отново.', 'error');
+      return;
+    }
+
+    showToast('Благодарим! Отзивът ви е изпратен и ще бъде публикуван след одобрение.', 'success');
+    await loadMyReview();
+    await loadApprovedReviews();
+  }
+
+  // ===== Одобрени отзиви =====
+  async function loadApprovedReviews() {
+    const { data, error } = await supabaseClient
+      .from('reviews')
+      .select('id, user_id, author_name, rating, content, created_at')
+      .eq('status', 'approved')
+      .order('created_at', { ascending: false });
+
+    const list = document.getElementById('reviews-list');
+    if (error) {
+      console.error(error);
+      list.innerHTML = '<div class="empty-state">Отзивите не можаха да се заредят.</div>';
+      return;
+    }
+
+    document.getElementById('reviews-count-hint').textContent = (data || []).length + ' публикувани';
+
+    if (!data || !data.length) {
+      list.innerHTML = '<div class="empty-state">Все още няма публикувани отзиви. Бъдете първи! 🎉</div>';
+      return;
+    }
+
+    list.innerHTML = data.map(r => `
+      <div class="review-card">
+        <div class="review-card-head">
+          <div class="review-author">
+            <div class="review-avatar">${escapeHtml(initials(r.author_name))}</div>
+            <div>
+              <div class="review-author-name">
+                ${escapeHtml(r.author_name)}
+                ${r.user_id === currentUser.id ? '<span class="mine-tag">· това сте вие</span>' : ''}
+              </div>
+              <div class="review-stars">${starsHtml(r.rating)}</div>
+            </div>
+          </div>
+          <span class="review-date">${fmtDate(r.created_at)}</span>
+        </div>
+        <p class="review-text">${escapeHtml(r.content)}</p>
+      </div>`).join('');
+  }
+
+  async function handleSignOut() {
+    await supabaseClient.auth.signOut();
+    window.location.href = 'login.html';
+  }
+</script>
+
+</body>
+</html>
