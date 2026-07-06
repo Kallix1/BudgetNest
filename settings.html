@@ -6,9 +6,9 @@
 <title>Настройки — BudgetNest</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=5">
-<link rel="stylesheet" href="css/dashboard.css?v=5">
-<script src="nav.js?v=5" defer></script>
+<link rel="stylesheet" href="css/style.css?v=6">
+<link rel="stylesheet" href="css/dashboard.css?v=6">
+<script src="nav.js?v=6" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -358,6 +358,7 @@
 
     await loadMembers();
     if (isOwner) await loadPendingInvites();
+    await loadCategories();
   })();
 
   // ===== Преименуване на домакинство =====
@@ -548,6 +549,122 @@
 
     showToast('Членът е премахнат', 'success');
     await loadMembers();
+  }
+
+  // ===== Категории =====
+  let categories = [];
+
+  async function loadCategories() {
+    const listEl = document.getElementById('categories-list');
+    const { data, error } = await supabaseClient
+      .from('categories')
+      .select('*')
+      .eq('household_id', currentHouseholdId)
+      .order('type')
+      .order('name');
+
+    if (error) {
+      console.error(error);
+      listEl.innerHTML = '<div class="empty-state" style="color:#DC2626;">Грешка при зареждане: ' + escapeHtml(error.message) + '</div>';
+      return;
+    }
+    categories = data || [];
+    renderCategories();
+  }
+
+  function renderCategories() {
+    const listEl = document.getElementById('categories-list');
+    const hint = document.getElementById('categories-count-hint');
+    hint.textContent = categories.length ? categories.length + ' общо' : '';
+
+    if (!categories.length) {
+      listEl.innerHTML = '<div class="empty-state">Все още няма категории. Добавете първата по-долу.</div>';
+      return;
+    }
+
+    const typeLabel = (t) => t === 'income' ? 'Приход' : 'Разход';
+
+    listEl.innerHTML = categories.map(c => `
+      <div class="member-row">
+        <div class="member-info">
+          <div class="member-avatar" style="font-family:'Inter',sans-serif; font-size:18px;">${escapeHtml(c.icon || '📦')}</div>
+          <div>
+            <div class="member-name">${escapeHtml(c.name)}</div>
+            <div class="member-email">${typeLabel(c.type)}</div>
+          </div>
+        </div>
+        <div class="member-actions">
+          <span class="member-role ${c.type === 'income' ? 'owner' : ''}">${typeLabel(c.type)}</span>
+          ${isOwner ? `<button class="member-remove" onclick="handleDeleteCategory('${c.id}')">Премахни</button>` : ''}
+        </div>
+      </div>`).join('');
+  }
+
+  async function handleAddCategory() {
+    if (!isOwner) {
+      setStatus('category-status', 'Само собственикът на домакинството може да добавя категории.', 'error');
+      return;
+    }
+    const icon = document.getElementById('new-cat-icon').value.trim();
+    const name = document.getElementById('new-cat-name').value.trim();
+    const type = document.getElementById('new-cat-type').value;
+
+    if (!name) { setStatus('category-status', 'Въведете име на категорията.', 'error'); return; }
+
+    // Проверка за дублиране (по име + тип), без значение за главни/малки букви
+    const exists = categories.some(c =>
+      c.type === type && c.name.trim().toLowerCase() === name.toLowerCase());
+    if (exists) { setStatus('category-status', 'Вече има категория с това име и тип.', 'error'); return; }
+
+    setStatus('category-status', 'Добавяне…', '');
+
+    const { error } = await supabaseClient
+      .from('categories')
+      .insert([{ household_id: currentHouseholdId, name, icon: icon || '📦', type, is_default: false }]);
+
+    if (error) {
+      setStatus('category-status', 'Грешка: ' + error.message, 'error');
+      return;
+    }
+
+    document.getElementById('new-cat-icon').value = '';
+    document.getElementById('new-cat-name').value = '';
+    document.getElementById('new-cat-type').value = 'expense';
+    setStatus('category-status', 'Категорията е добавена ✓', 'success');
+    setTimeout(() => setStatus('category-status', '', ''), 2000);
+    await loadCategories();
+  }
+
+  async function handleDeleteCategory(id) {
+    const cat = categories.find(c => c.id === id);
+    if (!cat) return;
+
+    // Проверка дали категорията се използва от транзакции
+    const { count, error: countErr } = await supabaseClient
+      .from('transactions')
+      .select('id', { count: 'exact', head: true })
+      .eq('category_id', id);
+
+    if (countErr) {
+      showToast('Грешка при проверка: ' + countErr.message, 'error');
+      return;
+    }
+
+    if (count && count > 0) {
+      showToast(`Категорията „${cat.name}" се използва в ${count} ${count === 1 ? 'транзакция' : 'транзакции'} и не може да бъде премахната.`, 'error');
+      return;
+    }
+
+    const ok = await showConfirm(`Сигурни ли сте, че искате да премахнете категорията „${cat.name}"?`, 'Премахване на категория');
+    if (!ok) return;
+
+    const { error } = await supabaseClient.from('categories').delete().eq('id', id);
+    if (error) {
+      showToast('Грешка: ' + error.message, 'error');
+      return;
+    }
+    showToast('Категорията е премахната', 'success');
+    await loadCategories();
   }
 
   // ===== Изход =====

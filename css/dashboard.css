@@ -409,8 +409,8 @@ body.dashboard-body {
   color: var(--text-dim);
 }
 .empty-state-rich .emoji { font-size: 34px; display: block; margin-bottom: 10px; }
-.empty-state-rich .title { font-size: 15px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; }
-.empty-state-rich .sub { font-size: 13px; margin-bottom: 16px; }
+.empty-state-rich .title { display: block; font-size: 15px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; }
+.empty-state-rich .sub { display: block; font-size: 13px; margin-bottom: 16px; max-width: 360px; margin-left: auto; margin-right: auto; line-height: 1.5; }
 .empty-state-rich a.cta-link {
   display: inline-block;
   font-size: 13px;
