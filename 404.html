@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B1%3C/text%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Страницата не е намерена — BudgetNest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-void:#F4F6F8; --bg-panel:#FFFFFF; --border-soft:#E2E8F0;
+    --nest-green-mid:#254A37; --nest-green-light:#366A4F; --nest-gold:#D4AF37; --nest-gold-accent:#C5A028;
+    --text-primary:#1A202C; --text-secondary:#4A5568; --text-dim:#718096;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-void:#0F1E17; --bg-panel:#16261D; --border-soft:rgba(255,255,255,0.08);
+      --nest-green-mid:#3E7A5A; --nest-green-light:#56916D; --nest-gold:#E3C067; --nest-gold-accent:#D4AF37;
+      --text-primary:#F1F5F1; --text-secondary:#A9BDAF; --text-dim:#6E8577;
+    }
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body {
+    font-family:'Inter',sans-serif; background:var(--bg-void); color:var(--text-primary);
+    min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:24px; line-height:1.6;
+  }
+  .mark {
+    width:64px; height:64px; border-radius:16px; font-size:34px;
+    display:flex; align-items:center; justify-content:center; margin-bottom:24px;
+    background:linear-gradient(135deg,var(--nest-green-mid),var(--nest-green-light));
+  }
+  .code { font-family:'Fraunces',serif; font-weight:700; font-size:clamp(56px,12vw,90px); line-height:1; margin-bottom:8px;
+    background:linear-gradient(120deg,var(--nest-green-light),var(--nest-gold));
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  h1 { font-family:'Fraunces',serif; font-weight:600; font-size:24px; margin-bottom:10px; }
+  p { color:var(--text-secondary); max-width:420px; margin:0 auto 28px; }
+  .actions { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
+  .btn {
+    display:inline-flex; align-items:center; justify-content:center; font-weight:600; font-size:14px;
+    padding:12px 24px; border-radius:12px; cursor:pointer; text-decoration:none;
+    border:1px solid transparent; transition:transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+  }
+  .btn-primary { background:linear-gradient(135deg,var(--nest-gold),var(--nest-gold-accent)); color:#1A1200; box-shadow:0 4px 14px rgba(197,160,40,0.28); }
+  .btn-primary:hover { transform:translateY(-2px); }
+  .btn-ghost { background:transparent; color:var(--text-primary); border-color:var(--border-soft); }
+  .btn-ghost:hover { background:var(--bg-panel); }
+</style>
+</head>
+<body>
+  <div class="mark">🌱</div>
+  <div class="code">404</div>
+  <h1>Тази страница я няма</h1>
+  <p>Изглежда сте попаднали на несъществуващ адрес. Да ви върнем при бюджета?</p>
+  <div class="actions">
+    <a href="dashboard.html" class="btn btn-primary">Към таблото</a>
+    <a href="index.html" class="btn btn-ghost">Начална страница</a>
+  </div>
+</body>
+</html>
