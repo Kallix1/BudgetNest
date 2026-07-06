@@ -6,9 +6,9 @@
 <title>Настройки — BudgetNest</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=2">
-<link rel="stylesheet" href="css/dashboard.css?v=2">
-<script src="nav.js?v=2" defer></script>
+<link rel="stylesheet" href="css/style.css?v=3">
+<link rel="stylesheet" href="css/dashboard.css?v=3">
+<script src="nav.js?v=3" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -23,11 +23,15 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 12px;
     padding: 14px 0;
     border-bottom: 1px solid var(--border-soft);
   }
   .member-row:last-child { border-bottom: none; }
-  .member-info { display: flex; align-items: center; gap: 12px; }
+  /* min-width:0 позволява на текста да се съкращава вместо да избутва
+     дясната част (баджа и "Премахни") извън панела */
+  .member-info { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; }
+  .member-info > div { min-width: 0; }
   .member-avatar {
     width: 38px; height: 38px; border-radius: 50%;
     background: var(--surface-alt);
@@ -35,18 +39,43 @@
     font-family: 'Fraunces', serif; font-weight: 600; font-size: 15px;
     color: var(--heading-accent); flex-shrink: 0;
   }
-  .member-name { font-weight: 600; color: var(--text-primary); font-size: 14px; }
-  .member-email { font-size: 12px; color: var(--text-dim); }
+  .member-name {
+    font-weight: 600; color: var(--text-primary); font-size: 14px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .member-email {
+    font-size: 12px; color: var(--text-dim);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .member-actions {
+    display: flex; align-items: center; gap: 4px;
+    flex-shrink: 0;
+  }
   .member-role {
     font-size: 11px; font-weight: 700; text-transform: uppercase;
     letter-spacing: 0.04em; padding: 4px 10px; border-radius: 999px;
     background: var(--surface-alt); color: var(--text-secondary);
+    white-space: nowrap;
   }
   .member-role.owner { color: var(--nest-gold-accent); background: rgba(212,175,55,0.15); }
   .member-remove {
     font-family: 'Inter', sans-serif; font-size: 12px; color: #DC2626;
     background: none; border: none; cursor: pointer; text-decoration: underline;
-    margin-left: 14px;
+    margin-left: 10px; white-space: nowrap; flex-shrink: 0;
+  }
+
+  /* На тесни екрани баджът и "Премахни" слизат под името,
+     подравнени вляво — нищо не излиза от панела */
+  @media (max-width: 560px) {
+    .member-row { flex-wrap: wrap; }
+    .member-info { flex: 1 1 100%; }
+    .member-actions {
+      flex: 1 1 100%;
+      justify-content: flex-start;
+      margin-left: 50px; /* колкото аватара + gap, за подравняване с името */
+      gap: 8px;
+    }
+    .member-remove { margin-left: auto; }
   }
   .invite-row { display: flex; gap: 10px; margin-top: 16px; }
   .invite-row input { flex: 1; }
@@ -54,11 +83,15 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 10px;
     padding: 10px 0;
     border-bottom: 1px solid var(--border-soft);
   }
   .pending-invite-row:last-child { border-bottom: none; }
-  .pending-invite-email { font-size: 13px; color: var(--text-secondary); }
+  .pending-invite-email {
+    font-size: 13px; color: var(--text-secondary);
+    min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
   .pending-invite-tag {
     font-size: 11px; font-weight: 700; text-transform: uppercase;
     letter-spacing: 0.04em; padding: 3px 8px; border-radius: 999px;
@@ -356,7 +389,7 @@
               <div class="member-email">${escapeHtml(email)}</div>
             </div>
           </div>
-          <div style="display:flex; align-items:center;">
+          <div class="member-actions">
             <span class="member-role ${m.role === 'owner' ? 'owner' : ''}">${m.role === 'owner' ? 'Собственик' : 'Член'}</span>
             ${canRemove ? `<button class="member-remove" onclick="handleRemoveMember('${m.id}')">Премахни</button>` : ''}
           </div>

@@ -142,6 +142,8 @@ body.dashboard-body {
   width: calc(100% - 260px);
   padding: 40px 48px 80px;
   box-sizing: border-box;
+  min-width: 0; /* позволява на вътрешните елементи да се съкращават */
+  overflow-x: hidden; /* нищо не бута страницата настрани */
 }
 
 /* Центрираме съдържанието спрямо ОСТАНАЛОТО пространство
@@ -436,6 +438,17 @@ body.dashboard-body {
   transform: scale(1.15);
 }
 
+.tx-icon {
+  flex-shrink: 0;
+}
+
+/* flex:1 + min-width:0 = описанието се съкращава с "…" вместо
+   да избутва сумата извън реда на тесни екрани */
+.tx-info {
+  flex: 1;
+  min-width: 0;
+}
+
 .tx-desc {
   font-size: 14px;
   font-weight: 500;
@@ -449,6 +462,9 @@ body.dashboard-body {
   font-size: 12px;
   color: var(--text-dim);
   margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .tx-amount {
