@@ -6,9 +6,9 @@
 <title>Админ панел — BudgetNest</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/dashboard.css">
-<script src="nav.js" defer></script>
+<link rel="stylesheet" href="css/style.css?v=2">
+<link rel="stylesheet" href="css/dashboard.css?v=2">
+<script src="nav.js?v=2" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -30,7 +30,7 @@
   <div class="nav-left">
     <div class="nav-left-header">
       <div class="brand-mark">BudgetNest</div>
-      <button class="nav-toggle" type="button" aria-label="Меню" aria-expanded="false" aria-controls="nav-links" onclick="toggleNav(this)">
+      <button class="nav-toggle" type="button" aria-label="Меню" aria-expanded="false" aria-controls="nav-links">
         <span></span><span></span><span></span>
       </button>
     </div>
@@ -165,6 +165,65 @@
   <p style="color: var(--text-secondary); font-size: 14px;">Тази страница е достъпна само за администратори.</p>
   <div style="margin-top: 18px;"><a href="dashboard.html" style="color: var(--nest-gold-accent); font-weight:600;">← Обратно към таблото</a></div>
 </div>
+
+<!-- Диалог за потвърждение в стила на сайта (замества confirm()) -->
+<div class="overlay" id="confirm-overlay" style="display:none; z-index: 10500;">
+  <div class="overlay-card" style="max-width: 420px; padding: 30px;">
+    <h2 id="confirm-title" style="font-size: 20px;">Потвърждение</h2>
+    <p id="confirm-message" style="margin-bottom: 22px;"></p>
+    <div style="display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap;">
+      <button class="btn-ghost" id="confirm-cancel-btn">Отказ</button>
+      <button class="btn-primary-sm" id="confirm-ok-btn" style="background: #DC2626; border-color: #DC2626;">Изтрий</button>
+    </div>
+  </div>
+</div>
+
+<div id="app-toast-container" style="position: fixed; top: 24px; right: 24px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; align-items: flex-end;"></div>
+
+<script>
+  function showToast(message, type) {
+    const container = document.getElementById('app-toast-container');
+    const toast = document.createElement('div');
+    const palette = {
+      error:   { bg: '#7F1D1D', border: '#EF4444' },
+      success: { bg: '#14532D', border: '#22C55E' },
+      info:    { bg: '#1E3A5F', border: '#3B82F6' },
+    };
+    const c = palette[type] || palette.info;
+    toast.style.cssText = `background:${c.bg}; border:1px solid ${c.border}; color:#fff; padding:14px 18px; border-radius:10px; font-family:'Inter',sans-serif; font-size:13px; font-weight:500; box-shadow:0 8px 24px rgba(0,0,0,0.35); max-width:340px; line-height:1.45;`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.style.transition = 'opacity 0.3s ease';
+      toast.style.opacity = '0';
+      setTimeout(() => toast.remove(), 300);
+    }, 4200);
+  }
+
+  // Връща Promise<true/false> — ползва се с await, както confirm()
+  function showConfirm({ title = 'Потвърждение', message = '', okText = 'Потвърди' } = {}) {
+    return new Promise((resolve) => {
+      const overlay = document.getElementById('confirm-overlay');
+      const okBtn = document.getElementById('confirm-ok-btn');
+      const cancelBtn = document.getElementById('confirm-cancel-btn');
+      document.getElementById('confirm-title').textContent = title;
+      document.getElementById('confirm-message').textContent = message;
+      okBtn.textContent = okText;
+      overlay.style.display = 'flex';
+      const cleanup = (result) => {
+        overlay.style.display = 'none';
+        okBtn.onclick = cancelBtn.onclick = overlay.onclick = null;
+        document.removeEventListener('keydown', onKey);
+        resolve(result);
+      };
+      const onKey = (e) => { if (e.key === 'Escape') cleanup(false); };
+      okBtn.onclick = () => cleanup(true);
+      cancelBtn.onclick = () => cleanup(false);
+      overlay.onclick = (e) => { if (e.target === overlay) cleanup(false); };
+      document.addEventListener('keydown', onKey);
+    });
+  }
+</script>
 
 <script>
   // ===== Тъмна тема =====
@@ -338,14 +397,21 @@
       .from('reviews')
       .update({ status: status, updated_at: new Date().toISOString() })
       .eq('id', id);
-    if (error) { console.error(error); alert('Грешка при промяна на статуса.'); return; }
+    if (error) { console.error(error); showToast('Грешка при промяна на статуса.', 'error'); return; }
+    showToast(status === 'approved' ? 'Отзивът е одобрен и публикуван.' : 'Отзивът е отхвърлен.', 'success');
     await loadReviews();
   }
 
   async function deleteReview(id) {
-    if (!confirm('Сигурни ли сте, че искате да изтриете този отзив? Действието е необратимо.')) return;
+    const ok = await showConfirm({
+      title: 'Изтриване на отзив',
+      message: 'Сигурни ли сте, че искате да изтриете този отзив? Действието е необратимо.',
+      okText: 'Изтрий',
+    });
+    if (!ok) return;
     const { error } = await supabaseClient.from('reviews').delete().eq('id', id);
-    if (error) { console.error(error); alert('Грешка при изтриване.'); return; }
+    if (error) { console.error(error); showToast('Грешка при изтриване.', 'error'); return; }
+    showToast('Отзивът беше изтрит.', 'success');
     await loadReviews();
   }
 

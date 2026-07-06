@@ -712,6 +712,8 @@ body.dashboard-body {
 
 .nav-toggle {
   display: none; /* скрит на десктоп — там менюто е странична лента */
+  touch-action: manipulation; /* без забавяне при докосване на телефон */
+  -webkit-tap-highlight-color: transparent;
   background: none;
   border: none;
   cursor: pointer;
