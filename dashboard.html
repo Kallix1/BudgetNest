@@ -6,9 +6,9 @@
 <title>Табло — Бюджет</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght=500;600;700&family=Inter:wght=400;500;600;700&family=IBM+Plex+Mono:wght=400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=3">
-<link rel="stylesheet" href="css/dashboard.css?v=3">
-<script src="nav.js?v=3" defer></script>
+<link rel="stylesheet" href="css/style.css?v=4">
+<link rel="stylesheet" href="css/dashboard.css?v=4">
+<script src="nav.js?v=4" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 
@@ -98,15 +98,17 @@
           <span id="chart-card-title">Разходи по категория</span>
           <span class="hint" id="chart-month-label"></span>
         </div>
-        <div class="chart-wrap" id="chart-wrap">
-          <canvas id="expense-chart"></canvas>
-          <div class="legend" id="chart-legend"></div>
+        <div class="chart-switch-row">
+          <button type="button" class="chart-arrow" onclick="toggleChartView()" aria-label="Предишна диаграма">←</button>
+          <div class="chart-wrap" id="chart-wrap">
+            <canvas id="expense-chart"></canvas>
+            <div class="legend" id="chart-legend"></div>
+          </div>
+          <button type="button" class="chart-arrow" onclick="toggleChartView()" aria-label="Следваща диаграма">→</button>
         </div>
-        
-        <div class="chart-nav" id="chart-nav" style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-top: 20px; border-top: 1px solid var(--border-soft); padding-top: 15px;">
-          <button type="button" onclick="toggleChartView()" style="background: var(--bg-void); border: 1px solid var(--border-soft); border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); font-weight: bold; transition: all 0.2s; font-size: 14px;" onmouseover="this.style.background='#E2E8F0'" onmouseout="this.style.background='var(--bg-void)'">←</button>
-          <span id="chart-view-label" style="font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 14px; color: var(--text-primary); min-width: 80px; text-align: center;">Разходи</span>
-          <button type="button" onclick="toggleChartView()" style="background: var(--bg-void); border: 1px solid var(--border-soft); border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); font-weight: bold; transition: all 0.2s; font-size: 14px;" onmouseover="this.style.background='#E2E8F0'" onmouseout="this.style.background='var(--bg-void)'">→</button>
+
+        <div class="chart-nav" id="chart-nav" style="display: flex; align-items: center; justify-content: center; margin-top: 16px;">
+          <span id="chart-view-label" style="font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 14px; color: var(--text-primary); text-align: center;">Разходи</span>
         </div>
 
         <div class="empty-state" id="chart-empty" style="display:none;">Все още няма данни за този месец.</div>

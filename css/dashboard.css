@@ -259,6 +259,39 @@ body.dashboard-body {
   gap: 26px;
 }
 
+/* Ред: стрелка · диаграма · стрелка */
+.chart-switch-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.chart-switch-row .chart-wrap {
+  flex: 1;
+  min-width: 0;
+}
+.chart-arrow {
+  flex-shrink: 0;
+  background: var(--bg-void);
+  border: 1px solid var(--border-soft);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-weight: bold;
+  font-size: 15px;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+.chart-arrow:hover {
+  background: var(--surface-alt);
+  color: var(--nest-gold-accent);
+  transform: scale(1.08);
+}
+.chart-arrow:active { transform: scale(0.95); }
+
 .chart-wrap canvas {
   max-width: 190px;
   max-height: 190px;
@@ -817,6 +850,9 @@ body.dashboard-body {
     max-width: 100%;
   }
   .chart-wrap { flex-direction: column; }
+  /* На мобилно стрелките са по-близо до диаграмата и малко по-дребни */
+  .chart-switch-row { gap: 6px; }
+  .chart-arrow { width: 32px; height: 32px; font-size: 14px; }
 }
 
 /* ===== Мобилни телефони (тесни екрани) ===== */
