@@ -8,9 +8,9 @@
 <meta name="description" content="Табло на BudgetNest — общ преглед на приходите, разходите и баланса на домакинството.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght=500;600;700&family=Inter:wght=400;500;600;700&family=IBM+Plex+Mono:wght=400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=7">
-<link rel="stylesheet" href="css/dashboard.css?v=7">
-<script src="nav.js?v=7" defer></script>
+<link rel="stylesheet" href="css/style.css?v=8">
+<link rel="stylesheet" href="css/dashboard.css?v=8">
+<script src="nav.js?v=8" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 
@@ -172,7 +172,7 @@
       <div class="card">
         <div class="card-title" id="form-title">Бърза транзакция</div>
         <form id="quick-add-form" class="quick-add-grid" onsubmit="handleAddTransaction(event)">
-          <div class="type-toggle">
+          <div class="type-toggle" id="tx-type-toggle">
             <button type="button" class="type-btn active" data-type="expense" onclick="setTxType('expense')">Разход</button>
             <button type="button" class="type-btn" data-type="income" onclick="setTxType('income')">Приход</button>
           </div>
@@ -352,7 +352,13 @@
 
   function setTxType(type) {
     currentTxType = type;
-    document.querySelectorAll('.type-btn').forEach(b => b.classList.toggle('active', b.dataset.type === type));
+    // Само бутоните на бързата транзакция (не на шаблоните)
+    document.querySelectorAll('#tx-type-toggle .type-btn').forEach(b => b.classList.toggle('active', b.dataset.type === type));
+    // Placeholder според типа — за приход "Пазар от Kaufland" няма логика
+    const descInput = document.getElementById('tx-description');
+    if (descInput) {
+      descInput.placeholder = type === 'income' ? 'напр. Заплата, Хонорар' : 'напр. Пазар от Kaufland';
+    }
     populateCategorySelect();
   }
 
