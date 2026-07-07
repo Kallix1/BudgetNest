@@ -1117,6 +1117,18 @@ body.dashboard-body {
   .chart-arrow { width: 32px; height: 32px; font-size: 14px; }
 }
 
+/* ===== Таблети (портрет, напр. iPad) — междинно стъпало между десктоп и телефон =====
+   Менюто си остава хамбургер (900px прагът за него не се пипа), но плочките
+   и картите вече не се разтягат в 1 самотна колона — има достатъчно място за 2-3. */
+@media (min-width: 701px) and (max-width: 900px) {
+  .summary-row {
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  }
+  .content-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
 /* ===== Мобилни телефони (тесни екрани) ===== */
 @media (max-width: 600px) {
   body { padding: 0; }
