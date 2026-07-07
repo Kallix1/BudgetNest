@@ -197,7 +197,7 @@ body.dashboard-body {
 
 .summary-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 20px;
   margin-bottom: 24px;
 }
@@ -268,8 +268,8 @@ body.dashboard-body {
   margin: 10px 0 16px;
 }
 
-.wallet-value.card { color: var(--nest-gold-accent); }
-.wallet-value.cash { color: var(--nest-green-mid); }
+.wallet-value.is-card { color: var(--nest-gold-accent); }
+.wallet-value.is-cash { color: var(--nest-green-mid); }
 
 .wallet-edit-row {
   display: flex;

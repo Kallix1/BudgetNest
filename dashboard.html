@@ -8,8 +8,8 @@
 <meta name="description" content="Табло на BudgetNest — общ преглед на приходите, разходите и баланса на домакинството.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght=500;600;700&family=Inter:wght=400;500;600;700&family=IBM+Plex+Mono:wght=400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=10">
-<link rel="stylesheet" href="css/dashboard.css?v=10">
+<link rel="stylesheet" href="css/style.css?v=11">
+<link rel="stylesheet" href="css/dashboard.css?v=11">
 <link rel="stylesheet" href="css/datepicker.css?v=1">
 <script src="datepicker.js?v=1" defer></script>
 <script src="nav.js?v=9" defer></script>
@@ -94,16 +94,13 @@
       <div class="summary-label">Баланс</div>
       <div class="summary-value balance" id="summary-balance">0.00 €</div>
     </div>
-  </div>
-
-  <div class="wallet-row">
-    <div class="wallet-card" style="cursor:pointer;" onclick="window.location.href='wallets.html'" title="Виж портфейла">
-      <div class="wallet-card-head"><span class="wallet-icon">💳</span> В картата</div>
-      <div class="wallet-value card" id="summary-card-balance">0.00 €</div>
+    <div class="summary-card" style="cursor:pointer;" onclick="window.location.href='wallets.html'" title="Виж портфейла">
+      <div class="summary-label">В картата</div>
+      <div class="summary-value card-balance" id="summary-card-balance">0.00 €</div>
     </div>
-    <div class="wallet-card" style="cursor:pointer;" onclick="window.location.href='wallets.html'" title="Виж портфейла">
-      <div class="wallet-card-head"><span class="wallet-icon">💵</span> В брой</div>
-      <div class="wallet-value cash" id="summary-cash-balance">0.00 €</div>
+    <div class="summary-card" style="cursor:pointer;" onclick="window.location.href='wallets.html'" title="Виж портфейла">
+      <div class="summary-label">В брой</div>
+      <div class="summary-value cash-balance" id="summary-cash-balance">0.00 €</div>
     </div>
   </div>
 

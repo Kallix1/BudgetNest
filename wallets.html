@@ -8,8 +8,8 @@
 <meta name="description" content="Баланс по карта и в брой в BudgetNest.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=10">
-<link rel="stylesheet" href="css/dashboard.css?v=10">
+<link rel="stylesheet" href="css/style.css?v=11">
+<link rel="stylesheet" href="css/dashboard.css?v=11">
 <script src="nav.js?v=9" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -68,7 +68,7 @@
   <div class="wallet-row">
     <div class="wallet-card">
       <div class="wallet-card-head"><span class="wallet-icon">💳</span> В картата</div>
-      <div class="wallet-value card" id="wallet-card-value">0.00 €</div>
+      <div class="wallet-value is-card" id="wallet-card-value">0.00 €</div>
       <div class="wallet-edit-row">
         <input type="number" id="wallet-card-input" step="0.01" placeholder="0.00">
         <button type="button" onclick="saveWalletBalance('card')">Запази</button>
@@ -77,7 +77,7 @@
 
     <div class="wallet-card">
       <div class="wallet-card-head"><span class="wallet-icon">💵</span> В брой</div>
-      <div class="wallet-value cash" id="wallet-cash-value">0.00 €</div>
+      <div class="wallet-value is-cash" id="wallet-cash-value">0.00 €</div>
       <div class="wallet-edit-row">
         <input type="number" id="wallet-cash-input" step="0.01" placeholder="0.00">
         <button type="button" onclick="saveWalletBalance('cash')">Запази</button>
