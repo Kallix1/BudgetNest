@@ -13,13 +13,12 @@
     --nest-green-mid:#254A37; --nest-green-light:#366A4F; --nest-gold-accent:#C5A028;
     --text-primary:#1A202C; --text-secondary:#4A5568; --text-dim:#718096;
   }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg-void:#0F1E17; --bg-panel:#16261D; --border-soft:rgba(255,255,255,0.08);
-      --nest-green-mid:#3E7A5A; --nest-green-light:#56916D; --nest-gold-accent:#D4AF37;
-      --text-primary:#F1F5F1; --text-secondary:#A9BDAF; --text-dim:#6E8577;
-    }
+  [data-theme="dark"] {
+    --bg-void:#0F1E17; --bg-panel:#16261D; --border-soft:rgba(255,255,255,0.08);
+    --nest-green-mid:#3E7A5A; --nest-green-light:#56916D; --nest-gold-accent:#D4AF37;
+    --text-primary:#F1F5F1; --text-secondary:#A9BDAF; --text-dim:#6E8577;
   }
+  body { transition: background-color 0.25s ease, color 0.25s ease; }
   * { box-sizing:border-box; margin:0; padding:0; }
   body { font-family:'Inter',sans-serif; background:var(--bg-void); color:var(--text-primary); line-height:1.7; }
   a { color:var(--nest-green-light); }
@@ -29,6 +28,17 @@
   }
   .logo { display:flex; align-items:center; gap:8px; font-weight:700; font-size:19px; text-decoration:none; color:inherit; }
   .logo-mark { width:28px; height:28px; border-radius:8px; background:linear-gradient(135deg,var(--nest-green-mid),var(--nest-green-light)); display:flex; align-items:center; justify-content:center; }
+  .header-actions { display:flex; align-items:center; gap:14px; }
+  .theme-toggle {
+    display:flex; align-items:center; justify-content:center;
+    width:38px; height:38px; border-radius:999px;
+    border:1px solid var(--border-soft); background:var(--bg-panel);
+    color:var(--text-secondary); cursor:pointer; font-size:17px;
+    transition:background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+    flex-shrink:0;
+  }
+  .theme-toggle:hover { color:var(--nest-gold-accent); border-color:var(--nest-gold-accent); transform:translateY(-1px); }
+  .theme-toggle:active { transform:scale(0.9); }
   main { max-width:760px; margin:0 auto; padding:50px 24px 80px; }
   h1 { font-family:'Fraunces',serif; font-weight:600; font-size:36px; margin-bottom:8px; }
   .updated { color:var(--text-dim); font-size:14px; margin-bottom:36px; }
@@ -43,7 +53,10 @@
 <body>
 <header>
   <a href="index.html" class="logo"><span class="logo-mark">🌱</span> BudgetNest</a>
-  <a href="login.html" style="text-decoration:none; color:var(--text-secondary); font-weight:600; font-size:14px;">Вход →</a>
+  <div class="header-actions">
+    <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Смяна на тема" aria-label="Смяна на тема">🌙</button>
+    <a href="login.html" style="text-decoration:none; color:var(--text-secondary); font-weight:600; font-size:14px;">Вход →</a>
+  </div>
 </header>
 <main>
   <h1>Политика за поверителност</h1>
@@ -96,5 +109,28 @@
 
   <a href="index.html" class="back">← Обратно към началото</a>
 </main>
+
+<script>
+  // ===== Тъмна/светла тема (същата логика като останалите страници) =====
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    var btn = document.getElementById('theme-toggle-btn');
+    if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+    localStorage.setItem('budgetnest-theme', theme);
+  }
+  function toggleTheme() {
+    var current = document.documentElement.getAttribute('data-theme') || 'light';
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  }
+  // При първо посещение: ползвай запазения избор, иначе настройката на системата
+  (function initTheme() {
+    var saved = localStorage.getItem('budgetnest-theme');
+    if (!saved) {
+      var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      saved = prefersDark ? 'dark' : 'light';
+    }
+    applyTheme(saved);
+  })();
+</script>
 </body>
 </html>
