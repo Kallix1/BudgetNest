@@ -8,7 +8,7 @@
 <meta name="description" content="Всички транзакции на домакинството в BudgetNest — филтриране, търсене и експорт.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=13">
+<link rel="stylesheet" href="css/style.css?v=14">
 <link rel="stylesheet" href="css/dashboard.css?v=13">
 <link rel="stylesheet" href="css/datepicker.css?v=1">
 <script src="datepicker.js?v=1" defer></script>
@@ -51,7 +51,7 @@
   </div>
   <div class="nav-right">
     <span class="household-pill" id="household-name">…</span>
-    <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Смяна на тема">🌙</button>
+    <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Смяна на тема"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-toggle-icon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button>
     <button class="btn-ghost" onclick="handleSignOut()">Изход</button>
   </div>
 </nav>
@@ -212,10 +212,12 @@
 
 <script>
   // ===== Тъмна тема =====
+  const SUN_ICON_PATH = '<circle cx="12" cy="12" r="4"></circle><line x1="12" y1="2" x2="12" y2="4"></line><line x1="12" y1="20" x2="12" y2="22"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="2" y1="12" x2="4" y2="12"></line><line x1="20" y1="12" x2="22" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+  const MOON_ICON_PATH = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
   function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     const btn = document.getElementById('theme-toggle-btn');
-    if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+    if (btn) btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-toggle-icon">' + (theme === 'dark' ? SUN_ICON_PATH : MOON_ICON_PATH) + '</svg>';
     localStorage.setItem('budgetnest-theme', theme);
   }
   function toggleTheme() {

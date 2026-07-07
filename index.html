@@ -73,6 +73,11 @@
   }
   .theme-toggle:hover { color: var(--nest-gold-accent); border-color: var(--nest-gold-accent); transform: translateY(-1px); }
   .theme-toggle:active { transform: scale(0.9); }
+  .theme-toggle-icon { width: 18px; height: 18px; animation: theme-icon-pop 0.35s ease; }
+  @keyframes theme-icon-pop {
+    from { transform: rotate(-90deg) scale(0.4); opacity: 0; }
+    to { transform: rotate(0deg) scale(1); opacity: 1; }
+  }
   .btn {
     display: inline-flex; align-items: center; justify-content: center;
     font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px;
@@ -215,7 +220,7 @@
     BudgetNest
   </a>
   <div class="header-actions">
-    <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Смяна на тема" aria-label="Смяна на тема">🌙</button>
+    <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Смяна на тема" aria-label="Смяна на тема"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-toggle-icon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button>
     <a href="login.html" class="btn btn-ghost">Вход</a>
     <a href="login.html" class="btn btn-primary">Създай акаунт</a>
   </div>
@@ -348,10 +353,12 @@
 
 <script>
   // ===== Тъмна/светла тема (същата логика като останалите страници) =====
+  const SUN_ICON_PATH = '<circle cx="12" cy="12" r="4"></circle><line x1="12" y1="2" x2="12" y2="4"></line><line x1="12" y1="20" x2="12" y2="22"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="2" y1="12" x2="4" y2="12"></line><line x1="20" y1="12" x2="22" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+  const MOON_ICON_PATH = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
   function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     var btn = document.getElementById('theme-toggle-btn');
-    if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+    if (btn) btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-toggle-icon">' + (theme === 'dark' ? SUN_ICON_PATH : MOON_ICON_PATH) + '</svg>';
     localStorage.setItem('budgetnest-theme', theme);
   }
   function toggleTheme() {

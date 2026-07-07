@@ -114,6 +114,17 @@ body { transition: background-color 0.25s ease, color 0.25s ease; }
   transform: scale(0.9);
 }
 
+.theme-toggle-icon {
+  width: 18px;
+  height: 18px;
+  animation: theme-icon-pop 0.35s ease;
+}
+
+@keyframes theme-icon-pop {
+  from { transform: rotate(-90deg) scale(0.4); opacity: 0; }
+  to { transform: rotate(0deg) scale(1); opacity: 1; }
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body { height: 100%; }
