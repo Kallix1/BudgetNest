@@ -265,6 +265,47 @@ body.dashboard-body {
   color: var(--text-dim);
 }
 
+.card-title-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-visibility-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  background: var(--surface-alt, transparent);
+  color: var(--text-dim);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.card-visibility-toggle:hover {
+  color: var(--text-primary);
+  border-color: var(--heading-accent);
+}
+
+.card-visibility-toggle svg {
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+}
+
+.card-collapsed .card-collapsible-body {
+  display: none;
+}
+
+.card-collapsed {
+  padding-bottom: 20px;
+}
+
 /* ===== Графика ===== */
 .chart-wrap {
   display: flex;
