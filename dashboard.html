@@ -67,6 +67,7 @@
       <a href="transactions.html" class="nav-link">Транзакции</a>
       <a href="budgets.html" class="nav-link">Бюджети</a>
       <a href="wallets.html" class="nav-link">Портфейл</a>
+      <a href="recurring.html" class="nav-link">Периодични</a>
       <a href="reviews.html" class="nav-link">Отзиви</a>
       <a href="settings.html" class="nav-link">Настройки</a>
       <a href="admin.html" class="nav-link" id="admin-nav-link" style="display:none;">Админ</a>
@@ -588,6 +589,14 @@
     householdMemberCount = (memberRows || []).length || 1;
 
     await loadCategories();
+
+    // Досъбира просрочени периодични транзакции (заплата, абонаменти) преди да заредим таблото
+    try {
+      await supabaseClient.rpc('run_recurring_now', { p_household_id: currentHouseholdId });
+    } catch (e) {
+      console.error('run_recurring_now failed', e);
+    }
+
     await loadDashboard();
     await loadTemplates();
   }
