@@ -243,33 +243,49 @@
         </form>
       </div>
 
-      <div class="card">
-        <div class="card-title">Последни транзакции</div>
-        <div class="tx-list" id="tx-list">
-          <div class="skeleton-row"><span class="skeleton skeleton-circle"></span><span class="skeleton-lines"><span class="skeleton skeleton-line medium"></span><span class="skeleton skeleton-line short"></span></span><span class="skeleton skeleton-amount"></span></div>
-          <div class="skeleton-row"><span class="skeleton skeleton-circle"></span><span class="skeleton-lines"><span class="skeleton skeleton-line medium"></span><span class="skeleton skeleton-line short"></span></span><span class="skeleton skeleton-amount"></span></div>
-          <div class="skeleton-row"><span class="skeleton skeleton-circle"></span><span class="skeleton-lines"><span class="skeleton skeleton-line medium"></span><span class="skeleton skeleton-line short"></span></span><span class="skeleton skeleton-amount"></span></div>
+      <div class="card" id="card-recent" data-card-key="recent">
+        <div class="card-title">
+          Последни транзакции
+          <span class="card-title-right">
+            <button type="button" class="card-visibility-toggle" onclick="toggleCardVisibility('recent')" aria-label="Скрий/покажи блока" title="Скрий/покажи блока">
+              <svg id="eye-icon-recent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+            </button>
+          </span>
         </div>
+        <div class="card-collapsible-body" id="card-recent-body">
+          <div class="tx-list" id="tx-list">
+            <div class="skeleton-row"><span class="skeleton skeleton-circle"></span><span class="skeleton-lines"><span class="skeleton skeleton-line medium"></span><span class="skeleton skeleton-line short"></span></span><span class="skeleton skeleton-amount"></span></div>
+            <div class="skeleton-row"><span class="skeleton skeleton-circle"></span><span class="skeleton-lines"><span class="skeleton skeleton-line medium"></span><span class="skeleton skeleton-line short"></span></span><span class="skeleton skeleton-amount"></span></div>
+            <div class="skeleton-row"><span class="skeleton skeleton-circle"></span><span class="skeleton-lines"><span class="skeleton skeleton-line medium"></span><span class="skeleton skeleton-line short"></span></span><span class="skeleton skeleton-amount"></span></div>
+          </div>
 
-        <div class="tx-nav" id="tx-nav" style="display: none; align-items: center; justify-content: center; gap: 20px; margin-top: 20px; border-top: 1px solid var(--border-soft); padding-top: 15px;">
-          <button type="button" onclick="changeTxPage(-1)" style="background: var(--bg-void); border: 1px solid var(--border-soft); border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); font-weight: bold; transition: all 0.2s; font-size: 14px;" onmouseover="this.style.background='#E2E8F0'" onmouseout="this.style.background='var(--bg-void)'">←</button>
-          <span id="tx-page-label" style="font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 14px; color: var(--text-primary); min-width: 130px; text-align: center;">Страница 1 от 1</span>
-          <button type="button" onclick="changeTxPage(1)" style="background: var(--bg-void); border: 1px solid var(--border-soft); border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); font-weight: bold; transition: all 0.2s; font-size: 14px;" onmouseover="this.style.background='#E2E8F0'" onmouseout="this.style.background='var(--bg-void)'">→</button>
+          <div class="tx-nav" id="tx-nav" style="display: none; align-items: center; justify-content: center; gap: 20px; margin-top: 20px; border-top: 1px solid var(--border-soft); padding-top: 15px;">
+            <button type="button" onclick="changeTxPage(-1)" style="background: var(--bg-void); border: 1px solid var(--border-soft); border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); font-weight: bold; transition: all 0.2s; font-size: 14px;" onmouseover="this.style.background='#E2E8F0'" onmouseout="this.style.background='var(--bg-void)'">←</button>
+            <span id="tx-page-label" style="font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 14px; color: var(--text-primary); min-width: 130px; text-align: center;">Страница 1 от 1</span>
+            <button type="button" onclick="changeTxPage(1)" style="background: var(--bg-void); border: 1px solid var(--border-soft); border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); font-weight: bold; transition: all 0.2s; font-size: 14px;" onmouseover="this.style.background='#E2E8F0'" onmouseout="this.style.background='var(--bg-void)'">→</button>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Тенденция по месеци (последните 6 месеца) -->
-  <div class="card" style="margin-top: 24px;">
+  <div class="card" id="card-trend" data-card-key="trend" style="margin-top: 24px;">
     <div class="card-title">
       Тенденция по месеци
-      <span class="hint">приходи и разходи, последните 6 месеца</span>
+      <span class="card-title-right">
+        <span class="hint">приходи и разходи, последните 6 месеца</span>
+        <button type="button" class="card-visibility-toggle" onclick="toggleCardVisibility('trend')" aria-label="Скрий/покажи блока" title="Скрий/покажи блока">
+          <svg id="eye-icon-trend" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+        </button>
+      </span>
     </div>
-    <div id="trend-wrap" style="position: relative; height: 260px; margin-top: 8px;">
-      <canvas id="trend-chart"></canvas>
+    <div class="card-collapsible-body" id="card-trend-body">
+      <div id="trend-wrap" style="position: relative; height: 260px; margin-top: 8px;">
+        <canvas id="trend-chart"></canvas>
+      </div>
+      <div class="empty-state" id="trend-empty" style="display:none;">Нужни са данни поне от два месеца, за да се покаже тенденция.</div>
     </div>
-    <div class="empty-state" id="trend-empty" style="display:none;">Нужни са данни поне от два месеца, за да се покаже тенденция.</div>
   </div>
 
 </main>
@@ -363,7 +379,7 @@
 
   (function initCardVisibility() {
     const state = getCardVisibilityState();
-    ['compare', 'templates'].forEach(key => applyCardVisibility(key, !!state[key]));
+    ['compare', 'templates', 'trend', 'recent'].forEach(key => applyCardVisibility(key, !!state[key]));
   })();
 
   // ===== Supabase конфигурация =====
