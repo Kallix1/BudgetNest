@@ -108,6 +108,7 @@
         </tbody>
       </table>
     </div>
+    <div class="admin-pagination" id="users-pagination" style="display:none;"></div>
   </div>
 
   <div class="card">
@@ -132,6 +133,7 @@
         </tbody>
       </table>
     </div>
+    <div class="admin-pagination" id="households-pagination" style="display:none;"></div>
   </div>
 
   <div class="card">
@@ -303,19 +305,88 @@
       eur(stats.total_income) + ' / ' + eur(stats.total_expense);
   }
 
+  // ===== Пагинация (споделена логика за таблиците Потребители / Домакинства) =====
+  const ADMIN_PAGE_SIZE = 10;
+  let usersData = [];
+  let usersPage = 1;
+  let householdsData = [];
+  let householdsPage = 1;
+
+  function paginateSlice(data, page, pageSize) {
+    const start = (page - 1) * pageSize;
+    return data.slice(start, start + pageSize);
+  }
+
+  function renderPagination(containerId, totalItems, currentPage, pageSize, onChange) {
+    const container = document.getElementById(containerId);
+    if (totalItems <= pageSize) {
+      container.style.display = 'none';
+      container.innerHTML = '';
+      return;
+    }
+    container.style.display = 'flex';
+
+    const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+    const startItem = (currentPage - 1) * pageSize + 1;
+    const endItem = Math.min(currentPage * pageSize, totalItems);
+
+    let pages = [];
+    for (let p = 1; p <= totalPages; p++) pages.push(p);
+    let shown;
+    if (totalPages <= 7) {
+      shown = pages;
+    } else {
+      shown = [1];
+      if (currentPage > 3) shown.push('…');
+      for (let p = Math.max(2, currentPage - 1); p <= Math.min(totalPages - 1, currentPage + 1); p++) shown.push(p);
+      if (currentPage < totalPages - 2) shown.push('…');
+      shown.push(totalPages);
+    }
+
+    let controlsHtml = `<button type="button" class="admin-page-btn" data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''} aria-label="Предишна страница">‹</button>`;
+    shown.forEach(p => {
+      if (p === '…') {
+        controlsHtml += `<span class="admin-page-ellipsis">…</span>`;
+      } else {
+        controlsHtml += `<button type="button" class="admin-page-btn${p === currentPage ? ' admin-page-active' : ''}" data-page="${p}">${p}</button>`;
+      }
+    });
+    controlsHtml += `<button type="button" class="admin-page-btn" data-page="${currentPage + 1}" ${currentPage === totalPages ? 'disabled' : ''} aria-label="Следваща страница">›</button>`;
+
+    container.innerHTML = `
+      <div class="admin-pagination-info">${startItem}–${endItem} от ${totalItems}</div>
+      <div class="admin-pagination-controls">${controlsHtml}</div>
+    `;
+
+    container.querySelectorAll('.admin-page-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const p = parseInt(btn.dataset.page, 10);
+        if (!p || p < 1 || p > totalPages || p === currentPage) return;
+        onChange(p);
+      });
+    });
+  }
+
   async function loadUsers() {
     const { data, error } = await supabaseClient.rpc('admin_list_users');
     if (error) { console.error(error); return; }
 
-    document.getElementById('users-count-hint').textContent = (data || []).length + ' общо';
+    usersData = data || [];
+    usersPage = 1;
+    document.getElementById('users-count-hint').textContent = usersData.length + ' общо';
+    renderUsersPage();
+  }
 
+  function renderUsersPage() {
     const tbody = document.getElementById('users-tbody');
-    if (!data || !data.length) {
+    if (!usersData.length) {
       tbody.innerHTML = '<tr><td colspan="5" style="color: var(--text-dim);">Няма данни.</td></tr>';
+      document.getElementById('users-pagination').style.display = 'none';
       return;
     }
 
-    tbody.innerHTML = data.map(u => `
+    const pageItems = paginateSlice(usersData, usersPage, ADMIN_PAGE_SIZE);
+    tbody.innerHTML = pageItems.map(u => `
       <tr>
         <td>${escapeHtml(u.email)}</td>
         <td>${escapeHtml(u.full_name) || '—'}</td>
@@ -323,21 +394,33 @@
         <td>${u.household_count}</td>
         <td>${u.transaction_count}</td>
       </tr>`).join('');
+
+    renderPagination('users-pagination', usersData.length, usersPage, ADMIN_PAGE_SIZE, (p) => {
+      usersPage = p;
+      renderUsersPage();
+    });
   }
 
   async function loadHouseholds() {
     const { data, error } = await supabaseClient.rpc('admin_list_households');
     if (error) { console.error(error); return; }
 
-    document.getElementById('households-count-hint').textContent = (data || []).length + ' общо';
+    householdsData = data || [];
+    householdsPage = 1;
+    document.getElementById('households-count-hint').textContent = householdsData.length + ' общо';
+    renderHouseholdsPage();
+  }
 
+  function renderHouseholdsPage() {
     const tbody = document.getElementById('households-tbody');
-    if (!data || !data.length) {
+    if (!householdsData.length) {
       tbody.innerHTML = '<tr><td colspan="6" style="color: var(--text-dim);">Няма данни.</td></tr>';
+      document.getElementById('households-pagination').style.display = 'none';
       return;
     }
 
-    tbody.innerHTML = data.map(h => `
+    const pageItems = paginateSlice(householdsData, householdsPage, ADMIN_PAGE_SIZE);
+    tbody.innerHTML = pageItems.map(h => `
       <tr>
         <td>${escapeHtml(h.name)}</td>
         <td>${fmtDate(h.created_at)}</td>
@@ -346,6 +429,11 @@
         <td>${eur(h.total_income)}</td>
         <td>${eur(h.total_expense)}</td>
       </tr>`).join('');
+
+    renderPagination('households-pagination', householdsData.length, householdsPage, ADMIN_PAGE_SIZE, (p) => {
+      householdsPage = p;
+      renderHouseholdsPage();
+    });
   }
 
   // ===== Отзиви — модерация =====
