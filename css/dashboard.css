@@ -160,9 +160,9 @@ body.dashboard-body {
   font-family: 'Inter', sans-serif;
   font-size: 13px;
   font-weight: 500;
-  color: #E2E8F0;
+  color: var(--text-secondary);
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--input-border);
   border-radius: 8px;
   padding: 8px 14px;
   cursor: pointer;
@@ -170,13 +170,26 @@ body.dashboard-body {
 }
 
 .btn-ghost:hover {
-  color: #FFFFFF;
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.4);
+  color: var(--text-primary);
+  background: var(--surface-alt);
+  border-color: var(--text-dim);
 }
 
 .btn-ghost:active {
   transform: scale(0.96);
+}
+
+/* Бутоните вътре в тъмнозеления sidebar (напр. „Изход") остават
+   светли и в двете теми, защото фонът им винаги е тъмнозелен. */
+.navbar .btn-ghost {
+  color: #E2E8F0;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.navbar .btn-ghost:hover {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 /* ===== Основно съдържание ===== */
