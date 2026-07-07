@@ -101,6 +101,11 @@
         <button type="button" class="method-btn" data-method="cash" onclick="setRecurMethod('cash')">💵 В брой</button>
       </div>
 
+      <div class="type-toggle" id="recur-freq-toggle">
+        <button type="button" class="type-btn active" data-freq="monthly" onclick="setRecurFrequency('monthly')">Веднъж месечно</button>
+        <button type="button" class="type-btn" data-freq="weekly" onclick="setRecurFrequency('weekly')">Всяка седмица</button>
+      </div>
+
       <div class="field full">
         <label>Сума (€)</label>
         <input type="number" id="recur-amount" step="0.01" min="0.01" placeholder="0.00" required>
@@ -113,13 +118,26 @@
 
       <div class="field full">
         <label>Описание</label>
-        <input type="text" id="recur-description" placeholder="напр. Заплата, Нетфликс абонамент">
+        <input type="text" id="recur-description" placeholder="напр. Заплата, Нетфликс абонамент, седмичен хонорар">
       </div>
 
-      <div class="field full">
+      <div class="field full" id="recur-day-month-field">
         <label>Ден от месеца</label>
-        <input type="number" id="recur-day" min="1" max="31" placeholder="напр. 1" required>
+        <input type="number" id="recur-day" min="1" max="31" placeholder="напр. 1">
         <span class="hint" style="font-size:11.5px;">Ако месецът е по-кратък, ще се приложи на последния му ден.</span>
+      </div>
+
+      <div class="field full" id="recur-day-week-field" style="display:none;">
+        <label>Ден от седмицата</label>
+        <select id="recur-weekday">
+          <option value="1">Понеделник</option>
+          <option value="2">Вторник</option>
+          <option value="3">Сряда</option>
+          <option value="4">Четвъртък</option>
+          <option value="5">Петък</option>
+          <option value="6">Събота</option>
+          <option value="0">Неделя</option>
+        </select>
       </div>
 
       <div class="field full">
@@ -191,6 +209,7 @@
   let recurringRows = [];
   let recurType = 'expense';
   let recurMethod = 'card';
+  let recurFrequency = 'monthly';
 
   const eur = (n) => (Number(n) || 0).toLocaleString('bg-BG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
 
@@ -220,6 +239,13 @@
   function setRecurMethod(method) {
     recurMethod = method;
     document.querySelectorAll('#recur-method-toggle .method-btn').forEach(b => b.classList.toggle('active', b.dataset.method === method));
+  }
+
+  function setRecurFrequency(freq) {
+    recurFrequency = freq;
+    document.querySelectorAll('#recur-freq-toggle .type-btn').forEach(b => b.classList.toggle('active', b.dataset.freq === freq));
+    document.getElementById('recur-day-month-field').style.display = freq === 'monthly' ? 'block' : 'none';
+    document.getElementById('recur-day-week-field').style.display = freq === 'weekly' ? 'block' : 'none';
   }
 
   function populateRecurCategorySelect() {
@@ -263,7 +289,11 @@
     await loadCategories();
 
     // Досъбира просрочени правила веднага (без да чакаме нощния cron)
-    await supabaseClient.rpc('run_recurring_now', { p_household_id: currentHouseholdId });
+    try {
+      await supabaseClient.rpc('run_recurring_now', { p_household_id: currentHouseholdId });
+    } catch (e) {
+      console.error('run_recurring_now failed', e);
+    }
 
     await loadRecurring();
   })();
@@ -283,14 +313,27 @@
   async function loadRecurring() {
     const { data, error } = await supabaseClient
       .from('recurring_transactions')
-      .select('*, categories(name, icon, type)')
+      .select('*')
       .eq('household_id', currentHouseholdId)
-      .order('day_of_month');
+      .order('created_at');
 
-    if (error) { console.error(error); return; }
+    if (error) {
+      console.error(error);
+      document.getElementById('recur-list').innerHTML =
+        '<div class="empty-state">Грешка при зареждане: ' + escapeHtml(error.message) + '</div>';
+      document.getElementById('recur-count-label').textContent = '';
+      return;
+    }
+
     recurringRows = data || [];
     renderRecurring();
   }
+
+  function categoryById(id) {
+    return categories.find(c => c.id === id) || null;
+  }
+
+  const WEEKDAY_NAMES = ['неделя', 'понеделник', 'вторник', 'сряда', 'четвъртък', 'петък', 'събота'];
 
   function renderRecurring() {
     const list = document.getElementById('recur-list');
@@ -303,16 +346,20 @@
     }
 
     list.innerHTML = recurringRows.map(r => {
-      const isIncome = r.categories?.type === 'income';
+      const cat = categoryById(r.category_id);
+      const isIncome = cat?.type === 'income';
       const sign = isIncome ? '+' : '−';
       const methodIcon = r.payment_method === 'cash' ? '💵' : (r.payment_method === 'card' ? '💳 ' : '');
       const nextDate = new Date(r.next_run_date).toLocaleDateString('bg-BG');
+      const schedule = r.frequency === 'weekly'
+        ? `всяка ${WEEKDAY_NAMES[r.day_of_week]}`
+        : `всеки месец на ${r.day_of_month}-во`;
       return `
         <div class="recur-row ${r.is_active ? '' : 'paused'}">
-          <div class="recur-icon">${escapeHtml(r.categories?.icon) || '💰'}</div>
+          <div class="recur-icon">${escapeHtml(cat?.icon) || '💰'}</div>
           <div class="recur-info">
-            <div class="recur-desc">${escapeHtml(r.description || r.categories?.name) || 'Транзакция'}${r.is_active ? '' : '<span class="recur-badge">на пауза</span>'}</div>
-            <div class="recur-meta">${methodIcon} всеки месец на ${r.day_of_month}-во · следваща: ${nextDate}</div>
+            <div class="recur-desc">${escapeHtml(r.description || cat?.name) || 'Транзакция'}${r.is_active ? '' : '<span class="recur-badge">на пауза</span>'}</div>
+            <div class="recur-meta">${methodIcon} ${schedule} · следваща: ${nextDate}</div>
           </div>
           <div class="recur-amount ${isIncome ? 'income' : 'expense'}">${sign} ${eur(r.amount)}</div>
           <div class="recur-actions">
@@ -329,29 +376,38 @@
 
     const amount = parseFloat(document.getElementById('recur-amount').value);
     const categoryId = document.getElementById('recur-category').value;
-    const day = parseInt(document.getElementById('recur-day').value, 10);
     const description = document.getElementById('recur-description').value.trim();
 
     if (!categoryId) { setStatus('recur-status', 'Изберете категория.', 'error'); return; }
     if (isNaN(amount) || amount <= 0) { setStatus('recur-status', 'Въведете сума по-голяма от 0.', 'error'); return; }
-    if (isNaN(day) || day < 1 || day > 31) { setStatus('recur-status', 'Денят трябва да е между 1 и 31.', 'error'); return; }
 
-    setStatus('recur-status', 'Добавяне…', '');
-
-    const today = new Date();
-    const nextRunDate = computeNextRunDate(today, day);
-
-    const { error } = await supabaseClient.from('recurring_transactions').insert([{
+    const payload = {
       household_id: currentHouseholdId,
       user_id: currentUser.id,
       category_id: categoryId,
       amount: Math.round(amount * 100) / 100,
       description,
       payment_method: recurMethod,
-      day_of_month: day,
-      next_run_date: nextRunDate,
+      frequency: recurFrequency,
       is_active: true,
-    }]);
+    };
+
+    const today = new Date();
+
+    if (recurFrequency === 'monthly') {
+      const day = parseInt(document.getElementById('recur-day').value, 10);
+      if (isNaN(day) || day < 1 || day > 31) { setStatus('recur-status', 'Денят трябва да е между 1 и 31.', 'error'); return; }
+      payload.day_of_month = day;
+      payload.next_run_date = computeNextMonthlyRunDate(today, day);
+    } else {
+      const weekday = parseInt(document.getElementById('recur-weekday').value, 10);
+      payload.day_of_week = weekday;
+      payload.next_run_date = computeNextWeeklyRunDate(today, weekday);
+    }
+
+    setStatus('recur-status', 'Добавяне…', '');
+
+    const { error } = await supabaseClient.from('recurring_transactions').insert([payload]);
 
     if (error) {
       setStatus('recur-status', 'Грешка: ' + error.message, 'error');
@@ -363,25 +419,34 @@
     document.getElementById('recur-form').reset();
     setRecurType('expense');
     setRecurMethod('card');
+    setRecurFrequency('monthly');
 
     await loadRecurring();
   }
 
-  // Първата следваща дата: ако избраният ден от текущия месец вече е минал, взимаме следващия месец
-  function computeNextRunDate(today, day) {
+  // Първата следваща дата за месечно правило: ако денят този месец вече е минал, взимаме следващия месец
+  function computeNextMonthlyRunDate(today, day) {
     const y = today.getFullYear();
     const m = today.getMonth(); // 0-based
     const daysInThisMonth = new Date(y, m + 1, 0).getDate();
     const clampedThisMonth = Math.min(day, daysInThisMonth);
     const candidateThisMonth = new Date(y, m, clampedThisMonth);
 
-    if (candidateThisMonth >= new Date(y, today.getMonth(), today.getDate())) {
+    if (candidateThisMonth >= new Date(y, m, today.getDate())) {
       return candidateThisMonth.toISOString().slice(0, 10);
     }
 
     const daysInNextMonth = new Date(y, m + 2, 0).getDate();
     const clampedNextMonth = Math.min(day, daysInNextMonth);
     return new Date(y, m + 1, clampedNextMonth).toISOString().slice(0, 10);
+  }
+
+  // Първата следваща дата за седмично правило: следващият ден от седмицата (0=нед..6=съб) на/след днес
+  function computeNextWeeklyRunDate(today, weekday) {
+    const result = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const diff = (weekday - result.getDay() + 7) % 7;
+    result.setDate(result.getDate() + diff);
+    return result.toISOString().slice(0, 10);
   }
 
   // ===== Пауза / възобновяване =====
