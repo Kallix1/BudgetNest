@@ -8,8 +8,8 @@
 <meta name="description" content="Табло на BudgetNest — общ преглед на приходите, разходите и баланса на домакинството.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght=500;600;700&family=Inter:wght=400;500;600;700&family=IBM+Plex+Mono:wght=400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=9">
-<link rel="stylesheet" href="css/dashboard.css?v=9">
+<link rel="stylesheet" href="css/style.css?v=10">
+<link rel="stylesheet" href="css/dashboard.css?v=10">
 <link rel="stylesheet" href="css/datepicker.css?v=1">
 <script src="datepicker.js?v=1" defer></script>
 <script src="nav.js?v=9" defer></script>
@@ -191,6 +191,11 @@
           <div class="type-toggle" id="tx-type-toggle">
             <button type="button" class="type-btn active" data-type="expense" onclick="setTxType('expense')">Разход</button>
             <button type="button" class="type-btn" data-type="income" onclick="setTxType('income')">Приход</button>
+          </div>
+
+          <div class="method-toggle" id="tx-method-toggle">
+            <button type="button" class="method-btn active" data-method="card" onclick="setQuickMethod('card')">💳 Карта</button>
+            <button type="button" class="method-btn" data-method="cash" onclick="setQuickMethod('cash')">💵 В брой</button>
           </div>
 
           <div class="field full">
@@ -378,6 +383,7 @@
   let memberProfiles = {}; // user_id -> { full_name, email }
   let categories = [];
   let currentTxType = 'expense';
+  let quickAddMethod = 'card';
   let dashboardChart = null;
   let trendChart = null;
   let currentChartViewType = 'expense';
@@ -398,6 +404,11 @@
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
+  }
+
+  function setQuickMethod(method) {
+    quickAddMethod = method;
+    document.querySelectorAll('#tx-method-toggle .method-btn').forEach(b => b.classList.toggle('active', b.dataset.method === method));
   }
 
   function setTxType(type) {
@@ -904,7 +915,7 @@
           <div class="tx-icon">${escapeHtml(t.categories?.icon) || '💰'}</div>
           <div class="tx-info">
             <div class="tx-desc">${escapeHtml(t.description || t.categories?.name) || 'Транзакция'}</div>
-            <div class="tx-meta">${escapeHtml(t.transaction_date)} <span style="color: var(--nest-gold); font-size: 11px; margin-left: 6px; font-weight:600;">✏️ Промени</span>${actorName}</div>
+            <div class="tx-meta">${t.payment_method === 'cash' ? '💵' : t.payment_method === 'card' ? '💳' : ''} ${escapeHtml(t.transaction_date)} <span style="color: var(--nest-gold); font-size: 11px; margin-left: 6px; font-weight:600;">✏️ Промени</span>${actorName}</div>
           </div>
           <div class="tx-amount ${isIncome ? 'income' : 'expense'}">${sign} ${eur(t.amount)}</div>
         </div>`;
@@ -961,6 +972,7 @@
     document.getElementById('tx-delete').style.display = 'block';
 
     setTxType(tx.categories?.type || 'expense');
+    setQuickMethod(tx.payment_method || 'card');
     document.getElementById('tx-amount').value = tx.amount;
     document.getElementById('tx-description').value = tx.description || '';
     document.getElementById('tx-date').value = tx.transaction_date;
@@ -981,6 +993,7 @@
     document.getElementById('quick-add-form').reset();
     document.getElementById('tx-date').valueAsDate = new Date();
     setTxType('expense');
+    setQuickMethod('card');
   }
 
   // ===== Управление на Поп-ъп Прозореца =====
@@ -1039,6 +1052,7 @@
       amount: parseFloat(document.getElementById('tx-amount').value),
       description: document.getElementById('tx-description').value.trim(),
       transaction_date: document.getElementById('tx-date').value,
+      payment_method: quickAddMethod,
     };
 
     let resultError = null;
