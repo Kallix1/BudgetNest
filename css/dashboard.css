@@ -229,6 +229,91 @@ body.dashboard-body {
 .summary-value.income  { color: var(--color-income); }
 .summary-value.expense { color: #DC2626; }
 .summary-value.balance { color: var(--text-primary); }
+.summary-value.card-balance { color: var(--nest-gold-accent); }
+.summary-value.cash-balance { color: var(--nest-green-mid); }
+
+/* ===== Портфейл (карта / в брой) ===== */
+.wallet-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.wallet-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--card-shadow);
+}
+
+.wallet-card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.wallet-icon {
+  font-size: 20px;
+}
+
+.wallet-value {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 30px;
+  font-weight: 700;
+  margin: 10px 0 16px;
+}
+
+.wallet-value.card { color: var(--nest-gold-accent); }
+.wallet-value.cash { color: var(--nest-green-mid); }
+
+.wallet-edit-row {
+  display: flex;
+  gap: 8px;
+}
+
+.wallet-edit-row input {
+  flex: 1;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: var(--text-primary);
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  outline: none;
+}
+
+.wallet-edit-row input:focus {
+  border-color: var(--nest-green-mid);
+}
+
+.wallet-edit-row button {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  color: #FFFFFF;
+  background: var(--nest-green-mid);
+  border: 1px solid var(--nest-green-dark);
+  border-radius: 10px;
+  padding: 10px 16px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.wallet-total-card {
+  background: var(--surface-alt);
+  border: 1px dashed var(--border-soft);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
 
 .content-grid {
   display: grid;
