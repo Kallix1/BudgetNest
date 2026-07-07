@@ -9,6 +9,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css?v=9">
 <link rel="stylesheet" href="css/dashboard.css?v=9">
+<link rel="stylesheet" href="css/emojipicker.css?v=1">
+<script src="emojipicker.js?v=1" defer></script>
 <script src="nav.js?v=9" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -200,7 +202,7 @@
       <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end;">
         <div class="field" style="width:70px; flex:0 0 auto;">
           <label style="font-size:12px;">Икона</label>
-          <input type="text" id="new-cat-icon" maxlength="2" placeholder="🍎" style="text-align:center; font-size:18px;">
+          <input type="text" id="new-cat-icon" data-emoji-picker maxlength="2" placeholder="🍎" style="text-align:center; font-size:18px;">
         </div>
         <div class="field" style="flex:1; min-width:120px;">
           <label style="font-size:12px;">Име</label>

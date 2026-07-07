@@ -1,0 +1,131 @@
+/* ============================================
+   BudgetNest — Custom emoji picker (за икони на категории)
+   Използва темата на сайта (--nest-green, --nest-gold, ...)
+   ============================================ */
+
+.emp-input-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.emp-input-wrap input.emp-trigger {
+  width: 100%;
+  cursor: pointer;
+  caret-color: transparent;
+}
+
+.emp-input-wrap.emp-open input.emp-trigger {
+  border-color: var(--nest-green-mid);
+  box-shadow: 0 0 0 3px rgba(37, 74, 55, 0.1);
+}
+
+/* ===== Панел ===== */
+.emp-panel {
+  position: fixed;
+  z-index: 3000;
+  width: 300px;
+  max-height: 340px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+  box-shadow: var(--card-shadow), 0 12px 28px rgba(0, 0, 0, 0.12);
+  font-family: 'Inter', sans-serif;
+  opacity: 0;
+  transform: translateY(-6px) scale(0.98);
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  overflow: hidden;
+}
+
+.emp-panel.emp-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.emp-search-row {
+  padding: 12px 12px 8px;
+  flex-shrink: 0;
+}
+
+.emp-search-row input {
+  width: 100%;
+  font-family: 'Inter', sans-serif;
+  font-size: 13.5px;
+  color: var(--text-primary);
+  background: var(--surface-alt);
+  border: 1px solid var(--input-border);
+  border-radius: 9px;
+  padding: 9px 12px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.emp-search-row input:focus {
+  border-color: var(--nest-green-mid);
+}
+
+.emp-search-row input::placeholder {
+  color: #94A3B8;
+}
+
+.emp-scroll {
+  overflow-y: auto;
+  padding: 4px 12px 12px;
+  flex: 1;
+}
+
+.emp-scroll::-webkit-scrollbar { width: 6px; }
+.emp-scroll::-webkit-scrollbar-thumb { background: var(--border-soft); border-radius: 4px; }
+
+.emp-group-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-dim);
+  padding: 10px 2px 6px;
+}
+
+.emp-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.emp-emoji-btn {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  border-radius: 9px;
+  font-size: 19px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.emp-emoji-btn:hover {
+  background: var(--surface-alt);
+  transform: scale(1.12);
+}
+
+.emp-emoji-btn.emp-selected {
+  background: var(--nest-green-mid);
+  box-shadow: 0 0 0 2px var(--nest-gold-accent) inset;
+}
+
+.emp-empty {
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 13px;
+  padding: 24px 8px;
+}
+
+@media (max-width: 480px) {
+  .emp-panel { width: min(300px, calc(100vw - 32px)); }
+}
