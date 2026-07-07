@@ -90,10 +90,6 @@
       <div class="summary-label">Разходи този месец</div>
       <div class="summary-value expense" id="summary-expense">0.00 €</div>
     </div>
-    <div class="summary-card">
-      <div class="summary-label">Баланс този месец</div>
-      <div class="summary-value balance" id="summary-balance">0.00 €</div>
-    </div>
     <div class="summary-card" style="cursor:pointer;" onclick="window.location.href='wallets.html'" title="Виж портфейла">
       <div class="summary-label">В картата</div>
       <div class="summary-value card-balance" id="summary-card-balance">0.00 €</div>
@@ -101,6 +97,10 @@
     <div class="summary-card" style="cursor:pointer;" onclick="window.location.href='wallets.html'" title="Виж портфейла">
       <div class="summary-label">В брой</div>
       <div class="summary-value cash-balance" id="summary-cash-balance">0.00 €</div>
+    </div>
+    <div class="summary-card" style="cursor:pointer;" onclick="window.location.href='wallets.html'" title="Виж портфейла">
+      <div class="summary-label">Общо</div>
+      <div class="summary-value balance" id="summary-total-balance">0.00 €</div>
     </div>
   </div>
 
@@ -663,6 +663,7 @@
   async function loadWalletSummary() {
     const cardEl = document.getElementById('summary-card-balance');
     const cashEl = document.getElementById('summary-cash-balance');
+    const totalEl = document.getElementById('summary-total-balance');
     if (!cardEl || !cashEl) return;
 
     const { data, error } = await supabaseClient
@@ -673,8 +674,12 @@
 
     if (error) { console.error(error); return; }
 
-    cardEl.textContent = eur(data ? data.card_balance : 0);
-    cashEl.textContent = eur(data ? data.cash_balance : 0);
+    const card = data ? Number(data.card_balance) : 0;
+    const cash = data ? Number(data.cash_balance) : 0;
+
+    cardEl.textContent = eur(card);
+    cashEl.textContent = eur(cash);
+    if (totalEl) totalEl.textContent = eur(card + cash);
   }
 
   // ===== Банер: категории близо до / над лимита този месец =====
@@ -829,7 +834,6 @@
     const expense = txs.filter(t => t.categories?.type === 'expense').reduce((s, t) => s + Number(t.amount), 0);
     document.getElementById('summary-income').textContent = eur(income);
     document.getElementById('summary-expense').textContent = eur(expense);
-    document.getElementById('summary-balance').textContent = eur(income - expense);
   }
 
   function toggleChartView() {
