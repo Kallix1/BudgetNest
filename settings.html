@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B1%3C/text%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Настройки — BudgetNest</title>
+<title data-i18n="settings.page_title">Настройки — BudgetNest</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css?v=14">
@@ -146,43 +146,43 @@
 <main class="dashboard-main" id="page-main" style="display:none;">
 
   <div class="page-header">
-    <h1>Настройки</h1>
+    <h1 data-i18n="settings.h1">Настройки</h1>
   </div>
 
   <div class="card">
-    <div class="card-title">Име на домакинството</div>
+    <div class="card-title" data-i18n="settings.household_name_title">Име на домакинството</div>
     <div class="invite-row">
       <div class="field" style="flex:1;">
-        <input type="text" id="household-name-input" placeholder="Име на домакинството">
+        <input type="text" id="household-name-input" data-i18n-placeholder="settings.household_name_placeholder" placeholder="Име на домакинството">
       </div>
-      <button type="button" class="budget-save-btn" onclick="handleRenameHousehold()">Запази</button>
+      <button type="button" class="budget-save-btn" onclick="handleRenameHousehold()" data-i18n="settings.save_btn">Запази</button>
     </div>
     <div class="status-msg" id="household-name-status" style="margin-top: 10px;"></div>
   </div>
 
   <div class="card">
     <div class="card-title">
-      Членове
+      <span data-i18n="settings.members_title">Членове</span>
       <span class="hint" id="members-count-label"></span>
     </div>
     <div id="members-list">
-      <div class="empty-state">Зареждане…</div>
+      <div class="empty-state" data-i18n="settings.loading">Зареждане…</div>
     </div>
 
     <div id="pending-invites-wrap" style="display:none; margin-top: 18px;">
-      <div class="card-title" style="font-size: 13px;">Чакащи покани</div>
+      <div class="card-title" data-i18n="settings.pending_invites_title" style="font-size: 13px;">Чакащи покани</div>
       <div id="pending-invites-list"></div>
     </div>
 
     <div id="invite-section">
       <div class="invite-row">
         <div class="field" style="flex:1;">
-          <input type="email" id="invite-email-input" placeholder="имейл на вече регистриран потребител">
+          <input type="email" id="invite-email-input" data-i18n-placeholder="settings.invite_email_placeholder" placeholder="имейл на вече регистриран потребител">
         </div>
-        <button type="button" class="budget-save-btn" onclick="handleInviteMember()">Добави</button>
+        <button type="button" class="budget-save-btn" onclick="handleInviteMember()" data-i18n="settings.add_btn">Добави</button>
       </div>
       <div class="status-msg" id="invite-status" style="margin-top: 10px;"></div>
-      <p style="font-size: 12px; color: var(--text-dim); margin-top: 10px; line-height: 1.5;">
+      <p data-i18n="settings.invite_hint" style="font-size: 12px; color: var(--text-dim); margin-top: 10px; line-height: 1.5;">
         Поканеният ще види молба за потвърждение при следващия си вход в BudgetNest — независимо дали вече има акаунт, или тепърва ще се регистрира.
       </p>
     </div>
@@ -191,10 +191,10 @@
   <!-- Управление на категории -->
   <div class="card">
     <div class="card-title">
-      Категории
+      <span data-i18n="settings.categories_title">Категории</span>
       <span class="hint" id="categories-count-hint"></span>
     </div>
-    <p style="font-size:13px; color:var(--text-secondary); margin-bottom:16px; line-height:1.5;">
+    <p data-i18n="settings.categories_hint" style="font-size:13px; color:var(--text-secondary); margin-bottom:16px; line-height:1.5;">
       Добавете, преименувайте или премахнете категории за приходи и разходи на домакинството.
     </p>
     <div id="categories-list">
@@ -204,24 +204,24 @@
     </div>
 
     <div id="category-add-section" style="margin-top:18px; padding-top:16px; border-top:1px solid var(--border-soft);">
-      <div style="font-size:13px; font-weight:600; color:var(--text-primary); margin-bottom:10px;">Нова категория</div>
+      <div data-i18n="settings.new_category_title" style="font-size:13px; font-weight:600; color:var(--text-primary); margin-bottom:10px;">Нова категория</div>
       <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end;">
         <div class="field" style="width:70px; flex:0 0 auto;">
-          <label style="font-size:12px;">Икона</label>
+          <label style="font-size:12px;" data-i18n="settings.icon_label">Икона</label>
           <input type="text" id="new-cat-icon" data-emoji-picker maxlength="2" placeholder="🍎" style="text-align:center; font-size:18px;">
         </div>
         <div class="field" style="flex:1; min-width:120px;">
-          <label style="font-size:12px;">Име</label>
-          <input type="text" id="new-cat-name" maxlength="40" placeholder="напр. Домашни любимци">
+          <label style="font-size:12px;" data-i18n="settings.name_label">Име</label>
+          <input type="text" id="new-cat-name" maxlength="40" data-i18n-placeholder="settings.name_placeholder" placeholder="напр. Домашни любимци">
         </div>
         <div class="field" style="flex:0 0 auto;">
-          <label style="font-size:12px;">Тип</label>
+          <label style="font-size:12px;" data-i18n="settings.type_label">Тип</label>
           <select id="new-cat-type">
-            <option value="expense">Разход</option>
-            <option value="income">Приход</option>
+            <option value="expense" data-i18n="settings.type_expense">Разход</option>
+            <option value="income" data-i18n="settings.type_income">Приход</option>
           </select>
         </div>
-        <button type="button" class="budget-save-btn" onclick="handleAddCategory()" style="height:44px;">Добави</button>
+        <button type="button" class="budget-save-btn" onclick="handleAddCategory()" style="height:44px;" data-i18n="settings.add_btn">Добави</button>
       </div>
       <div class="status-msg" id="category-status" style="margin-top:10px;"></div>
     </div>
@@ -230,11 +230,11 @@
 <div class="overlay" id="app-confirm-overlay" style="display:none; z-index: 9999;">
   <div class="overlay-card" style="max-width: 420px; text-align: center; padding: 30px;">
     <div style="font-size: 40px; margin-bottom: 15px;">⚠️</div>
-    <h3 id="app-confirm-title" style="margin-bottom: 10px; font-family: 'Space Grotesk', sans-serif; font-size: 20px; color: var(--text-primary);">Потвърждение</h3>
+    <h3 id="app-confirm-title" data-i18n="common.confirm_title" style="margin-bottom: 10px; font-family: 'Space Grotesk', sans-serif; font-size: 20px; color: var(--text-primary);">Потвърждение</h3>
     <p id="app-confirm-message" style="color: var(--text-secondary); margin-bottom: 25px; font-size: 14px; line-height: 1.5;"></p>
     <div style="display: flex; gap: 12px; justify-content: center;">
-      <button type="button" id="app-confirm-cancel-btn" style="flex: 1; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: var(--text-secondary); background: var(--surface-alt); border: 1px solid var(--border-soft); border-radius: 10px; padding: 12px; cursor: pointer;">Отказ</button>
-      <button type="button" id="app-confirm-ok-btn" style="flex: 1; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: #FFFFFF; background: #EF4444; border: 1px solid #DC2626; border-radius: 10px; padding: 12px; cursor: pointer;">Да, продължи</button>
+      <button type="button" id="app-confirm-cancel-btn" data-i18n="common.cancel" style="flex: 1; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: var(--text-secondary); background: var(--surface-alt); border: 1px solid var(--border-soft); border-radius: 10px; padding: 12px; cursor: pointer;">Отказ</button>
+      <button type="button" id="app-confirm-ok-btn" data-i18n="common.confirm_ok" style="flex: 1; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: #FFFFFF; background: #EF4444; border: 1px solid #DC2626; border-radius: 10px; padding: 12px; cursor: pointer;">Да, продължи</button>
     </div>
   </div>
 </div>
@@ -265,7 +265,7 @@
   // ===== Модал за потвърждение (замества confirm()) =====
   function showConfirm(message, title) {
     return new Promise((resolve) => {
-      document.getElementById('app-confirm-title').textContent = title || 'Потвърждение';
+      document.getElementById('app-confirm-title').textContent = title || (window.BudgetNestI18n ? window.BudgetNestI18n.t('common.confirm_title') : 'Потвърждение');
       document.getElementById('app-confirm-message').textContent = message;
       const overlay = document.getElementById('app-confirm-overlay');
       overlay.style.display = 'flex';
@@ -345,6 +345,9 @@
       .replace(/'/g, '&#39;');
   }
 
+  const tr = (key, vars) => window.BudgetNestI18n ? window.BudgetNestI18n.t(key, vars) : key;
+  const getLang = () => window.BudgetNestI18n ? window.BudgetNestI18n.getLang() : 'bg';
+
   function setStatus(elId, message, type) {
     const el = document.getElementById(elId);
     el.textContent = message;
@@ -395,11 +398,11 @@
   async function handleRenameHousehold() {
     const name = document.getElementById('household-name-input').value.trim();
     if (!name) {
-      setStatus('household-name-status', 'Името не може да е празно.', 'error');
+      setStatus('household-name-status', tr('settings.err_name_empty'), 'error');
       return;
     }
 
-    setStatus('household-name-status', 'Запазване…', '');
+    setStatus('household-name-status', tr('settings.status_saving'), '');
 
     const { error } = await supabaseClient
       .from('households')
@@ -407,12 +410,12 @@
       .eq('id', currentHouseholdId);
 
     if (error) {
-      setStatus('household-name-status', 'Грешка: ' + error.message, 'error');
+      setStatus('household-name-status', tr('common.error_prefix') + error.message, 'error');
       return;
     }
 
     document.getElementById('household-name-pill').textContent = name;
-    setStatus('household-name-status', 'Запазено ✓', 'success');
+    setStatus('household-name-status', tr('settings.status_saved'), 'success');
     setTimeout(() => setStatus('household-name-status', '', ''), 2000);
   }
 
@@ -427,7 +430,7 @@
     if (error) {
       console.error(error);
       document.getElementById('members-list').innerHTML =
-        '<div class="empty-state" style="color:#DC2626;">Грешка при зареждане: ' + error.message + '</div>';
+        '<div class="empty-state" style="color:#DC2626;">' + escapeHtml(tr('settings.err_loading_prefix')) + escapeHtml(error.message) + '</div>';
       return;
     }
     members = data || [];
@@ -441,10 +444,10 @@
 
   function renderMembers() {
     const container = document.getElementById('members-list');
-    document.getElementById('members-count-label').textContent = members.length + (members.length === 1 ? ' член' : ' членове');
+    document.getElementById('members-count-label').textContent = tr(members.length === 1 ? 'settings.members_count_one' : 'settings.members_count_other', { n: members.length });
 
     container.innerHTML = members.map(m => {
-      const name = m.profiles?.full_name || m.profiles?.email || 'Неизвестен потребител';
+      const name = m.profiles?.full_name || m.profiles?.email || tr('settings.unknown_user');
       const email = m.profiles?.email || '';
       const canRemove = isOwner && m.role !== 'owner' && m.user_id !== currentUser.id;
 
@@ -458,8 +461,8 @@
             </div>
           </div>
           <div class="member-actions">
-            <span class="member-role ${m.role === 'owner' ? 'owner' : ''}">${m.role === 'owner' ? 'Собственик' : 'Член'}</span>
-            ${canRemove ? `<button class="member-remove" onclick="handleRemoveMember('${m.id}')">Премахни</button>` : ''}
+            <span class="member-role ${m.role === 'owner' ? 'owner' : ''}">${m.role === 'owner' ? tr('settings.role_owner') : tr('settings.role_member')}</span>
+            ${canRemove ? `<button class="member-remove" onclick="handleRemoveMember('${m.id}')">${tr('settings.remove_btn')}</button>` : ''}
           </div>
         </div>`;
     }).join('');
@@ -472,21 +475,21 @@
   async function handleInviteMember() {
     const email = document.getElementById('invite-email-input').value.trim().toLowerCase();
     if (!email) {
-      setStatus('invite-status', 'Въведете имейл.', 'error');
+      setStatus('invite-status', tr('settings.err_email_required'), 'error');
       return;
     }
 
     if (email === currentUser.email.toLowerCase()) {
-      setStatus('invite-status', 'Не можете да поканите себе си.', 'error');
+      setStatus('invite-status', tr('settings.err_cant_invite_self'), 'error');
       return;
     }
 
     if (members.some(m => (m.profiles?.email || '').toLowerCase() === email)) {
-      setStatus('invite-status', 'Този потребител вече е член на домакинството.', 'error');
+      setStatus('invite-status', tr('settings.err_already_member'), 'error');
       return;
     }
 
-    setStatus('invite-status', 'Изпращане на покана…', '');
+    setStatus('invite-status', tr('settings.status_sending_invite'), '');
 
     const { error: inviteError } = await supabaseClient
       .from('household_invites')
@@ -496,12 +499,12 @@
       );
 
     if (inviteError) {
-      setStatus('invite-status', 'Грешка: ' + inviteError.message, 'error');
+      setStatus('invite-status', tr('common.error_prefix') + inviteError.message, 'error');
       return;
     }
 
     document.getElementById('invite-email-input').value = '';
-    setStatus('invite-status', 'Поканата е изпратена ✓ Ще бъде потвърдена при следващия вход на потребителя.', 'success');
+    setStatus('invite-status', tr('settings.toast_invite_sent'), 'success');
     await loadPendingInvites();
   }
 
@@ -537,15 +540,15 @@
       <div class="pending-invite-row">
         <div>
           <span class="pending-invite-email">${escapeHtml(inv.email)}</span>
-          <span class="pending-invite-tag">Чака регистрация</span>
+          <span class="pending-invite-tag">${escapeHtml(tr('settings.pending_tag'))}</span>
         </div>
-        <button class="pending-invite-cancel" onclick="handleCancelInvite('${inv.id}')">Отмени</button>
+        <button class="pending-invite-cancel" onclick="handleCancelInvite('${inv.id}')">${escapeHtml(tr('settings.cancel_invite_btn'))}</button>
       </div>`).join('');
   }
 
   // ===== Отмяна на чакаща покана =====
   async function handleCancelInvite(inviteId) {
-    const ok = await showConfirm('Сигурни ли сте, че искате да отмените тази покана?', 'Отмяна на покана');
+    const ok = await showConfirm(tr('settings.confirm_cancel_invite_message'), tr('settings.confirm_cancel_invite_title'));
     if (!ok) return;
 
     const { error } = await supabaseClient
@@ -554,17 +557,17 @@
       .eq('id', inviteId);
 
     if (error) {
-      showToast('Грешка: ' + error.message, 'error');
+      showToast(tr('common.error_prefix') + error.message, 'error');
       return;
     }
 
-    showToast('Поканата е отменена', 'success');
+    showToast(tr('settings.toast_invite_cancelled'), 'success');
     await loadPendingInvites();
   }
 
   // ===== Премахване на член =====
   async function handleRemoveMember(membershipId) {
-    const ok = await showConfirm('Сигурни ли сте, че искате да премахнете този член от домакинството?', 'Премахване на член');
+    const ok = await showConfirm(tr('settings.confirm_remove_member_message'), tr('settings.confirm_remove_member_title'));
     if (!ok) return;
 
     const { error } = await supabaseClient
@@ -573,11 +576,11 @@
       .eq('id', membershipId);
 
     if (error) {
-      showToast('Грешка: ' + error.message, 'error');
+      showToast(tr('common.error_prefix') + error.message, 'error');
       return;
     }
 
-    showToast('Членът е премахнат', 'success');
+    showToast(tr('settings.toast_member_removed'), 'success');
     await loadMembers();
   }
 
@@ -595,7 +598,7 @@
 
     if (error) {
       console.error(error);
-      listEl.innerHTML = '<div class="empty-state" style="color:#DC2626;">Грешка при зареждане: ' + escapeHtml(error.message) + '</div>';
+      listEl.innerHTML = '<div class="empty-state" style="color:#DC2626;">' + escapeHtml(tr('settings.err_loading_prefix')) + escapeHtml(error.message) + '</div>';
       return;
     }
     categories = data || [];
@@ -605,14 +608,14 @@
   function renderCategories() {
     const listEl = document.getElementById('categories-list');
     const hint = document.getElementById('categories-count-hint');
-    hint.textContent = categories.length ? categories.length + ' общо' : '';
+    hint.textContent = categories.length ? tr('settings.categories_count_suffix', { n: categories.length }) : '';
 
     if (!categories.length) {
-      listEl.innerHTML = '<div class="empty-state">Все още няма категории. Добавете първата по-долу.</div>';
+      listEl.innerHTML = '<div class="empty-state">' + escapeHtml(tr('settings.empty_no_categories')) + '</div>';
       return;
     }
 
-    const typeLabel = (t) => t === 'income' ? 'Приход' : 'Разход';
+    const typeLabel = (t) => t === 'income' ? tr('settings.type_income') : tr('settings.type_expense');
 
     listEl.innerHTML = categories.map(c => `
       <div class="member-row">
@@ -625,42 +628,42 @@
         </div>
         <div class="member-actions">
           <span class="member-role ${c.type === 'income' ? 'owner' : ''}">${typeLabel(c.type)}</span>
-          ${isOwner ? `<button class="member-remove" onclick="handleDeleteCategory('${c.id}')">Премахни</button>` : ''}
+          ${isOwner ? `<button class="member-remove" onclick="handleDeleteCategory('${c.id}')">${tr('settings.remove_btn')}</button>` : ''}
         </div>
       </div>`).join('');
   }
 
   async function handleAddCategory() {
     if (!isOwner) {
-      setStatus('category-status', 'Само собственикът на домакинството може да добавя категории.', 'error');
+      setStatus('category-status', tr('settings.err_owner_only_add'), 'error');
       return;
     }
     const icon = document.getElementById('new-cat-icon').value.trim();
     const name = document.getElementById('new-cat-name').value.trim();
     const type = document.getElementById('new-cat-type').value;
 
-    if (!name) { setStatus('category-status', 'Въведете име на категорията.', 'error'); return; }
+    if (!name) { setStatus('category-status', tr('settings.err_category_name_required'), 'error'); return; }
 
     // Проверка за дублиране (по име + тип), без значение за главни/малки букви
     const exists = categories.some(c =>
       c.type === type && c.name.trim().toLowerCase() === name.toLowerCase());
-    if (exists) { setStatus('category-status', 'Вече има категория с това име и тип.', 'error'); return; }
+    if (exists) { setStatus('category-status', tr('settings.err_category_duplicate'), 'error'); return; }
 
-    setStatus('category-status', 'Добавяне…', '');
+    setStatus('category-status', tr('settings.status_adding'), '');
 
     const { error } = await supabaseClient
       .from('categories')
       .insert([{ household_id: currentHouseholdId, name, icon: icon || '📦', type, is_default: false }]);
 
     if (error) {
-      setStatus('category-status', 'Грешка: ' + error.message, 'error');
+      setStatus('category-status', tr('common.error_prefix') + error.message, 'error');
       return;
     }
 
     document.getElementById('new-cat-icon').value = '';
     document.getElementById('new-cat-name').value = '';
     document.getElementById('new-cat-type').value = 'expense';
-    setStatus('category-status', 'Категорията е добавена ✓', 'success');
+    setStatus('category-status', tr('settings.toast_category_added'), 'success');
     setTimeout(() => setStatus('category-status', '', ''), 2000);
     await loadCategories();
   }
@@ -676,24 +679,24 @@
       .eq('category_id', id);
 
     if (countErr) {
-      showToast('Грешка при проверка: ' + countErr.message, 'error');
+      showToast(tr('settings.err_check_prefix') + countErr.message, 'error');
       return;
     }
 
     if (count && count > 0) {
-      showToast(`Категорията „${cat.name}" се използва в ${count} ${count === 1 ? 'транзакция' : 'транзакции'} и не може да бъде премахната.`, 'error');
+      showToast(tr('settings.err_category_in_use', { name: cat.name, n: count, unit: tr(count === 1 ? 'settings.tx_unit_one' : 'settings.tx_unit_other') }), 'error');
       return;
     }
 
-    const ok = await showConfirm(`Сигурни ли сте, че искате да премахнете категорията „${cat.name}"?`, 'Премахване на категория');
+    const ok = await showConfirm(tr('settings.confirm_delete_category_message', { name: cat.name }), tr('settings.confirm_delete_category_title'));
     if (!ok) return;
 
     const { error } = await supabaseClient.from('categories').delete().eq('id', id);
     if (error) {
-      showToast('Грешка: ' + error.message, 'error');
+      showToast(tr('common.error_prefix') + error.message, 'error');
       return;
     }
-    showToast('Категорията е премахната', 'success');
+    showToast(tr('settings.toast_category_removed'), 'success');
     await loadCategories();
   }
 
@@ -702,6 +705,14 @@
     await supabaseClient.auth.signOut();
     window.location.href = 'login.html';
   }
+
+  // ===== Смяна на език: презареждаме динамично рендерираните части =====
+  window.onLanguageChange = function () {
+    if (!currentHouseholdId) return;
+    renderMembers();
+    renderPendingInvites();
+    renderCategories();
+  };
 </script>
 
 </body>

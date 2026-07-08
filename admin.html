@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B1%3C/text%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Админ панел — BudgetNest</title>
+<title data-i18n="admin.page_title">Админ панел — BudgetNest</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css?v=14">
@@ -59,58 +59,58 @@
 <main class="dashboard-main" id="page-main" style="display:none;">
 
   <div class="page-header">
-    <h1>Админ панел</h1>
-    <span class="hint" style="color: var(--text-secondary); font-size: 13px;">Общ преглед на всички потребители и домакинства</span>
+    <h1 data-i18n="admin.h1">Админ панел</h1>
+    <span class="hint" data-i18n="admin.subtitle" style="color: var(--text-secondary); font-size: 13px;">Общ преглед на всички потребители и домакинства</span>
   </div>
 
   <div class="summary-row" id="stats-row">
     <div class="summary-card">
-      <div class="summary-label">Потребители</div>
+      <div class="summary-label" data-i18n="admin.stat_users">Потребители</div>
       <div class="summary-value" id="stat-users">—</div>
     </div>
     <div class="summary-card">
-      <div class="summary-label">Домакинства</div>
+      <div class="summary-label" data-i18n="admin.stat_households">Домакинства</div>
       <div class="summary-value" id="stat-households">—</div>
     </div>
     <div class="summary-card">
-      <div class="summary-label">Транзакции общо</div>
+      <div class="summary-label" data-i18n="admin.stat_tx_total">Транзакции общо</div>
       <div class="summary-value" id="stat-transactions">—</div>
     </div>
   </div>
 
   <div class="summary-row">
     <div class="summary-card">
-      <div class="summary-label">Нови потребители (7 дни)</div>
+      <div class="summary-label" data-i18n="admin.stat_new_users_7d">Нови потребители (7 дни)</div>
       <div class="summary-value" id="stat-new-users">—</div>
     </div>
     <div class="summary-card">
-      <div class="summary-label">Транзакции (30 дни)</div>
+      <div class="summary-label" data-i18n="admin.stat_tx_30d">Транзакции (30 дни)</div>
       <div class="summary-value" id="stat-tx-30d">—</div>
     </div>
     <div class="summary-card">
-      <div class="summary-label">Приходи / Разходи общо</div>
+      <div class="summary-label" data-i18n="admin.stat_income_expense">Приходи / Разходи общо</div>
       <div class="summary-value" style="font-size: 20px;" id="stat-income-expense">—</div>
     </div>
   </div>
 
   <div class="card">
     <div class="card-title">
-      Потребители
+      <span data-i18n="admin.users_title">Потребители</span>
       <span class="hint" id="users-count-hint"></span>
     </div>
     <div class="admin-table-wrap">
       <table class="admin-table" id="users-table">
         <thead>
           <tr>
-            <th>Имейл</th>
-            <th>Име</th>
-            <th>Регистриран на</th>
-            <th>Домакинства</th>
-            <th>Транзакции</th>
+            <th data-i18n="admin.th_email">Имейл</th>
+            <th data-i18n="admin.th_name">Име</th>
+            <th data-i18n="admin.th_registered">Регистриран на</th>
+            <th data-i18n="admin.th_households">Домакинства</th>
+            <th data-i18n="admin.th_transactions">Транзакции</th>
           </tr>
         </thead>
         <tbody id="users-tbody">
-          <tr><td colspan="5" style="color: var(--text-dim);">Зареждане…</td></tr>
+          <tr><td colspan="5" style="color: var(--text-dim);" data-i18n="admin.loading">Зареждане…</td></tr>
         </tbody>
       </table>
     </div>
@@ -119,23 +119,23 @@
 
   <div class="card">
     <div class="card-title">
-      Домакинства
+      <span data-i18n="admin.households_title">Домакинства</span>
       <span class="hint" id="households-count-hint"></span>
     </div>
     <div class="admin-table-wrap">
       <table class="admin-table" id="households-table">
         <thead>
           <tr>
-            <th>Име</th>
-            <th>Създадено на</th>
-            <th>Членове</th>
-            <th>Транзакции</th>
-            <th>Приходи</th>
-            <th>Разходи</th>
+            <th data-i18n="admin.th_name_household">Име</th>
+            <th data-i18n="admin.th_created">Създадено на</th>
+            <th data-i18n="admin.th_members">Членове</th>
+            <th data-i18n="admin.th_transactions">Транзакции</th>
+            <th data-i18n="admin.th_income">Приходи</th>
+            <th data-i18n="admin.th_expense">Разходи</th>
           </tr>
         </thead>
         <tbody id="households-tbody">
-          <tr><td colspan="6" style="color: var(--text-dim);">Зареждане…</td></tr>
+          <tr><td colspan="6" style="color: var(--text-dim);" data-i18n="admin.loading">Зареждане…</td></tr>
         </tbody>
       </table>
     </div>
@@ -144,23 +144,23 @@
 
   <div class="card">
     <div class="card-title">
-      Отзиви — модерация
+      <span data-i18n="admin.reviews_title">Отзиви — модерация</span>
       <span class="hint" id="reviews-count-hint"></span>
     </div>
     <div class="admin-table-wrap">
       <table class="admin-table" id="reviews-table">
         <thead>
           <tr>
-            <th>Автор</th>
-            <th>Оценка</th>
-            <th>Отзив</th>
-            <th>Дата</th>
-            <th>Статус</th>
-            <th>Действия</th>
+            <th data-i18n="admin.th_author">Автор</th>
+            <th data-i18n="admin.th_rating">Оценка</th>
+            <th data-i18n="admin.th_review">Отзив</th>
+            <th data-i18n="admin.th_date">Дата</th>
+            <th data-i18n="admin.th_status">Статус</th>
+            <th data-i18n="admin.th_actions">Действия</th>
           </tr>
         </thead>
         <tbody id="reviews-tbody">
-          <tr><td colspan="6" style="color: var(--text-dim);">Зареждане…</td></tr>
+          <tr><td colspan="6" style="color: var(--text-dim);" data-i18n="admin.loading">Зареждане…</td></tr>
         </tbody>
       </table>
     </div>
@@ -170,19 +170,19 @@
 
 <div class="card" id="no-access-card" style="display:none; max-width: 480px; margin: 80px auto; text-align:center;">
   <div style="font-size: 40px; margin-bottom: 12px;">🔒</div>
-  <div class="card-title" style="justify-content:center;">Нямате достъп до тази страница</div>
-  <p style="color: var(--text-secondary); font-size: 14px;">Тази страница е достъпна само за администратори.</p>
-  <div style="margin-top: 18px;"><a href="dashboard.html" style="color: var(--nest-gold-accent); font-weight:600;">← Обратно към таблото</a></div>
+  <div class="card-title" data-i18n="admin.no_access_title" style="justify-content:center;">Нямате достъп до тази страница</div>
+  <p style="color: var(--text-secondary); font-size: 14px;" data-i18n="admin.no_access_text">Тази страница е достъпна само за администратори.</p>
+  <div style="margin-top: 18px;"><a href="dashboard.html" style="color: var(--nest-gold-accent); font-weight:600;" data-i18n="admin.no_access_back">← Обратно към таблото</a></div>
 </div>
 
 <!-- Диалог за потвърждение в стила на сайта (замества confirm()) -->
 <div class="overlay" id="confirm-overlay" style="display:none; z-index: 10500;">
   <div class="overlay-card" style="max-width: 420px; padding: 30px;">
-    <h2 id="confirm-title" style="font-size: 20px;">Потвърждение</h2>
+    <h2 id="confirm-title" data-i18n="admin.confirm_title_default" style="font-size: 20px;">Потвърждение</h2>
     <p id="confirm-message" style="margin-bottom: 22px;"></p>
     <div style="display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap;">
-      <button class="btn-ghost" id="confirm-cancel-btn">Отказ</button>
-      <button class="btn-primary-sm" id="confirm-ok-btn" style="background: #DC2626; border-color: #DC2626;">Изтрий</button>
+      <button class="btn-ghost" id="confirm-cancel-btn" data-i18n="admin.cancel_btn">Отказ</button>
+      <button class="btn-primary-sm" id="confirm-ok-btn" data-i18n="admin.delete_btn" style="background: #DC2626; border-color: #DC2626;">Изтрий</button>
     </div>
   </div>
 </div>
@@ -210,7 +210,9 @@
   }
 
   // Връща Promise<true/false> — ползва се с await, както confirm()
-  function showConfirm({ title = 'Потвърждение', message = '', okText = 'Потвърди' } = {}) {
+  function showConfirm({ title, message = '', okText } = {}) {
+    title = title || (window.BudgetNestI18n ? window.BudgetNestI18n.t('admin.confirm_title_default') : 'Потвърждение');
+    okText = okText || (window.BudgetNestI18n ? window.BudgetNestI18n.t('admin.confirm_ok_default') : 'Потвърди');
     return new Promise((resolve) => {
       const overlay = document.getElementById('confirm-overlay');
       const okBtn = document.getElementById('confirm-ok-btn');
@@ -289,8 +291,10 @@
       .replace(/'/g, '&#39;');
   }
 
-  const eur = (n) => (Number(n) || 0).toLocaleString('bg-BG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
-  const fmtDate = (iso) => new Date(iso).toLocaleDateString('bg-BG', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const tr = (key, vars) => window.BudgetNestI18n ? window.BudgetNestI18n.t(key, vars) : key;
+  const getLang = () => window.BudgetNestI18n ? window.BudgetNestI18n.getLang() : 'bg';
+  const eur = (n) => (Number(n) || 0).toLocaleString(getLang() === 'bg' ? 'bg-BG' : 'en-IE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+  const fmtDate = (iso) => new Date(iso).toLocaleDateString(getLang() === 'bg' ? 'bg-BG' : 'en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
   (async function init() {
     const { data: { session } } = await supabaseClient.auth.getSession();
@@ -370,7 +374,7 @@
       shown.push(totalPages);
     }
 
-    let controlsHtml = `<button type="button" class="admin-page-btn" data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''} aria-label="Предишна страница">‹</button>`;
+    let controlsHtml = `<button type="button" class="admin-page-btn" data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''} aria-label="${escapeHtml(tr('admin.prev_page_aria'))}">‹</button>`;
     shown.forEach(p => {
       if (p === '…') {
         controlsHtml += `<span class="admin-page-ellipsis">…</span>`;
@@ -378,10 +382,10 @@
         controlsHtml += `<button type="button" class="admin-page-btn${p === currentPage ? ' admin-page-active' : ''}" data-page="${p}">${p}</button>`;
       }
     });
-    controlsHtml += `<button type="button" class="admin-page-btn" data-page="${currentPage + 1}" ${currentPage === totalPages ? 'disabled' : ''} aria-label="Следваща страница">›</button>`;
+    controlsHtml += `<button type="button" class="admin-page-btn" data-page="${currentPage + 1}" ${currentPage === totalPages ? 'disabled' : ''} aria-label="${escapeHtml(tr('admin.next_page_aria'))}">›</button>`;
 
     container.innerHTML = `
-      <div class="admin-pagination-info">${startItem}–${endItem} от ${totalItems}</div>
+      <div class="admin-pagination-info">${tr('admin.pagination_info', { start: startItem, end: endItem, total: totalItems })}</div>
       <div class="admin-pagination-controls">${controlsHtml}</div>
     `;
 
@@ -400,14 +404,14 @@
 
     usersData = data || [];
     usersPage = 1;
-    document.getElementById('users-count-hint').textContent = usersData.length + ' общо';
+    document.getElementById('users-count-hint').textContent = tr('admin.count_total', { n: usersData.length });
     renderUsersPage();
   }
 
   function renderUsersPage() {
     const tbody = document.getElementById('users-tbody');
     if (!usersData.length) {
-      tbody.innerHTML = '<tr><td colspan="5" style="color: var(--text-dim);">Няма данни.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" style="color: var(--text-dim);">' + escapeHtml(tr('admin.no_data')) + '</td></tr>';
       document.getElementById('users-pagination').style.display = 'none';
       return;
     }
@@ -434,14 +438,14 @@
 
     householdsData = data || [];
     householdsPage = 1;
-    document.getElementById('households-count-hint').textContent = householdsData.length + ' общо';
+    document.getElementById('households-count-hint').textContent = tr('admin.count_total', { n: householdsData.length });
     renderHouseholdsPage();
   }
 
   function renderHouseholdsPage() {
     const tbody = document.getElementById('households-tbody');
     if (!householdsData.length) {
-      tbody.innerHTML = '<tr><td colspan="6" style="color: var(--text-dim);">Няма данни.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" style="color: var(--text-dim);">' + escapeHtml(tr('admin.no_data')) + '</td></tr>';
       document.getElementById('households-pagination').style.display = 'none';
       return;
     }
@@ -464,7 +468,12 @@
   }
 
   // ===== Отзиви — модерация =====
-  const REVIEW_STATUS_LABELS = { pending: '⏳ Чака', approved: '✓ Одобрен', rejected: '✗ Отхвърлен' };
+  function reviewStatusLabel(status) {
+    if (status === 'pending') return tr('admin.review_status_pending');
+    if (status === 'approved') return tr('admin.review_status_approved');
+    if (status === 'rejected') return tr('admin.review_status_rejected');
+    return status;
+  }
 
   async function loadReviews() {
     // Админът вижда всички отзиви благодарение на RLS политиката reviews_select (is_admin()).
@@ -480,16 +489,16 @@
     const tbody = document.getElementById('reviews-tbody');
     if (error) {
       console.error(error);
-      tbody.innerHTML = '<tr><td colspan="6" style="color: var(--text-dim);">Грешка при зареждане. Изпълнена ли е reviews_setup.sql?</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" style="color: var(--text-dim);">' + escapeHtml(tr('admin.err_load_reviews')) + '</td></tr>';
       return;
     }
 
     const pendingCount = (data || []).filter(r => r.status === 'pending').length;
     document.getElementById('reviews-count-hint').textContent =
-      (data || []).length + ' общо · ' + pendingCount + ' чакат одобрение';
+      tr('admin.reviews_count_hint', { total: (data || []).length, pending: pendingCount });
 
     if (!data || !data.length) {
-      tbody.innerHTML = '<tr><td colspan="6" style="color: var(--text-dim);">Няма отзиви.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" style="color: var(--text-dim);">' + escapeHtml(tr('admin.no_reviews')) + '</td></tr>';
       return;
     }
 
@@ -499,11 +508,11 @@
         <td style="color: var(--nest-gold-accent); white-space: nowrap;">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</td>
         <td style="max-width: 340px;">${escapeHtml(r.content)}</td>
         <td style="white-space: nowrap;">${fmtDate(r.created_at)}</td>
-        <td style="white-space: nowrap;">${REVIEW_STATUS_LABELS[r.status] || escapeHtml(r.status)}</td>
+        <td style="white-space: nowrap;">${escapeHtml(reviewStatusLabel(r.status))}</td>
         <td style="white-space: nowrap;">
-          ${r.status !== 'approved' ? `<button class="btn-ghost" style="padding: 4px 10px; font-size: 12px;" onclick="moderateReview('${r.id}', 'approved')">Одобри</button>` : ''}
-          ${r.status !== 'rejected' ? `<button class="btn-ghost" style="padding: 4px 10px; font-size: 12px;" onclick="moderateReview('${r.id}', 'rejected')">Отхвърли</button>` : ''}
-          <button class="btn-ghost" style="padding: 4px 10px; font-size: 12px; color: #DC2626;" onclick="deleteReview('${r.id}')">Изтрий</button>
+          ${r.status !== 'approved' ? `<button class="btn-ghost" style="padding: 4px 10px; font-size: 12px;" onclick="moderateReview('${r.id}', 'approved')">${tr('admin.approve_btn')}</button>` : ''}
+          ${r.status !== 'rejected' ? `<button class="btn-ghost" style="padding: 4px 10px; font-size: 12px;" onclick="moderateReview('${r.id}', 'rejected')">${tr('admin.reject_btn')}</button>` : ''}
+          <button class="btn-ghost" style="padding: 4px 10px; font-size: 12px; color: #DC2626;" onclick="deleteReview('${r.id}')">${tr('admin.delete_btn')}</button>
         </td>
       </tr>`).join('');
   }
@@ -513,21 +522,21 @@
       .from('reviews')
       .update({ status: status, updated_at: new Date().toISOString() })
       .eq('id', id);
-    if (error) { console.error(error); showToast('Грешка при промяна на статуса.', 'error'); return; }
-    showToast(status === 'approved' ? 'Отзивът е одобрен и публикуван.' : 'Отзивът е отхвърлен.', 'success');
+    if (error) { console.error(error); showToast(tr('admin.err_status_change'), 'error'); return; }
+    showToast(status === 'approved' ? tr('admin.toast_approved') : tr('admin.toast_rejected'), 'success');
     await loadReviews();
   }
 
   async function deleteReview(id) {
     const ok = await showConfirm({
-      title: 'Изтриване на отзив',
-      message: 'Сигурни ли сте, че искате да изтриете този отзив? Действието е необратимо.',
-      okText: 'Изтрий',
+      title: tr('admin.confirm_delete_review_title'),
+      message: tr('admin.confirm_delete_review_message'),
+      okText: tr('admin.delete_btn'),
     });
     if (!ok) return;
     const { error } = await supabaseClient.from('reviews').delete().eq('id', id);
-    if (error) { console.error(error); showToast('Грешка при изтриване.', 'error'); return; }
-    showToast('Отзивът беше изтрит.', 'success');
+    if (error) { console.error(error); showToast(tr('admin.err_deleting'), 'error'); return; }
+    showToast(tr('admin.toast_review_deleted'), 'success');
     await loadReviews();
   }
 
@@ -535,6 +544,13 @@
     await supabaseClient.auth.signOut();
     window.location.href = 'login.html';
   }
+
+  // ===== Смяна на език: презареждаме динамично рендерираните части =====
+  window.onLanguageChange = function () {
+    renderUsersPage();
+    renderHouseholdsPage();
+    loadReviews();
+  };
 </script>
 
 </body>

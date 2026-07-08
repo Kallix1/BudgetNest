@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B1%3C/text%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Отзиви — BudgetNest</title>
+<title data-i18n="reviews.page_title">Отзиви — BudgetNest</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css?v=14">
@@ -203,39 +203,35 @@
 <main class="dashboard-main" id="page-main" style="display:none;">
 
   <div class="page-header">
-    <h1>Отзиви</h1>
-    <span class="hint" style="color: var(--text-secondary); font-size: 13px;">какво казват потребителите за BudgetNest</span>
+    <h1 data-i18n="reviews.h1">Отзиви</h1>
+    <span class="hint" data-i18n="reviews.subtitle" style="color: var(--text-secondary); font-size: 13px;">какво казват потребителите за BudgetNest</span>
   </div>
 
   <!-- Интро + форма -->
   <div class="card">
     <div class="card-title">
-      Споделете мнението си
-      <span class="hint">отнема по-малко от минута</span>
+      <span data-i18n="reviews.share_title">Споделете мнението си</span>
+      <span class="hint" data-i18n="reviews.share_hint">отнема по-малко от минута</span>
     </div>
     <div class="reviews-intro">
-      <p>
-        BudgetNest се развива благодарение на хората, които го използват всеки ден.
-        <strong>Вашата обратна връзка е най-ценният ни инструмент</strong> — тя ни показва кое работи добре
-        и кое можем да направим още по-удобно за вашето домакинство.
-      </p>
-      <p>
+      <p id="reviews-intro-p1"></p>
+      <p data-i18n="reviews.intro_p2">
         Харесва ли ви таблото? Липсва ли ви функция? Разкажете ни! Всеки отзив минава
         през кратка проверка от екипа ни, преди да бъде публикуван на тази страница.
       </p>
     </div>
 
     <div id="review-form-wrap" style="margin-top: 18px;">
-      <div style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px;">Вашата оценка</div>
-      <div class="star-picker" id="star-picker" aria-label="Оценка от 1 до 5 звезди"></div>
+      <div data-i18n="reviews.your_rating" style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px;">Вашата оценка</div>
+      <div class="star-picker" id="star-picker" data-i18n-title="reviews.star_aria_group" aria-label="Оценка от 1 до 5 звезди"></div>
 
-      <div style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin: 12px 0 6px;">Вашият коментар</div>
+      <div data-i18n="reviews.your_comment" style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin: 12px 0 6px;">Вашият коментар</div>
       <textarea id="review-content" class="review-textarea" maxlength="600"
-        placeholder="Напр. „Ползваме BudgetNest с цялото семейство от два месеца и вече знаем точно за какво отиват парите ни…“"></textarea>
-      <div class="char-counter"><span id="char-count">0</span> / 600 (минимум 10 символа)</div>
+        data-i18n-placeholder="reviews.textarea_placeholder" placeholder="Напр. „Ползваме BudgetNest с цялото семейство от два месеца и вече знаем точно за какво отиват парите ни…“"></textarea>
+      <div class="char-counter"><span id="char-count">0</span> <span id="char-counter-suffix">/ 600 (минимум 10 символа)</span></div>
 
       <div style="display: flex; align-items: center; gap: 14px; margin-top: 12px; flex-wrap: wrap;">
-        <button class="btn-primary-sm" id="submit-review-btn" onclick="submitReview()">Изпрати за одобрение</button>
+        <button class="btn-primary-sm" id="submit-review-btn" onclick="submitReview()" data-i18n="reviews.submit_btn">Изпрати за одобрение</button>
         <span id="my-review-status"></span>
       </div>
     </div>
@@ -244,11 +240,11 @@
   <!-- Одобрени отзиви -->
   <div class="card">
     <div class="card-title">
-      Одобрени отзиви
+      <span data-i18n="reviews.approved_title">Одобрени отзиви</span>
       <span class="hint" id="reviews-count-hint"></span>
     </div>
     <div class="reviews-grid" id="reviews-list">
-      <div class="empty-state">Зареждане…</div>
+      <div class="empty-state" data-i18n="reviews.loading">Зареждане…</div>
     </div>
   </div>
 
@@ -334,12 +330,21 @@
       .replace(/'/g, '&#39;');
   }
 
-  const fmtDate = (iso) => new Date(iso).toLocaleDateString('bg-BG', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const tr = (key, vars) => window.BudgetNestI18n ? window.BudgetNestI18n.t(key, vars) : key;
+  const getLang = () => window.BudgetNestI18n ? window.BudgetNestI18n.getLang() : 'bg';
+  const fmtDate = (iso) => new Date(iso).toLocaleDateString(getLang() === 'bg' ? 'bg-BG' : 'en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
   const initials = (name) => {
     const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
     if (!parts.length) return '?';
     return parts.slice(0, 2).map(p => p[0].toUpperCase()).join('');
   };
+  function renderIntroP1() {
+    const el = document.getElementById('reviews-intro-p1');
+    if (!el) return;
+    const strongHtml = '<strong>' + escapeHtml(tr('reviews.intro_p1_strong')) + '</strong>';
+    el.innerHTML = tr('reviews.intro_p1', { strong: strongHtml });
+  }
+
   const starsHtml = (rating) => {
     let s = '';
     for (let i = 1; i <= 5; i++) {
@@ -363,6 +368,7 @@
     document.getElementById('page-main').style.display = 'block';
 
     renderStarPicker();
+    renderIntroP1();
     setupCharCounter();
 
     // Име за показване — от profiles, с резервен вариант от имейла
@@ -372,9 +378,9 @@
         .select('full_name, email')
         .eq('id', currentUser.id)
         .single();
-      myDisplayName = profile?.full_name || (profile?.email || currentUser.email || '').split('@')[0] || 'Потребител';
+      myDisplayName = profile?.full_name || (profile?.email || currentUser.email || '').split('@')[0] || tr('reviews.default_user_name');
     } catch (_) {
-      myDisplayName = (currentUser.email || '').split('@')[0] || 'Потребител';
+      myDisplayName = (currentUser.email || '').split('@')[0] || tr('reviews.default_user_name');
     }
 
     await loadMyReview();
@@ -390,7 +396,7 @@
       btn.type = 'button';
       btn.className = 'star-btn' + (i <= selectedRating ? ' filled' : '');
       btn.textContent = '★';
-      btn.setAttribute('aria-label', i + ' от 5 звезди');
+      btn.setAttribute('aria-label', tr('reviews.star_aria_one', { n: i }));
       btn.onclick = () => { selectedRating = i; renderStarPicker(); };
       wrap.appendChild(btn);
     }
@@ -400,6 +406,12 @@
     const ta = document.getElementById('review-content');
     const counter = document.getElementById('char-count');
     ta.addEventListener('input', () => { counter.textContent = ta.value.length; });
+    renderCharCounterSuffix();
+  }
+
+  function renderCharCounterSuffix() {
+    const el = document.getElementById('char-counter-suffix');
+    if (el) el.textContent = tr('reviews.char_counter_suffix');
   }
 
   // ===== Моят отзив =====
@@ -418,7 +430,7 @@
 
     if (!myReview) {
       statusEl.innerHTML = '';
-      btn.textContent = 'Изпрати за одобрение';
+      btn.textContent = tr('reviews.submit_btn');
       return;
     }
 
@@ -428,12 +440,12 @@
     const ta = document.getElementById('review-content');
     ta.value = myReview.content;
     document.getElementById('char-count').textContent = ta.value.length;
-    btn.textContent = 'Обнови отзива';
+    btn.textContent = tr('reviews.update_btn');
 
     const labels = {
-      pending:  '⏳ Изчаква одобрение',
-      approved: '✓ Одобрен и публикуван',
-      rejected: '✗ Отхвърлен — може да го редактирате и изпратите отново',
+      pending:  tr('reviews.status_pending'),
+      approved: tr('reviews.status_approved'),
+      rejected: tr('reviews.status_rejected'),
     };
     statusEl.innerHTML = `<span class="status-badge ${myReview.status}">${labels[myReview.status] || myReview.status}</span>`;
   }
@@ -441,9 +453,9 @@
   async function submitReview() {
     const content = document.getElementById('review-content').value.trim();
 
-    if (!selectedRating) { showToast('Моля, изберете оценка (брой звезди).', 'error'); return; }
-    if (content.length < 10) { showToast('Коментарът трябва да е поне 10 символа.', 'error'); return; }
-    if (content.length > 600) { showToast('Коментарът може да е най-много 600 символа.', 'error'); return; }
+    if (!selectedRating) { showToast(tr('reviews.err_no_rating'), 'error'); return; }
+    if (content.length < 10) { showToast(tr('reviews.err_too_short'), 'error'); return; }
+    if (content.length > 600) { showToast(tr('reviews.err_too_long'), 'error'); return; }
 
     const btn = document.getElementById('submit-review-btn');
     btn.disabled = true;
@@ -465,11 +477,11 @@
 
     if (error) {
       console.error(error);
-      showToast('Възникна грешка при изпращането. Опитайте отново.', 'error');
+      showToast(tr('reviews.err_submit'), 'error');
       return;
     }
 
-    showToast('Благодарим! Отзивът ви е изпратен и ще бъде публикуван след одобрение.', 'success');
+    showToast(tr('reviews.toast_submitted'), 'success');
     await loadMyReview();
     await loadApprovedReviews();
   }
@@ -485,14 +497,14 @@
     const list = document.getElementById('reviews-list');
     if (error) {
       console.error(error);
-      list.innerHTML = '<div class="empty-state">Отзивите не можаха да се заредят.</div>';
+      list.innerHTML = '<div class="empty-state">' + escapeHtml(tr('reviews.err_load_reviews')) + '</div>';
       return;
     }
 
-    document.getElementById('reviews-count-hint').textContent = (data || []).length + ' публикувани';
+    document.getElementById('reviews-count-hint').textContent = tr('reviews.count_hint', { n: (data || []).length });
 
     if (!data || !data.length) {
-      list.innerHTML = '<div class="empty-state">Все още няма публикувани отзиви. Бъдете първи! 🎉</div>';
+      list.innerHTML = '<div class="empty-state">' + escapeHtml(tr('reviews.empty_none_yet')) + '</div>';
       return;
     }
 
@@ -504,7 +516,7 @@
             <div>
               <div class="review-author-name">
                 ${escapeHtml(r.author_name)}
-                ${r.user_id === currentUser.id ? '<span class="mine-tag">· това сте вие</span>' : ''}
+                ${r.user_id === currentUser.id ? `<span class="mine-tag">${escapeHtml(tr('reviews.mine_tag'))}</span>` : ''}
               </div>
               <div class="review-stars">${starsHtml(r.rating)}</div>
             </div>
@@ -519,6 +531,16 @@
     await supabaseClient.auth.signOut();
     window.location.href = 'login.html';
   }
+
+  // ===== Смяна на език: презареждаме динамично рендерираните части =====
+  window.onLanguageChange = function () {
+    renderIntroP1();
+    renderCharCounterSuffix();
+    if (currentUser) {
+      loadMyReview();
+      loadApprovedReviews();
+    }
+  };
 </script>
 
 </body>

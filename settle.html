@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B1%3C/text%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Споделено — BudgetNest</title>
+<title data-i18n="settle.page_title">Споделено — BudgetNest</title>
 <meta name="description" content="Кой на кого дължи в домакинството — споделени разходи в BudgetNest.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -112,39 +112,39 @@
 <main class="dashboard-main" id="page-main" style="display:none;">
 
   <div class="page-header">
-    <h1>Кой на кого дължи</h1>
-    <span class="hint" style="color: var(--text-secondary); font-size: 13px;">споделени разходи между членове</span>
+    <h1 data-i18n="settle.h1">Кой на кого дължи</h1>
+    <span class="hint" data-i18n="settle.subtitle" style="color: var(--text-secondary); font-size: 13px;">споделени разходи между членове</span>
   </div>
 
   <div class="card">
-    <div class="card-title">Баланс на всеки член</div>
+    <div class="card-title" data-i18n="settle.balances_title">Баланс на всеки член</div>
     <div class="balance-grid" id="balance-grid"></div>
   </div>
 
   <div class="card">
     <div class="card-title">
-      Предложени уравнявания
-      <span class="hint">най-малко на брой преводи, за да се изчистят сметките</span>
+      <span data-i18n="settle.transfers_title">Предложени уравнявания</span>
+      <span class="hint" data-i18n="settle.transfers_hint">най-малко на брой преводи, за да се изчистят сметките</span>
     </div>
     <div id="transfers-list">
-      <div class="empty-state">Зареждане…</div>
+      <div class="empty-state" data-i18n="settle.loading">Зареждане…</div>
     </div>
   </div>
 
   <div class="card">
     <div class="card-title">
-      Споделени разходи
-      <span class="hint">маркирай транзакция като „споделена" от Транзакции → Редактиране</span>
+      <span data-i18n="settle.shared_tx_title">Споделени разходи</span>
+      <span class="hint" data-i18n="settle.shared_tx_hint">маркирай транзакция като „споделена" от Транзакции → Редактиране</span>
     </div>
     <div id="shared-tx-list">
-      <div class="empty-state">Зареждане…</div>
+      <div class="empty-state" data-i18n="settle.loading">Зареждане…</div>
     </div>
   </div>
 
   <div class="card">
-    <div class="card-title">История на уравняванията</div>
+    <div class="card-title" data-i18n="settle.log_title">История на уравняванията</div>
     <div id="settlement-log-list">
-      <div class="empty-state">Все още няма уредени преводи.</div>
+      <div class="empty-state" data-i18n="settle.no_settlements_yet">Все още няма уредени преводи.</div>
     </div>
   </div>
 
@@ -154,11 +154,11 @@
 <div class="overlay" id="app-confirm-overlay" style="display:none; z-index: 9999;">
   <div class="overlay-card" style="max-width: 420px; text-align: center; padding: 30px;">
     <div style="font-size: 40px; margin-bottom: 15px;">⚠️</div>
-    <h3 id="app-confirm-title" style="margin-bottom: 10px; font-family: 'Space Grotesk', sans-serif; font-size: 20px; color: var(--text-primary);">Потвърждение</h3>
+    <h3 id="app-confirm-title" data-i18n="common.confirm_title" style="margin-bottom: 10px; font-family: 'Space Grotesk', sans-serif; font-size: 20px; color: var(--text-primary);">Потвърждение</h3>
     <p id="app-confirm-message" style="color: var(--text-secondary); margin-bottom: 25px; font-size: 14px; line-height: 1.5;"></p>
     <div style="display: flex; gap: 12px; justify-content: center;">
-      <button type="button" id="app-confirm-cancel-btn" style="flex: 1; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: var(--text-secondary); background: var(--surface-alt); border: 1px solid var(--border-soft); border-radius: 10px; padding: 12px; cursor: pointer;">Отказ</button>
-      <button type="button" id="app-confirm-ok-btn" style="flex: 1; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: #FFFFFF; background: #EF4444; border: 1px solid #DC2626; border-radius: 10px; padding: 12px; cursor: pointer;">Да, продължи</button>
+      <button type="button" id="app-confirm-cancel-btn" data-i18n="common.cancel" style="flex: 1; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: var(--text-secondary); background: var(--surface-alt); border: 1px solid var(--border-soft); border-radius: 10px; padding: 12px; cursor: pointer;">Отказ</button>
+      <button type="button" id="app-confirm-ok-btn" data-i18n="common.confirm_ok" style="flex: 1; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: #FFFFFF; background: #EF4444; border: 1px solid #DC2626; border-radius: 10px; padding: 12px; cursor: pointer;">Да, продължи</button>
     </div>
   </div>
 </div>
@@ -187,7 +187,7 @@
 
   function showConfirm(message, title) {
     return new Promise((resolve) => {
-      document.getElementById('app-confirm-title').textContent = title || 'Потвърждение';
+      document.getElementById('app-confirm-title').textContent = title || tr('common.confirm_title');
       document.getElementById('app-confirm-message').textContent = message;
       const overlay = document.getElementById('app-confirm-overlay');
       overlay.style.display = 'flex';
@@ -257,7 +257,9 @@
   let splitsByTx = {};            // transaction_id -> [{user_id, share_amount}]
   let settlementsLog = [];
 
-  const eur = (n) => (Number(n) || 0).toLocaleString('bg-BG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+  const tr = (key, vars) => window.BudgetNestI18n ? window.BudgetNestI18n.t(key, vars) : key;
+  const getLang = () => window.BudgetNestI18n ? window.BudgetNestI18n.getLang() : 'bg';
+  const eur = (n) => (Number(n) || 0).toLocaleString(getLang() === 'bg' ? 'bg-BG' : 'en-IE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
   const EPS = 0.01;
 
   function escapeHtml(str) {
@@ -271,12 +273,12 @@
   }
 
   function memberName(userId) {
-    if (userId === currentUser?.id) return 'Аз (' + (nameOf(userId)) + ')';
+    if (userId === currentUser?.id) return tr('settle.you_label', { name: nameOf(userId) });
     return nameOf(userId);
   }
   function nameOf(userId) {
     const m = members.find(x => x.user_id === userId);
-    return m ? (m.full_name || m.email || 'Неизвестен') : 'Неизвестен';
+    return m ? (m.full_name || m.email || tr('settle.unknown_member')) : tr('settle.unknown_member');
   }
 
   // ===== Init flow =====
@@ -324,7 +326,7 @@
 
     if (members.length < 2) {
       document.getElementById('balance-grid').innerHTML =
-        '<div class="empty-state">Разделянето на разходи има смисъл само с 2+ члена в домакинството. Покани някого от Настройки.</div>';
+        '<div class="empty-state">' + escapeHtml(tr('settle.need_two_members')) + '</div>';
       document.getElementById('transfers-list').innerHTML = '';
       document.getElementById('shared-tx-list').innerHTML = '';
       return;
@@ -430,10 +432,10 @@
     grid.innerHTML = members.map(m => {
       const amount = net[m.user_id] || 0;
       const cls = amount > EPS ? 'owed' : (amount < -EPS ? 'owes' : 'even');
-      const sub = amount > EPS ? 'има да взима' : (amount < -EPS ? 'дължи' : 'всичко е уредено');
+      const sub = amount > EPS ? tr('settle.balance_owed_sub') : (amount < -EPS ? tr('settle.balance_owes_sub') : tr('settle.balance_even_sub'));
       return `
         <div class="balance-pill-card">
-          <div class="balance-pill-name">${escapeHtml(m.full_name || m.email || 'Неизвестен')}</div>
+          <div class="balance-pill-name">${escapeHtml(m.full_name || m.email || tr('settle.unknown_member'))}</div>
           <div class="balance-pill-amount ${cls}">${amount > EPS ? '+' : ''}${eur(amount)}</div>
           <div class="balance-pill-sub">${sub}</div>
         </div>`;
@@ -445,34 +447,34 @@
     const transfers = simplifyTransfers(net);
 
     if (!transfers.length) {
-      el.innerHTML = '<div class="empty-state">✓ Всички сметки са уредени.</div>';
+      el.innerHTML = '<div class="empty-state">' + escapeHtml(tr('settle.all_settled')) + '</div>';
       return;
     }
 
     el.innerHTML = transfers.map(t => `
       <div class="transfer-row">
         <div class="transfer-desc">
-          <b>${escapeHtml(nameOf(t.from))}</b> дължи на <b>${escapeHtml(nameOf(t.to))}</b>: <b>${eur(t.amount)}</b>
+          ${tr('settle.transfer_desc', { from: '<b>' + escapeHtml(nameOf(t.from)) + '</b>', to: '<b>' + escapeHtml(nameOf(t.to)) + '</b>', amount: '<b>' + eur(t.amount) + '</b>' })}
         </div>
-        <button type="button" class="transfer-settle-btn" onclick="settleTransfer('${t.from}', '${t.to}', ${t.amount})">Отбележи като уредено</button>
+        <button type="button" class="transfer-settle-btn" onclick="settleTransfer('${t.from}', '${t.to}', ${t.amount})">${tr('settle.settle_btn')}</button>
       </div>`).join('');
   }
 
   function renderSharedTransactions() {
     const el = document.getElementById('shared-tx-list');
     if (!sharedTransactions.length) {
-      el.innerHTML = '<div class="empty-state">Още няма транзакции, маркирани като споделени.</div>';
+      el.innerHTML = '<div class="empty-state">' + escapeHtml(tr('settle.no_shared_tx_yet')) + '</div>';
       return;
     }
     el.innerHTML = sharedTransactions.slice(0, 20).map(tx => {
       const splits = splitsByTx[tx.id] || [];
       const splitLabel = splits.map(s => `${escapeHtml(nameOf(s.user_id))}: ${eur(s.share_amount)}`).join(' · ');
-      const dateLabel = new Date(tx.transaction_date).toLocaleDateString('bg-BG');
+      const dateLabel = new Date(tx.transaction_date).toLocaleDateString(getLang() === 'bg' ? 'bg-BG' : 'en-GB');
       return `
         <div class="shared-tx-row">
           <div>
-            <div class="shared-tx-desc">${escapeHtml(tx.categories?.icon || '💰')} ${escapeHtml(tx.description || tx.categories?.name || 'Транзакция')}</div>
-            <div class="shared-tx-meta">платено от ${escapeHtml(nameOf(tx.user_id))} · ${dateLabel} · ${splitLabel}</div>
+            <div class="shared-tx-desc">${escapeHtml(tx.categories?.icon || '💰')} ${escapeHtml(tx.description || tx.categories?.name) || escapeHtml(tr('settle.tx_default_desc'))}</div>
+            <div class="shared-tx-meta">${escapeHtml(tr('settle.paid_by_meta', { name: nameOf(tx.user_id), date: dateLabel, splits: splitLabel }))}</div>
           </div>
           <div class="shared-tx-amount">${eur(tx.amount)}</div>
         </div>`;
@@ -482,15 +484,15 @@
   function renderSettlementLog() {
     const el = document.getElementById('settlement-log-list');
     if (!settlementsLog.length) {
-      el.innerHTML = '<div class="empty-state">Все още няма уредени преводи.</div>';
+      el.innerHTML = '<div class="empty-state">' + escapeHtml(tr('settle.no_settlements_yet')) + '</div>';
       return;
     }
     el.innerHTML = settlementsLog.slice(0, 20).map(s => {
-      const dateLabel = new Date(s.created_at).toLocaleDateString('bg-BG');
+      const dateLabel = new Date(s.created_at).toLocaleDateString(getLang() === 'bg' ? 'bg-BG' : 'en-GB');
       return `
         <div class="settlement-log-row">
           <span>${escapeHtml(nameOf(s.from_user_id))} → ${escapeHtml(nameOf(s.to_user_id))}: <b>${eur(s.amount)}</b> · ${dateLabel}</span>
-          <button type="button" class="goal-delete-btn" style="background:none;border:none;color:var(--text-dim);cursor:pointer;" onclick="deleteSettlement('${s.id}')" title="Изтрий (при грешка)">✕</button>
+          <button type="button" class="goal-delete-btn" style="background:none;border:none;color:var(--text-dim);cursor:pointer;" onclick="deleteSettlement('${s.id}')" title="${escapeHtml(tr('settle.delete_settlement_title'))}">✕</button>
         </div>`;
     }).join('');
   }
@@ -498,8 +500,8 @@
   // ===== Отбелязване на превод като уреден =====
   async function settleTransfer(fromUserId, toUserId, amount) {
     const ok = await showConfirm(
-      `Потвърждаваш ли, че ${nameOf(fromUserId)} е платил${amount ? '' : ''} ${eur(amount)} на ${nameOf(toUserId)}?`,
-      'Отбелязване като уредено'
+      tr('settle.confirm_settle_message', { from: nameOf(fromUserId), amount: eur(amount), to: nameOf(toUserId) }),
+      tr('settle.confirm_settle_title')
     );
     if (!ok) return;
 
@@ -514,24 +516,24 @@
       }]);
 
     if (error) {
-      showToast('Грешка: ' + error.message, 'error');
+      showToast(tr('common.error_prefix') + error.message, 'error');
       return;
     }
 
-    showToast('Уредено ✓', 'success');
+    showToast(tr('settle.toast_settled'), 'success');
     await loadAll();
   }
 
   async function deleteSettlement(id) {
-    const ok = await showConfirm('Да изтрия ли този запис за уравняване? Балансите ще се преизчислят.', 'Изтриване');
+    const ok = await showConfirm(tr('settle.confirm_delete_settlement_message'), tr('settle.confirm_delete_settlement_title'));
     if (!ok) return;
 
     const { error } = await supabaseClient.from('settlements').delete().eq('id', id);
     if (error) {
-      showToast('Грешка: ' + error.message, 'error');
+      showToast(tr('common.error_prefix') + error.message, 'error');
       return;
     }
-    showToast('Изтрито', 'success');
+    showToast(tr('settle.toast_deleted'), 'success');
     await loadAll();
   }
 
@@ -540,6 +542,11 @@
     await supabaseClient.auth.signOut();
     window.location.href = 'login.html';
   }
+
+  // ===== Смяна на език: презареждаме динамично рендерираните части =====
+  window.onLanguageChange = function () {
+    if (currentHouseholdId) renderAll();
+  };
 </script>
 
 </body>

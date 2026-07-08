@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B1%3C/text%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Бюджети — BudgetNest</title>
+<title data-i18n="budgets.page_title">Бюджети — BudgetNest</title>
 <meta name="description" content="Месечни лимити по категория в BudgetNest — следете колко ви остава.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -87,14 +87,14 @@
 <main class="dashboard-main" id="page-main" style="display:none;">
 
   <div class="page-header">
-    <h1>Бюджети</h1>
+    <h1 data-i18n="budgets.h1">Бюджети</h1>
     <span class="hint" id="budgets-month-label" style="color: var(--text-secondary); font-size: 13px;"></span>
   </div>
 
   <div class="card">
     <div class="card-title">
-      Месечни лимити по категория
-      <span class="hint">разходни категории</span>
+      <span data-i18n="budgets.card_title">Месечни лимити по категория</span>
+      <span class="hint" data-i18n="budgets.card_hint">разходни категории</span>
     </div>
     <div id="budgets-summary" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;"></div>
     <div id="budgets-list">
@@ -177,7 +177,9 @@
   let rolloverInByCategory = {}; // category_id -> пренесена сума за ТЕКУЩИЯ месец
   const ROLLOVER_LOOKBACK_MONTHS = 12;
 
-  const eur = (n) => (Number(n) || 0).toLocaleString('bg-BG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+  const tr = (key, vars) => window.BudgetNestI18n ? window.BudgetNestI18n.t(key, vars) : key;
+  const getLang = () => window.BudgetNestI18n ? window.BudgetNestI18n.getLang() : 'bg';
+  const eur = (n) => (Number(n) || 0).toLocaleString(getLang() === 'bg' ? 'bg-BG' : 'en-IE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
 
   // ===== Escaping на потребителски текст преди вмъкване в innerHTML =====
   // ВАЖНО: никога не викаме .toISOString() върху дата, конструирана по
@@ -227,7 +229,8 @@
     document.getElementById('household-name').textContent = memberships[0].households.name;
     document.getElementById('page-main').style.display = 'block';
 
-    const monthNames = ['януари','февруари','март','април','май','юни','юли','август','септември','октомври','ноември','декември'];
+    const monthKeys = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+    const monthNames = monthKeys.map(k => tr('dashboard.month_' + k));
     const now = new Date();
     document.getElementById('budgets-month-label').textContent = monthNames[now.getMonth()] + ' ' + now.getFullYear();
 
@@ -371,7 +374,7 @@
     const container = document.getElementById('budgets-list');
 
     if (!expenseCategories.length) {
-      container.innerHTML = '<div class="empty-state">Все още няма разходни категории.</div>';
+      container.innerHTML = '<div class="empty-state">' + escapeHtml(tr('budgets.empty_no_categories')) + '</div>';
       return;
     }
 
@@ -394,17 +397,17 @@
       }
 
       const rolloverHint = (rolloverEnabled && hasLimit && Math.abs(rolloverIn) >= 0.01)
-        ? `<div class="hint" style="margin-top:4px;">↻ база ${eur(base)} + пренесено ${eur(rolloverIn)} = ефективен лимит ${eur(effective)}</div>`
+        ? `<div class="hint" style="margin-top:4px;">${escapeHtml(tr('budgets.rollover_hint', { base: eur(base), rolloverIn: eur(rolloverIn), effective: eur(effective) }))}</div>`
         : '';
 
       const statsHtml = hasLimit
         ? `<div class="budget-stats">
-             <span>Похарчено: <b>${eur(spent)}</b></span>
-             <span class="${isOver ? 'over-label' : ''}">${isOver ? 'Надвишен лимит' : 'Лимит'}: <b>${eur(limit)}</b></span>
+             <span>${tr('budgets.spent_label')}: <b>${eur(spent)}</b></span>
+             <span class="${isOver ? 'over-label' : ''}">${isOver ? tr('budgets.limit_over_label') : tr('budgets.limit_label')}: <b>${eur(limit)}</b></span>
            </div>`
         : `<div class="budget-stats">
-             <span>Похарчено този месец: <b>${eur(spent)}</b></span>
-             <span class="budget-no-limit">Без зададен лимит</span>
+             <span>${tr('budgets.spent_this_month_label')}: <b>${eur(spent)}</b></span>
+             <span class="budget-no-limit">${tr('budgets.no_limit_label')}</span>
            </div>`;
 
       const fillClass = isOver ? 'over' : (isNear ? 'near' : '');
@@ -413,8 +416,8 @@
         : '';
 
       const warnHtml = isOver
-        ? `<div class="budget-warn over">Надхвърлихте лимита с ${eur(spent - limit)}.</div>`
-        : (isNear ? `<div class="budget-warn near">Наближавате лимита — остават ${eur(limit - spent)}.</div>` : '');
+        ? `<div class="budget-warn over">${escapeHtml(tr('budgets.warn_over', { amount: eur(spent - limit) }))}</div>`
+        : (isNear ? `<div class="budget-warn near">${escapeHtml(tr('budgets.warn_near', { amount: eur(limit - spent) }))}</div>` : '');
 
       return `
         <div class="budget-row" data-category="${cat.id}">
@@ -426,15 +429,15 @@
             </div>
             <div class="budget-controls">
               <input type="number" class="budget-input" id="budget-input-${cat.id}" min="0" step="0.01"
-                     placeholder="Лимит €" value="${budget ? base : ''}">
-              <button type="button" class="budget-save-btn" onclick="saveBudget('${cat.id}')">Запази</button>
-              ${budget ? `<button type="button" class="budget-clear-btn" onclick="clearBudget('${cat.id}')">Изчисти</button>` : ''}
+                     placeholder="${escapeHtml(tr('budgets.limit_placeholder'))}" value="${budget ? base : ''}">
+              <button type="button" class="budget-save-btn" onclick="saveBudget('${cat.id}')">${tr('budgets.save_btn')}</button>
+              ${budget ? `<button type="button" class="budget-clear-btn" onclick="clearBudget('${cat.id}')">${tr('budgets.clear_btn')}</button>` : ''}
             </div>
           </div>
           <label style="display:flex; align-items:center; gap:6px; margin-top:6px; font-size:12.5px; color:var(--text-secondary); cursor:pointer;">
             <input type="checkbox" id="budget-rollover-${cat.id}" style="width:auto;" ${rolloverEnabled ? 'checked' : ''}
               onchange="saveBudgetRollover('${cat.id}', this.checked)">
-            Пренасяй неизползвания остатък към следващия месец
+            ${escapeHtml(tr('budgets.rollover_checkbox_label'))}
           </label>
           ${trackHtml}
           ${statsHtml}
@@ -460,11 +463,11 @@
       else if (pct >= 80) near++;
     });
     if (over === 0 && near === 0) {
-      labelEl.innerHTML = '<span class="budget-summary-pill ok">✓ Всички лимити са под контрол</span>';
+      labelEl.innerHTML = '<span class="budget-summary-pill ok">' + escapeHtml(tr('budgets.summary_all_ok')) + '</span>';
     } else {
       const parts = [];
-      if (over) parts.push(`<span class="budget-summary-pill over">⚠ ${over} надвишен${over === 1 ? '' : 'и'} лимит${over === 1 ? '' : 'а'}</span>`);
-      if (near) parts.push(`<span class="budget-summary-pill near">${near} близо до лимита</span>`);
+      if (over) parts.push(`<span class="budget-summary-pill over">⚠ ${escapeHtml(tr(over === 1 ? 'budgets.summary_over_one' : 'budgets.summary_over_many', { n: over }))}</span>`);
+      if (near) parts.push(`<span class="budget-summary-pill near">${escapeHtml(tr('budgets.summary_near', { n: near }))}</span>`);
       labelEl.innerHTML = parts.join(' ');
     }
   }
@@ -475,7 +478,7 @@
     const value = parseFloat(input.value);
 
     if (isNaN(value) || value <= 0) {
-      showToast('Въведете валидна сума за лимит.', 'error');
+      showToast(tr('budgets.err_invalid_limit'), 'error');
       return;
     }
 
@@ -491,7 +494,7 @@
       );
 
     if (error) {
-      showToast('Грешка: ' + error.message, 'error');
+      showToast(tr('common.error_prefix') + error.message, 'error');
       return;
     }
 
@@ -503,7 +506,7 @@
   async function saveBudgetRollover(categoryId, enabled) {
     const existing = budgetsByCategory[categoryId];
     if (!existing) {
-      showToast('Първо запазете лимит за тази категория.', 'error');
+      showToast(tr('budgets.err_save_limit_first'), 'error');
       const checkbox = document.getElementById('budget-rollover-' + categoryId);
       if (checkbox) checkbox.checked = false;
       return;
@@ -516,11 +519,11 @@
       .eq('category_id', categoryId);
 
     if (error) {
-      showToast('Грешка: ' + error.message, 'error');
+      showToast(tr('common.error_prefix') + error.message, 'error');
       return;
     }
 
-    showToast(enabled ? 'Пренасянето е включено ✓' : 'Пренасянето е изключено', 'success');
+    showToast(enabled ? tr('budgets.rollover_on_toast') : tr('budgets.rollover_off_toast'), 'success');
     await loadData();
     renderBudgets();
   }
@@ -534,7 +537,7 @@
       .eq('category_id', categoryId);
 
     if (error) {
-      showToast('Грешка: ' + error.message, 'error');
+      showToast(tr('common.error_prefix') + error.message, 'error');
       return;
     }
 
@@ -547,6 +550,16 @@
     await supabaseClient.auth.signOut();
     window.location.href = 'login.html';
   }
+
+  // ===== Смяна на език: презареждаме динамично рендерираните части =====
+  window.onLanguageChange = function () {
+    if (!currentHouseholdId) return;
+    const now = new Date();
+    const monthKeys = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+    const monthNames = monthKeys.map(k => tr('dashboard.month_' + k));
+    document.getElementById('budgets-month-label').textContent = monthNames[now.getMonth()] + ' ' + now.getFullYear();
+    renderBudgets();
+  };
 </script>
 
 </body>

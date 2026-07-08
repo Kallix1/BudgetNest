@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B1%3C/text%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Периодични — BudgetNest</title>
+<title data-i18n="recur.page_title">Периодични — BudgetNest</title>
 <meta name="description" content="Автоматични повтарящи се приходи и разходи в BudgetNest.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -98,85 +98,85 @@
 <main class="dashboard-main" id="page-main" style="display:none;">
 
   <div class="page-header">
-    <h1>Периодични транзакции</h1>
-    <span class="hint" style="color: var(--text-secondary); font-size: 13px;">автоматични приходи и разходи всеки месец</span>
+    <h1 data-i18n="recur.h1">Периодични транзакции</h1>
+    <span class="hint" data-i18n="recur.subtitle" style="color: var(--text-secondary); font-size: 13px;">автоматични приходи и разходи всеки месец</span>
   </div>
 
   <div class="card">
-    <div class="card-title">Ново правило</div>
+    <div class="card-title" data-i18n="recur.new_rule_title">Ново правило</div>
     <form id="recur-form" class="quick-add-grid" onsubmit="handleSaveRecurring(event)">
       <div class="type-toggle" id="recur-type-toggle">
-        <button type="button" class="type-btn active" data-type="expense" onclick="setRecurType('expense')">Разход</button>
-        <button type="button" class="type-btn" data-type="income" onclick="setRecurType('income')">Приход</button>
+        <button type="button" class="type-btn active" data-type="expense" onclick="setRecurType('expense')" data-i18n="recur.type_expense">Разход</button>
+        <button type="button" class="type-btn" data-type="income" onclick="setRecurType('income')" data-i18n="recur.type_income">Приход</button>
       </div>
 
       <div class="method-toggle" id="recur-method-toggle">
-        <button type="button" class="method-btn active" data-method="card" onclick="setRecurMethod('card')">💳 Карта</button>
-        <button type="button" class="method-btn" data-method="cash" onclick="setRecurMethod('cash')">💵 В брой</button>
+        <button type="button" class="method-btn active" data-method="card" onclick="setRecurMethod('card')" data-i18n="recur.method_card">💳 Карта</button>
+        <button type="button" class="method-btn" data-method="cash" onclick="setRecurMethod('cash')" data-i18n="recur.method_cash">💵 В брой</button>
       </div>
 
       <div class="type-toggle" id="recur-freq-toggle">
-        <button type="button" class="type-btn active" data-freq="monthly" onclick="setRecurFrequency('monthly')">Веднъж месечно</button>
-        <button type="button" class="type-btn" data-freq="weekly" onclick="setRecurFrequency('weekly')">Всяка седмица</button>
+        <button type="button" class="type-btn active" data-freq="monthly" onclick="setRecurFrequency('monthly')" data-i18n="recur.freq_monthly">Веднъж месечно</button>
+        <button type="button" class="type-btn" data-freq="weekly" onclick="setRecurFrequency('weekly')" data-i18n="recur.freq_weekly">Всяка седмица</button>
       </div>
 
       <div class="field full">
-        <label>Сума (€)</label>
+        <label data-i18n="recur.amount_label">Сума (€)</label>
         <input type="number" id="recur-amount" step="0.01" min="0.01" placeholder="0.00" required>
       </div>
 
       <div class="field full">
-        <label>Категория</label>
+        <label data-i18n="recur.category_label">Категория</label>
         <select id="recur-category" required></select>
       </div>
 
       <div class="field full">
-        <label>Описание</label>
-        <input type="text" id="recur-description" placeholder="напр. Заплата, Нетфликс абонамент, седмичен хонорар">
+        <label data-i18n="recur.description_label">Описание</label>
+        <input type="text" id="recur-description" data-i18n-placeholder="recur.description_placeholder" placeholder="напр. Заплата, Нетфликс абонамент, седмичен хонорар">
       </div>
 
       <div class="field full" id="recur-day-month-field">
-        <label>Ден от месеца</label>
-        <input type="number" id="recur-day" min="1" max="31" placeholder="напр. 1">
-        <span class="hint" style="font-size:11.5px;">Ако месецът е по-кратък, ще се приложи на последния му ден.</span>
+        <label data-i18n="recur.day_of_month_label">Ден от месеца</label>
+        <input type="number" id="recur-day" min="1" max="31" data-i18n-placeholder="recur.day_of_month_placeholder" placeholder="напр. 1">
+        <span class="hint" data-i18n="recur.day_of_month_hint" style="font-size:11.5px;">Ако месецът е по-кратък, ще се приложи на последния му ден.</span>
       </div>
 
       <div class="field full" id="recur-day-week-field" style="display:none;">
-        <label>Ден от седмицата</label>
+        <label data-i18n="recur.day_of_week_label">Ден от седмицата</label>
         <select id="recur-weekday">
-          <option value="1">Понеделник</option>
-          <option value="2">Вторник</option>
-          <option value="3">Сряда</option>
-          <option value="4">Четвъртък</option>
-          <option value="5">Петък</option>
-          <option value="6">Събота</option>
-          <option value="0">Неделя</option>
+          <option value="1" data-i18n="recur.weekday_mon">Понеделник</option>
+          <option value="2" data-i18n="recur.weekday_tue">Вторник</option>
+          <option value="3" data-i18n="recur.weekday_wed">Сряда</option>
+          <option value="4" data-i18n="recur.weekday_thu">Четвъртък</option>
+          <option value="5" data-i18n="recur.weekday_fri">Петък</option>
+          <option value="6" data-i18n="recur.weekday_sat">Събота</option>
+          <option value="0" data-i18n="recur.weekday_sun">Неделя</option>
         </select>
       </div>
 
       <div class="field full">
         <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
           <input type="checkbox" id="recur-remind-enabled" checked style="width:auto;" onchange="document.getElementById('recur-remind-days-field').style.display = this.checked ? 'block' : 'none';">
-          Напомняй ми по имейл преди плащането
+          <span data-i18n="recur.remind_checkbox_label">Напомняй ми по имейл преди плащането</span>
         </label>
       </div>
 
       <div class="field full" id="recur-remind-days-field">
-        <label>Колко дни предварително</label>
+        <label data-i18n="recur.remind_days_label">Колко дни предварително</label>
         <input type="number" id="recur-remind-days" min="0" max="30" value="3">
-        <span class="hint" style="font-size:11.5px;">Ще получиш обобщено писмо, ако правилото е активно.</span>
+        <span class="hint" data-i18n="recur.remind_days_hint" style="font-size:11.5px;">Ще получиш обобщено писмо, ако правилото е активно.</span>
       </div>
 
       <div class="field full">
         <div class="status-msg" id="recur-status"></div>
-        <button type="submit" class="submit" style="width: 100%; margin-top: 6px;">Добави правило</button>
+        <button type="submit" class="submit" data-i18n="recur.add_rule_btn" style="width: 100%; margin-top: 6px;">Добави правило</button>
       </div>
     </form>
   </div>
 
   <div class="card">
     <div class="card-title">
-      Активни правила
+      <span data-i18n="recur.active_rules_title">Активни правила</span>
       <span class="hint" id="recur-count-label"></span>
     </div>
     <div id="recur-list">
@@ -258,7 +258,9 @@
   let recurMethod = 'card';
   let recurFrequency = 'monthly';
 
-  const eur = (n) => (Number(n) || 0).toLocaleString('bg-BG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+  const tr = (key, vars) => window.BudgetNestI18n ? window.BudgetNestI18n.t(key, vars) : key;
+  const getLang = () => window.BudgetNestI18n ? window.BudgetNestI18n.getLang() : 'bg';
+  const eur = (n) => (Number(n) || 0).toLocaleString(getLang() === 'bg' ? 'bg-BG' : 'en-IE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
 
   function escapeHtml(str) {
     if (str === null || str === undefined) return '';
@@ -368,7 +370,7 @@
     if (error) {
       console.error(error);
       document.getElementById('recur-list').innerHTML =
-        '<div class="empty-state">Грешка при зареждане: ' + escapeHtml(error.message) + '</div>';
+        '<div class="empty-state">' + escapeHtml(tr('recur.err_loading_prefix')) + escapeHtml(error.message) + '</div>';
       document.getElementById('recur-count-label').textContent = '';
       return;
     }
@@ -381,15 +383,25 @@
     return categories.find(c => c.id === id) || null;
   }
 
-  const WEEKDAY_NAMES = ['неделя', 'понеделник', 'вторник', 'сряда', 'четвъртък', 'петък', 'събота'];
+  const WEEKDAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+  function weekdayFullName(idx) { return tr('recur.weekday_full_' + WEEKDAY_KEYS[idx]); }
+  // Пореден номер на деня, форматиран според езика (5-и / 5th / 21st...)
+  function formatOrdinalDay(day) {
+    if (getLang() !== 'en') return day + '-и';
+    const j = day % 10, k = day % 100;
+    if (j === 1 && k !== 11) return day + 'st';
+    if (j === 2 && k !== 12) return day + 'nd';
+    if (j === 3 && k !== 13) return day + 'rd';
+    return day + 'th';
+  }
 
   function renderRecurring() {
     const list = document.getElementById('recur-list');
     const countLabel = document.getElementById('recur-count-label');
-    countLabel.textContent = recurringRows.length ? recurringRows.length + ' правила' : '';
+    countLabel.textContent = recurringRows.length ? recurringRows.length + ' ' + tr('recur.rules_suffix') : '';
 
     if (!recurringRows.length) {
-      list.innerHTML = '<div class="empty-state">Още няма зададени периодични транзакции.</div>';
+      list.innerHTML = '<div class="empty-state">' + escapeHtml(tr('recur.empty_state')) + '</div>';
       return;
     }
 
@@ -398,25 +410,25 @@
       const isIncome = cat?.type === 'income';
       const sign = isIncome ? '+' : '−';
       const methodIcon = r.payment_method === 'cash' ? '💵' : (r.payment_method === 'card' ? '💳 ' : '');
-      const nextDate = new Date(r.next_run_date).toLocaleDateString('bg-BG');
+      const nextDate = new Date(r.next_run_date).toLocaleDateString(getLang() === 'bg' ? 'bg-BG' : 'en-GB');
       const schedule = r.frequency === 'weekly'
-        ? `всяка ${WEEKDAY_NAMES[r.day_of_week]}`
-        : `всеки месец на ${r.day_of_month}-во`;
+        ? tr('recur.schedule_weekly', { weekday: weekdayFullName(r.day_of_week) })
+        : tr('recur.schedule_monthly', { day: formatOrdinalDay(r.day_of_month) });
       return `
         <div class="recur-row ${r.is_active ? '' : 'paused'}">
           <div class="recur-main">
             <div class="recur-icon">${escapeHtml(cat?.icon) || '💰'}</div>
             <div class="recur-info">
-              <div class="recur-desc">${escapeHtml(r.description || cat?.name) || 'Транзакция'}${r.is_active ? '' : '<span class="recur-badge">на пауза</span>'}</div>
-              <div class="recur-meta">${methodIcon} ${schedule} · следваща: ${nextDate}${r.remind_enabled ? ` · 🔔 напомняне ${r.remind_days_before} ${r.remind_days_before === 1 ? 'ден' : 'дни'} преди` : ' · 🔕 без напомняне'}</div>
+              <div class="recur-desc">${escapeHtml(r.description || cat?.name) || escapeHtml(tr('recur.row_default_desc'))}${r.is_active ? '' : `<span class="recur-badge">${escapeHtml(tr('recur.paused_badge'))}</span>`}</div>
+              <div class="recur-meta">${methodIcon} ${schedule} · ${tr('recur.next_run_prefix')}: ${nextDate}${r.remind_enabled ? ' · ' + tr('recur.remind_on_meta', { n: r.remind_days_before, unit: tr(r.remind_days_before === 1 ? 'common.day_singular' : 'common.day_plural') }) : ' · ' + tr('recur.remind_off_meta')}</div>
             </div>
           </div>
           <div class="recur-side">
             <div class="recur-amount ${isIncome ? 'income' : 'expense'}">${sign} ${eur(r.amount)}</div>
             <div class="recur-actions">
-              <button type="button" class="recur-pause-btn" onclick="toggleRecurReminder('${r.id}', ${!r.remind_enabled})" title="Включи/изключи напомнянето">${r.remind_enabled ? '🔔' : '🔕'}</button>
-              <button type="button" class="recur-pause-btn" onclick="toggleRecurActive('${r.id}', ${!r.is_active})">${r.is_active ? 'Пауза' : 'Възобнови'}</button>
-              <button type="button" class="recur-delete-btn" onclick="deleteRecurring('${r.id}')">Изтрий</button>
+              <button type="button" class="recur-pause-btn" onclick="toggleRecurReminder('${r.id}', ${!r.remind_enabled})" title="${escapeHtml(tr('recur.remind_toggle_title'))}">${r.remind_enabled ? '🔔' : '🔕'}</button>
+              <button type="button" class="recur-pause-btn" onclick="toggleRecurActive('${r.id}', ${!r.is_active})">${r.is_active ? tr('recur.pause_btn') : tr('recur.resume_btn')}</button>
+              <button type="button" class="recur-delete-btn" onclick="deleteRecurring('${r.id}')">${tr('recur.delete_btn')}</button>
             </div>
           </div>
         </div>`;
@@ -431,8 +443,8 @@
     const categoryId = document.getElementById('recur-category').value;
     const description = document.getElementById('recur-description').value.trim();
 
-    if (!categoryId) { setStatus('recur-status', 'Изберете категория.', 'error'); return; }
-    if (isNaN(amount) || amount <= 0) { setStatus('recur-status', 'Въведете сума по-голяма от 0.', 'error'); return; }
+    if (!categoryId) { setStatus('recur-status', tr('recur.err_no_category'), 'error'); return; }
+    if (isNaN(amount) || amount <= 0) { setStatus('recur-status', tr('recur.err_bad_amount'), 'error'); return; }
 
     const payload = {
       household_id: currentHouseholdId,
@@ -451,7 +463,7 @@
 
     if (recurFrequency === 'monthly') {
       const day = parseInt(document.getElementById('recur-day').value, 10);
-      if (isNaN(day) || day < 1 || day > 31) { setStatus('recur-status', 'Денят трябва да е между 1 и 31.', 'error'); return; }
+      if (isNaN(day) || day < 1 || day > 31) { setStatus('recur-status', tr('recur.err_bad_day'), 'error'); return; }
       payload.day_of_month = day;
       payload.next_run_date = computeNextMonthlyRunDate(today, day);
     } else {
@@ -460,17 +472,17 @@
       payload.next_run_date = computeNextWeeklyRunDate(today, weekday);
     }
 
-    setStatus('recur-status', 'Добавяне…', '');
+    setStatus('recur-status', tr('recur.status_adding'), '');
 
     const { error } = await supabaseClient.from('recurring_transactions').insert([payload]);
 
     if (error) {
-      setStatus('recur-status', 'Грешка: ' + error.message, 'error');
+      setStatus('recur-status', tr('common.error_prefix') + error.message, 'error');
       return;
     }
 
     setStatus('recur-status', '', '');
-    showToast('Правилото е добавено ✓', 'success');
+    showToast(tr('recur.toast_added'), 'success');
     document.getElementById('recur-form').reset();
     setRecurType('expense');
     setRecurMethod('card');
@@ -524,7 +536,7 @@
       .update({ is_active: makeActive })
       .eq('id', id);
 
-    if (error) { showToast('Грешка: ' + error.message, 'error'); return; }
+    if (error) { showToast(tr('common.error_prefix') + error.message, 'error'); return; }
     await loadRecurring();
   }
 
@@ -535,8 +547,8 @@
       .update({ remind_enabled: makeEnabled })
       .eq('id', id);
 
-    if (error) { showToast('Грешка: ' + error.message, 'error'); return; }
-    showToast(makeEnabled ? 'Напомнянето е включено 🔔' : 'Напомнянето е изключено 🔕', 'success');
+    if (error) { showToast(tr('common.error_prefix') + error.message, 'error'); return; }
+    showToast(makeEnabled ? tr('recur.toast_reminder_on') : tr('recur.toast_reminder_off'), 'success');
     await loadRecurring();
   }
 
@@ -547,8 +559,8 @@
       .delete()
       .eq('id', id);
 
-    if (error) { showToast('Грешка: ' + error.message, 'error'); return; }
-    showToast('Правилото е изтрито ✓', 'success');
+    if (error) { showToast(tr('common.error_prefix') + error.message, 'error'); return; }
+    showToast(tr('recur.toast_deleted'), 'success');
     await loadRecurring();
   }
 
@@ -557,6 +569,11 @@
     await supabaseClient.auth.signOut();
     window.location.href = 'login.html';
   }
+
+  // ===== Смяна на език: презареждаме динамично рендерираните части =====
+  window.onLanguageChange = function () {
+    if (currentHouseholdId) renderRecurring();
+  };
 </script>
 
 </body>

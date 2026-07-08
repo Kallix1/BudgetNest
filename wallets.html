@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B1%3C/text%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Портфейл — BudgetNest</title>
+<title data-i18n="wallets.page_title">Портфейл — BudgetNest</title>
 <meta name="description" content="Баланс по карта и в брой в BudgetNest.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -66,41 +66,41 @@
 <main class="dashboard-main" id="page-main" style="display:none;">
 
   <div class="page-header">
-    <h1>Портфейл</h1>
-    <span class="hint" style="color: var(--text-secondary); font-size: 13px;">баланс по начин на плащане</span>
+    <h1 data-i18n="wallets.h1">Портфейл</h1>
+    <span class="hint" data-i18n="wallets.subtitle" style="color: var(--text-secondary); font-size: 13px;">баланс по начин на плащане</span>
   </div>
 
   <div class="wallet-row">
     <div class="wallet-card">
-      <div class="wallet-card-head"><span class="wallet-icon">💳</span> В картата</div>
+      <div class="wallet-card-head"><span class="wallet-icon">💳</span> <span data-i18n="wallets.card_label">В картата</span></div>
       <div class="wallet-value is-card" id="wallet-card-value">0.00 €</div>
       <div class="wallet-edit-row">
         <input type="number" id="wallet-card-input" step="0.01" placeholder="0.00">
-        <button type="button" onclick="saveWalletBalance('card')">Запази</button>
+        <button type="button" onclick="saveWalletBalance('card')" data-i18n="wallets.save_btn">Запази</button>
       </div>
     </div>
 
     <div class="wallet-card">
-      <div class="wallet-card-head"><span class="wallet-icon">💵</span> В брой</div>
+      <div class="wallet-card-head"><span class="wallet-icon">💵</span> <span data-i18n="wallets.cash_label">В брой</span></div>
       <div class="wallet-value is-cash" id="wallet-cash-value">0.00 €</div>
       <div class="wallet-edit-row">
         <input type="number" id="wallet-cash-input" step="0.01" placeholder="0.00">
-        <button type="button" onclick="saveWalletBalance('cash')">Запази</button>
+        <button type="button" onclick="saveWalletBalance('cash')" data-i18n="wallets.save_btn">Запази</button>
       </div>
     </div>
 
     <div class="wallet-total-card">
-      <div class="summary-label">Общо</div>
+      <div class="summary-label" data-i18n="wallets.total_label">Общо</div>
       <div class="summary-value balance" id="wallet-total-value">0.00 €</div>
     </div>
   </div>
 
   <div class="card">
-    <div class="card-title">Как работи</div>
+    <div class="card-title" data-i18n="wallets.how_it_works_title">Как работи</div>
     <div class="wallet-hint-card">
-      Всяка нова транзакция с посочен начин на плащане (💳 или 💵) автоматично коригира съответния баланс тук — не е нужно да го правиш ръчно.
+      <span data-i18n="wallets.hint_p1">Всяка нова транзакция с посочен начин на плащане (💳 или 💵) автоматично коригира съответния баланс тук — не е нужно да го правиш ръчно.</span>
       <br><br>
-      Използвай полетата по-горе само за да зададеш началните суми (колко имаш в момента) или да коригираш баланса при разминаване — например теглене на пари в брой, банкова такса, или транзакция, добавена без посочен начин на плащане.
+      <span data-i18n="wallets.hint_p2">Използвай полетата по-горе само за да зададеш началните суми (колко имаш в момента) или да коригираш баланса при разминаване — например теглене на пари в брой, банкова такса, или транзакция, добавена без посочен начин на плащане.</span>
     </div>
     <div class="status-msg" id="wallet-status" style="margin-top: 12px;"></div>
   </div>
@@ -175,7 +175,9 @@
   let cardBalance = 0;
   let cashBalance = 0;
 
-  const eur = (n) => (Number(n) || 0).toLocaleString('bg-BG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+  const tr = (key, vars) => window.BudgetNestI18n ? window.BudgetNestI18n.t(key, vars) : key;
+  const getLang = () => window.BudgetNestI18n ? window.BudgetNestI18n.getLang() : 'bg';
+  const eur = (n) => (Number(n) || 0).toLocaleString(getLang() === 'bg' ? 'bg-BG' : 'en-IE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
 
   function setStatus(id, message, type) {
     const el = document.getElementById(id);
@@ -226,7 +228,7 @@
 
     if (error) {
       console.error(error);
-      setStatus('wallet-status', 'Грешка при зареждане: ' + error.message, 'error');
+      setStatus('wallet-status', tr('wallets.err_load_prefix') + error.message, 'error');
       return;
     }
 
@@ -234,7 +236,7 @@
     cashBalance = data ? Number(data.cash_balance) : 0;
 
     if (!data) {
-      setStatus('wallet-status', 'Все още нямаш зададен баланс — въведи сегашните суми по-долу, за да започнем да ги следим.', '');
+      setStatus('wallet-status', tr('wallets.no_balance_yet'), '');
     }
   }
 
@@ -253,7 +255,7 @@
     const value = parseFloat(input.value);
 
     if (isNaN(value)) {
-      showToast('Въведете валидна сума.', 'error');
+      showToast(tr('wallets.err_invalid_amount'), 'error');
       return;
     }
 
@@ -268,12 +270,12 @@
       .upsert(payload, { onConflict: 'household_id' });
 
     if (error) {
-      showToast('Грешка: ' + error.message, 'error');
+      showToast(tr('common.error_prefix') + error.message, 'error');
       return;
     }
 
     setStatus('wallet-status', '', '');
-    showToast('Балансът е запазен ✓', 'success');
+    showToast(tr('wallets.saved_toast'), 'success');
     await loadWalletBalances();
     renderWallets();
   }
@@ -283,6 +285,11 @@
     await supabaseClient.auth.signOut();
     window.location.href = 'login.html';
   }
+
+  // ===== Смяна на език: презареждаме форматирането на сумите =====
+  window.onLanguageChange = function () {
+    if (currentHouseholdId) renderWallets();
+  };
 </script>
 
 </body>
