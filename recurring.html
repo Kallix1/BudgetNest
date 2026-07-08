@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css?v=14">
 <link rel="stylesheet" href="css/dashboard.css?v=13">
-<script src="nav.js?v=9" defer></script>
+<script src="nav.js?v=10" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -78,7 +78,9 @@
       <a href="transactions.html" class="nav-link">Транзакции</a>
       <a href="budgets.html" class="nav-link">Бюджети</a>
       <a href="wallets.html" class="nav-link">Портфейл</a>
+      <a href="goals.html" class="nav-link">Цели</a>
       <a href="recurring.html" class="nav-link active">Периодични</a>
+      <a href="settle.html" class="nav-link">Споделено</a>
       <a href="reviews.html" class="nav-link">Отзиви</a>
       <a href="settings.html" class="nav-link">Настройки</a>
       <a href="admin.html" class="nav-link" id="admin-nav-link" style="display:none;">Админ</a>
@@ -148,6 +150,19 @@
           <option value="6">Събота</option>
           <option value="0">Неделя</option>
         </select>
+      </div>
+
+      <div class="field full">
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+          <input type="checkbox" id="recur-remind-enabled" checked style="width:auto;" onchange="document.getElementById('recur-remind-days-field').style.display = this.checked ? 'block' : 'none';">
+          Напомняй ми по имейл преди плащането
+        </label>
+      </div>
+
+      <div class="field full" id="recur-remind-days-field">
+        <label>Колко дни предварително</label>
+        <input type="number" id="recur-remind-days" min="0" max="30" value="3">
+        <span class="hint" style="font-size:11.5px;">Ще получиш обобщено писмо, ако правилото е активно.</span>
       </div>
 
       <div class="field full">
@@ -372,12 +387,13 @@
             <div class="recur-icon">${escapeHtml(cat?.icon) || '💰'}</div>
             <div class="recur-info">
               <div class="recur-desc">${escapeHtml(r.description || cat?.name) || 'Транзакция'}${r.is_active ? '' : '<span class="recur-badge">на пауза</span>'}</div>
-              <div class="recur-meta">${methodIcon} ${schedule} · следваща: ${nextDate}</div>
+              <div class="recur-meta">${methodIcon} ${schedule} · следваща: ${nextDate}${r.remind_enabled ? ` · 🔔 напомняне ${r.remind_days_before} ${r.remind_days_before === 1 ? 'ден' : 'дни'} преди` : ' · 🔕 без напомняне'}</div>
             </div>
           </div>
           <div class="recur-side">
             <div class="recur-amount ${isIncome ? 'income' : 'expense'}">${sign} ${eur(r.amount)}</div>
             <div class="recur-actions">
+              <button type="button" class="recur-pause-btn" onclick="toggleRecurReminder('${r.id}', ${!r.remind_enabled})" title="Включи/изключи напомнянето">${r.remind_enabled ? '🔔' : '🔕'}</button>
               <button type="button" class="recur-pause-btn" onclick="toggleRecurActive('${r.id}', ${!r.is_active})">${r.is_active ? 'Пауза' : 'Възобнови'}</button>
               <button type="button" class="recur-delete-btn" onclick="deleteRecurring('${r.id}')">Изтрий</button>
             </div>
@@ -406,6 +422,8 @@
       payment_method: recurMethod,
       frequency: recurFrequency,
       is_active: true,
+      remind_enabled: document.getElementById('recur-remind-enabled').checked,
+      remind_days_before: parseInt(document.getElementById('recur-remind-days').value, 10) || 0,
     };
 
     const today = new Date();
@@ -436,6 +454,9 @@
     setRecurType('expense');
     setRecurMethod('card');
     setRecurFrequency('monthly');
+    document.getElementById('recur-remind-enabled').checked = true;
+    document.getElementById('recur-remind-days').value = 3;
+    document.getElementById('recur-remind-days-field').style.display = 'block';
 
     await loadRecurring();
   }
@@ -473,6 +494,18 @@
       .eq('id', id);
 
     if (error) { showToast('Грешка: ' + error.message, 'error'); return; }
+    await loadRecurring();
+  }
+
+  // ===== Включване/изключване на напомнянето по имейл =====
+  async function toggleRecurReminder(id, makeEnabled) {
+    const { error } = await supabaseClient
+      .from('recurring_transactions')
+      .update({ remind_enabled: makeEnabled })
+      .eq('id', id);
+
+    if (error) { showToast('Грешка: ' + error.message, 'error'); return; }
+    showToast(makeEnabled ? 'Напомнянето е включено 🔔' : 'Напомнянето е изключено 🔕', 'success');
     await loadRecurring();
   }
 

@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B1%3C/text%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Споделено — BudgetNest</title>
+<meta name="description" content="Кой на кого дължи в домакинството — споделени разходи в BudgetNest.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css?v=14">
+<link rel="stylesheet" href="css/dashboard.css?v=13">
+<script src="nav.js?v=10" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+  body.dashboard-body {
+    display: flex !important;
+    align-items: stretch !important;
+    min-height: 100vh !important;
+    margin: 0;
+    background: var(--bg-void);
+  }
+
+  .balance-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+  .balance-pill-card {
+    background: var(--surface-alt);
+    border: 1px solid var(--border-soft);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .balance-pill-name { font-size: 13px; color: var(--text-secondary); margin-bottom: 4px; }
+  .balance-pill-amount { font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 18px; }
+  .balance-pill-amount.owed { color: var(--color-income); }
+  .balance-pill-amount.owes { color: #E53E3E; }
+  .balance-pill-amount.even { color: var(--text-dim); }
+  .balance-pill-sub { font-size: 11.5px; color: var(--text-dim); margin-top: 2px; }
+
+  .transfer-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .transfer-row:last-child { border-bottom: none; }
+  .transfer-desc { font-size: 14px; color: var(--text-primary); }
+  .transfer-desc b { font-family: 'IBM Plex Mono', monospace; }
+  .transfer-settle-btn {
+    font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700;
+    border-radius: 8px; padding: 8px 12px; cursor: pointer; white-space: nowrap;
+    border: 1px solid var(--nest-green-mid); background: rgba(37,74,55,0.1); color: var(--nest-green-mid);
+  }
+
+  .shared-tx-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 10px 0; border-bottom: 1px solid var(--border-soft); font-size: 13px;
+  }
+  .shared-tx-row:last-child { border-bottom: none; }
+  .shared-tx-desc { color: var(--text-primary); font-weight: 500; }
+  .shared-tx-meta { color: var(--text-dim); font-size: 11.5px; margin-top: 2px; }
+  .shared-tx-amount { font-family: 'IBM Plex Mono', monospace; font-weight: 600; white-space: nowrap; }
+
+  .settlement-log-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 8px 0; border-bottom: 1px solid var(--border-soft); font-size: 12.5px; color: var(--text-secondary);
+  }
+  .settlement-log-row:last-child { border-bottom: none; }
+</style>
+</head>
+<body class="dashboard-body">
+
+<div class="bg-glow"></div>
+<div class="bg-grid"></div>
+
+<nav class="navbar">
+  <div class="nav-left">
+    <div class="nav-left-header">
+      <div class="brand-mark">BudgetNest</div>
+      <button class="nav-toggle" type="button" aria-label="Меню" aria-expanded="false" aria-controls="nav-links">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="nav-links" id="nav-links">
+      <a href="dashboard.html" class="nav-link">Табло</a>
+      <a href="transactions.html" class="nav-link">Транзакции</a>
+      <a href="budgets.html" class="nav-link">Бюджети</a>
+      <a href="wallets.html" class="nav-link">Портфейл</a>
+      <a href="goals.html" class="nav-link">Цели</a>
+      <a href="recurring.html" class="nav-link">Периодични</a>
+      <a href="settle.html" class="nav-link active">Споделено</a>
+      <a href="reviews.html" class="nav-link">Отзиви</a>
+      <a href="settings.html" class="nav-link">Настройки</a>
+      <a href="admin.html" class="nav-link" id="admin-nav-link" style="display:none;">Админ</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <span class="household-pill" id="household-name">…</span>
+    <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Смяна на тема"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-toggle-icon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button>
+    <button class="btn-ghost" onclick="handleSignOut()">Изход</button>
+  </div>
+</nav>
+
+<main class="dashboard-main" id="page-main" style="display:none;">
+
+  <div class="page-header">
+    <h1>Кой на кого дължи</h1>
+    <span class="hint" style="color: var(--text-secondary); font-size: 13px;">споделени разходи между членове</span>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Баланс на всеки член</div>
+    <div class="balance-grid" id="balance-grid"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      Предложени уравнявания
+      <span class="hint">най-малко на брой преводи, за да се изчистят сметките</span>
+    </div>
+    <div id="transfers-list">
+      <div class="empty-state">Зареждане…</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      Споделени разходи
+      <span class="hint">маркирай транзакция като „споделена" от Транзакции → Редактиране</span>
+    </div>
+    <div id="shared-tx-list">
+      <div class="empty-state">Зареждане…</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">История на уравняванията</div>
+    <div id="settlement-log-list">
+      <div class="empty-state">Все още няма уредени преводи.</div>
+    </div>
+  </div>
+
+</main>
+
+<!-- МОДАЛ: Потвърждение -->
+<div class="overlay" id="app-confirm-overlay" style="display:none; z-index: 9999;">
+  <div class="overlay-card" style="max-width: 420px; text-align: center; padding: 30px;">
+    <div style="font-size: 40px; margin-bottom: 15px;">⚠️</div>
+    <h3 id="app-confirm-title" style="margin-bottom: 10px; font-family: 'Space Grotesk', sans-serif; font-size: 20px; color: var(--text-primary);">Потвърждение</h3>
+    <p id="app-confirm-message" style="color: var(--text-secondary); margin-bottom: 25px; font-size: 14px; line-height: 1.5;"></p>
+    <div style="display: flex; gap: 12px; justify-content: center;">
+      <button type="button" id="app-confirm-cancel-btn" style="flex: 1; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: var(--text-secondary); background: var(--surface-alt); border: 1px solid var(--border-soft); border-radius: 10px; padding: 12px; cursor: pointer;">Отказ</button>
+      <button type="button" id="app-confirm-ok-btn" style="flex: 1; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: #FFFFFF; background: #EF4444; border: 1px solid #DC2626; border-radius: 10px; padding: 12px; cursor: pointer;">Да, продължи</button>
+    </div>
+  </div>
+</div>
+
+<div id="app-toast-container" style="position: fixed; top: 24px; right: 24px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; align-items: flex-end;"></div>
+
+<script>
+  function showToast(message, type) {
+    const container = document.getElementById('app-toast-container');
+    const toast = document.createElement('div');
+    const palette = {
+      error:   { bg: '#7F1D1D', border: '#EF4444' },
+      success: { bg: '#14532D', border: '#22C55E' },
+      info:    { bg: '#1E3A5F', border: '#3B82F6' },
+    };
+    const c = palette[type] || palette.info;
+    toast.style.cssText = `background:${c.bg}; border:1px solid ${c.border}; color:#fff; padding:14px 18px; border-radius:10px; font-family:'Inter',sans-serif; font-size:13px; font-weight:500; box-shadow:0 8px 24px rgba(0,0,0,0.35); max-width:340px; line-height:1.45;`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.style.transition = 'opacity 0.3s ease';
+      toast.style.opacity = '0';
+      setTimeout(() => toast.remove(), 300);
+    }, 4200);
+  }
+
+  function showConfirm(message, title) {
+    return new Promise((resolve) => {
+      document.getElementById('app-confirm-title').textContent = title || 'Потвърждение';
+      document.getElementById('app-confirm-message').textContent = message;
+      const overlay = document.getElementById('app-confirm-overlay');
+      overlay.style.display = 'flex';
+
+      const okBtn = document.getElementById('app-confirm-ok-btn');
+      const cancelBtn = document.getElementById('app-confirm-cancel-btn');
+
+      function cleanup(result) {
+        overlay.style.display = 'none';
+        okBtn.removeEventListener('click', onOk);
+        cancelBtn.removeEventListener('click', onCancel);
+        resolve(result);
+      }
+      function onOk() { cleanup(true); }
+      function onCancel() { cleanup(false); }
+
+      okBtn.addEventListener('click', onOk);
+      cancelBtn.addEventListener('click', onCancel);
+    });
+  }
+</script>
+
+<script>
+  // ===== Тъмна тема =====
+  const SUN_ICON_PATH = '<circle cx="12" cy="12" r="4"></circle><line x1="12" y1="2" x2="12" y2="4"></line><line x1="12" y1="20" x2="12" y2="22"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="2" y1="12" x2="4" y2="12"></line><line x1="20" y1="12" x2="22" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+  const MOON_ICON_PATH = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    const btn = document.getElementById('theme-toggle-btn');
+    if (btn) btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-toggle-icon">' + (theme === 'dark' ? SUN_ICON_PATH : MOON_ICON_PATH) + '</svg>';
+    localStorage.setItem('budgetnest-theme', theme);
+  }
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme') || 'light';
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  }
+  applyTheme(localStorage.getItem('budgetnest-theme') || 'light');
+
+  // ===== Supabase конфигурация =====
+  const SUPABASE_URL = 'https://fvorpmajvrsxrwtscmwk.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_KmFRXFvW-wCf5LJXMgHejQ__3CH2PB7';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const ADMIN_EMAILS = ['choko2009vr@gmail.com']; // <-- замени с истинския си имейл
+
+  let currentUser = null;
+  let currentHouseholdId = null;
+  let members = [];              // [{user_id, full_name, email}]
+  let sharedTransactions = [];    // transactions с is_shared = true
+  let splitsByTx = {};            // transaction_id -> [{user_id, share_amount}]
+  let settlementsLog = [];
+
+  const eur = (n) => (Number(n) || 0).toLocaleString('bg-BG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+  const EPS = 0.01;
+
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function memberName(userId) {
+    if (userId === currentUser?.id) return 'Аз (' + (nameOf(userId)) + ')';
+    return nameOf(userId);
+  }
+  function nameOf(userId) {
+    const m = members.find(x => x.user_id === userId);
+    return m ? (m.full_name || m.email || 'Неизвестен') : 'Неизвестен';
+  }
+
+  // ===== Init flow =====
+  (async function init() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) { window.location.href = 'login.html'; return; }
+    currentUser = session.user;
+
+    if (ADMIN_EMAILS.map(e => e.toLowerCase()).includes((currentUser.email || '').toLowerCase())) {
+      document.getElementById('admin-nav-link').style.display = 'flex';
+    }
+
+    const { data: memberships, error } = await supabaseClient
+      .from('household_members')
+      .select('household_id, households(name)')
+      .eq('user_id', currentUser.id)
+      .limit(1);
+
+    if (error) { console.error(error); return; }
+
+    if (!memberships || memberships.length === 0) {
+      window.location.href = 'dashboard.html';
+      return;
+    }
+
+    currentHouseholdId = memberships[0].household_id;
+    document.getElementById('household-name').textContent = memberships[0].households.name;
+    document.getElementById('page-main').style.display = 'block';
+
+    await loadAll();
+  })();
+
+  async function loadAll() {
+    const { data: memberRows } = await supabaseClient
+      .from('household_members')
+      .select('user_id, profiles(full_name, email)')
+      .eq('household_id', currentHouseholdId);
+
+    members = (memberRows || []).map(m => ({
+      user_id: m.user_id,
+      full_name: m.profiles?.full_name,
+      email: m.profiles?.email,
+    }));
+
+    if (members.length < 2) {
+      document.getElementById('balance-grid').innerHTML =
+        '<div class="empty-state">Разделянето на разходи има смисъл само с 2+ члена в домакинството. Покани някого от Настройки.</div>';
+      document.getElementById('transfers-list').innerHTML = '';
+      document.getElementById('shared-tx-list').innerHTML = '';
+      return;
+    }
+
+    const { data: txRows, error: txError } = await supabaseClient
+      .from('transactions')
+      .select('id, user_id, amount, description, transaction_date, category_id, categories(name, icon)')
+      .eq('household_id', currentHouseholdId)
+      .eq('is_shared', true)
+      .order('transaction_date', { ascending: false });
+
+    if (txError) { console.error(txError); }
+    sharedTransactions = txRows || [];
+
+    const txIds = sharedTransactions.map(t => t.id);
+    splitsByTx = {};
+    if (txIds.length) {
+      const { data: splitRows, error: splitError } = await supabaseClient
+        .from('transaction_splits')
+        .select('transaction_id, user_id, share_amount')
+        .in('transaction_id', txIds);
+      if (splitError) { console.error(splitError); }
+      (splitRows || []).forEach(s => {
+        if (!splitsByTx[s.transaction_id]) splitsByTx[s.transaction_id] = [];
+        splitsByTx[s.transaction_id].push(s);
+      });
+    }
+
+    const { data: settleRows, error: settleError } = await supabaseClient
+      .from('settlements')
+      .select('*')
+      .eq('household_id', currentHouseholdId)
+      .order('created_at', { ascending: false });
+    if (settleError) { console.error(settleError); }
+    settlementsLog = settleRows || [];
+
+    renderAll();
+  }
+
+  // ===== Изчисление на нетния баланс на всеки член =====
+  // net > 0  => домакинството дължи на този човек (той е "кредитор")
+  // net < 0  => този човек дължи на домакинството (той е "длъжник")
+  function computeNetBalances() {
+    const net = {};
+    members.forEach(m => { net[m.user_id] = 0; });
+
+    sharedTransactions.forEach(tx => {
+      if (net[tx.user_id] === undefined) net[tx.user_id] = 0;
+      net[tx.user_id] += Number(tx.amount); // платецът е "финансирал" цялата сума
+
+      (splitsByTx[tx.id] || []).forEach(s => {
+        if (net[s.user_id] === undefined) net[s.user_id] = 0;
+        net[s.user_id] -= Number(s.share_amount); // всеки участник дължи своя дял
+      });
+    });
+
+    settlementsLog.forEach(s => {
+      if (net[s.from_user_id] === undefined) net[s.from_user_id] = 0;
+      if (net[s.to_user_id] === undefined) net[s.to_user_id] = 0;
+      net[s.from_user_id] += Number(s.amount); // платил е → дългът му намалява
+      net[s.to_user_id] -= Number(s.amount);   // взел си е парите → вземането му намалява
+    });
+
+    return net;
+  }
+
+  // ===== Опростяване до минимален брой преводи (жаден алгоритъм) =====
+  function simplifyTransfers(net) {
+    const creditors = [];
+    const debtors = [];
+    Object.entries(net).forEach(([userId, amount]) => {
+      if (amount > EPS) creditors.push({ userId, amount });
+      else if (amount < -EPS) debtors.push({ userId, amount: -amount });
+    });
+    creditors.sort((a, b) => b.amount - a.amount);
+    debtors.sort((a, b) => b.amount - a.amount);
+
+    const transfers = [];
+    let ci = 0, di = 0;
+    while (ci < creditors.length && di < debtors.length) {
+      const c = creditors[ci], d = debtors[di];
+      const amt = Math.min(c.amount, d.amount);
+      transfers.push({ from: d.userId, to: c.userId, amount: Math.round(amt * 100) / 100 });
+      c.amount -= amt;
+      d.amount -= amt;
+      if (c.amount <= EPS) ci++;
+      if (d.amount <= EPS) di++;
+    }
+    return transfers;
+  }
+
+  function renderAll() {
+    const net = computeNetBalances();
+    renderBalanceGrid(net);
+    renderTransfers(net);
+    renderSharedTransactions();
+    renderSettlementLog();
+  }
+
+  function renderBalanceGrid(net) {
+    const grid = document.getElementById('balance-grid');
+    grid.innerHTML = members.map(m => {
+      const amount = net[m.user_id] || 0;
+      const cls = amount > EPS ? 'owed' : (amount < -EPS ? 'owes' : 'even');
+      const sub = amount > EPS ? 'има да взима' : (amount < -EPS ? 'дължи' : 'всичко е уредено');
+      return `
+        <div class="balance-pill-card">
+          <div class="balance-pill-name">${escapeHtml(m.full_name || m.email || 'Неизвестен')}</div>
+          <div class="balance-pill-amount ${cls}">${amount > EPS ? '+' : ''}${eur(amount)}</div>
+          <div class="balance-pill-sub">${sub}</div>
+        </div>`;
+    }).join('');
+  }
+
+  function renderTransfers(net) {
+    const el = document.getElementById('transfers-list');
+    const transfers = simplifyTransfers(net);
+
+    if (!transfers.length) {
+      el.innerHTML = '<div class="empty-state">✓ Всички сметки са уредени.</div>';
+      return;
+    }
+
+    el.innerHTML = transfers.map(t => `
+      <div class="transfer-row">
+        <div class="transfer-desc">
+          <b>${escapeHtml(nameOf(t.from))}</b> дължи на <b>${escapeHtml(nameOf(t.to))}</b>: <b>${eur(t.amount)}</b>
+        </div>
+        <button type="button" class="transfer-settle-btn" onclick="settleTransfer('${t.from}', '${t.to}', ${t.amount})">Отбележи като уредено</button>
+      </div>`).join('');
+  }
+
+  function renderSharedTransactions() {
+    const el = document.getElementById('shared-tx-list');
+    if (!sharedTransactions.length) {
+      el.innerHTML = '<div class="empty-state">Още няма транзакции, маркирани като споделени.</div>';
+      return;
+    }
+    el.innerHTML = sharedTransactions.slice(0, 20).map(tx => {
+      const splits = splitsByTx[tx.id] || [];
+      const splitLabel = splits.map(s => `${escapeHtml(nameOf(s.user_id))}: ${eur(s.share_amount)}`).join(' · ');
+      const dateLabel = new Date(tx.transaction_date).toLocaleDateString('bg-BG');
+      return `
+        <div class="shared-tx-row">
+          <div>
+            <div class="shared-tx-desc">${escapeHtml(tx.categories?.icon || '💰')} ${escapeHtml(tx.description || tx.categories?.name || 'Транзакция')}</div>
+            <div class="shared-tx-meta">платено от ${escapeHtml(nameOf(tx.user_id))} · ${dateLabel} · ${splitLabel}</div>
+          </div>
+          <div class="shared-tx-amount">${eur(tx.amount)}</div>
+        </div>`;
+    }).join('');
+  }
+
+  function renderSettlementLog() {
+    const el = document.getElementById('settlement-log-list');
+    if (!settlementsLog.length) {
+      el.innerHTML = '<div class="empty-state">Все още няма уредени преводи.</div>';
+      return;
+    }
+    el.innerHTML = settlementsLog.slice(0, 20).map(s => {
+      const dateLabel = new Date(s.created_at).toLocaleDateString('bg-BG');
+      return `
+        <div class="settlement-log-row">
+          <span>${escapeHtml(nameOf(s.from_user_id))} → ${escapeHtml(nameOf(s.to_user_id))}: <b>${eur(s.amount)}</b> · ${dateLabel}</span>
+          <button type="button" class="goal-delete-btn" style="background:none;border:none;color:var(--text-dim);cursor:pointer;" onclick="deleteSettlement('${s.id}')" title="Изтрий (при грешка)">✕</button>
+        </div>`;
+    }).join('');
+  }
+
+  // ===== Отбелязване на превод като уреден =====
+  async function settleTransfer(fromUserId, toUserId, amount) {
+    const ok = await showConfirm(
+      `Потвърждаваш ли, че ${nameOf(fromUserId)} е платил${amount ? '' : ''} ${eur(amount)} на ${nameOf(toUserId)}?`,
+      'Отбелязване като уредено'
+    );
+    if (!ok) return;
+
+    const { error } = await supabaseClient
+      .from('settlements')
+      .insert([{
+        household_id: currentHouseholdId,
+        from_user_id: fromUserId,
+        to_user_id: toUserId,
+        amount,
+        created_by: currentUser.id,
+      }]);
+
+    if (error) {
+      showToast('Грешка: ' + error.message, 'error');
+      return;
+    }
+
+    showToast('Уредено ✓', 'success');
+    await loadAll();
+  }
+
+  async function deleteSettlement(id) {
+    const ok = await showConfirm('Да изтрия ли този запис за уравняване? Балансите ще се преизчислят.', 'Изтриване');
+    if (!ok) return;
+
+    const { error } = await supabaseClient.from('settlements').delete().eq('id', id);
+    if (error) {
+      showToast('Грешка: ' + error.message, 'error');
+      return;
+    }
+    showToast('Изтрито', 'success');
+    await loadAll();
+  }
+
+  // ===== Изход =====
+  async function handleSignOut() {
+    await supabaseClient.auth.signOut();
+    window.location.href = 'login.html';
+  }
+</script>
+
+</body>
+</html>

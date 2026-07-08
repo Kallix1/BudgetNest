@@ -11,8 +11,8 @@
 <link rel="stylesheet" href="css/style.css?v=14">
 <link rel="stylesheet" href="css/dashboard.css?v=13">
 <link rel="stylesheet" href="css/datepicker.css?v=1">
-<script src="datepicker.js?v=1" defer></script>
-<script src="nav.js?v=9" defer></script>
+<script src="datepicker.js?v=2" defer></script>
+<script src="nav.js?v=10" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -22,6 +22,34 @@
     min-height: 100vh !important;
     margin: 0;
     background: var(--bg-void);
+  }
+
+  .split-member-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+  }
+  .split-member-row label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+    font-size: 13.5px;
+    color: var(--text-primary);
+    cursor: pointer;
+  }
+  .split-member-row input[type="checkbox"] { width: auto; flex-shrink: 0; }
+  .split-member-row input[type="number"] {
+    width: 84px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--input-border);
+    background: var(--input-bg);
+    color: var(--text-primary);
   }
 </style>
 </head>
@@ -43,7 +71,9 @@
       <a href="transactions.html" class="nav-link active">Транзакции</a>
       <a href="budgets.html" class="nav-link">Бюджети</a>
       <a href="wallets.html" class="nav-link">Портфейл</a>
+      <a href="goals.html" class="nav-link">Цели</a>
       <a href="recurring.html" class="nav-link">Периодични</a>
+      <a href="settle.html" class="nav-link">Споделено</a>
       <a href="reviews.html" class="nav-link">Отзиви</a>
       <a href="settings.html" class="nav-link">Настройки</a>
       <a href="admin.html" class="nav-link" id="admin-nav-link" style="display:none;">Админ</a>
@@ -165,7 +195,7 @@
 
       <div class="field full">
         <label>Сума (€)</label>
-        <input type="number" id="modal-tx-amount" step="0.01" min="0.01" placeholder="0.00" required>
+        <input type="number" id="modal-tx-amount" step="0.01" min="0.01" placeholder="0.00" required oninput="if (modalIsShared) renderSplitMembersUI();">
       </div>
 
       <div class="field full">
@@ -181,6 +211,28 @@
       <div class="field full">
         <label>Дата</label>
         <input type="date" id="modal-tx-date" required>
+      </div>
+
+      <div class="field full" id="modal-shared-section" style="display:none;">
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+          <input type="checkbox" id="modal-tx-shared-toggle" onchange="toggleModalShared()" style="width:auto;">
+          Споделен разход между членове на домакинството
+        </label>
+
+        <div id="modal-shared-details" style="display:none; margin-top:12px; padding:12px; border:1px solid var(--border-soft); border-radius:10px; background:var(--surface-alt);">
+          <div class="field" style="margin-bottom:10px;">
+            <label>Платено от</label>
+            <select id="modal-tx-paidby" onchange="renderSplitMembersUI()"></select>
+          </div>
+
+          <div class="type-toggle" id="split-mode-toggle" style="margin-bottom:10px;">
+            <button type="button" class="type-btn active" data-mode="equal" onclick="setSplitMode('equal')">Поравно</button>
+            <button type="button" class="type-btn" data-mode="manual" onclick="setSplitMode('manual')">Ръчно</button>
+          </div>
+
+          <div id="split-members-list"></div>
+          <div class="hint" id="split-summary-hint" style="margin-top:8px; display:block;"></div>
+        </div>
       </div>
 
       <div class="field full">
@@ -258,6 +310,12 @@
   let householdMemberCount = 1;
   let memberProfiles = {}; // user_id -> { full_name, email }
 
+  // ===== Разделяне на споделен разход =====
+  let modalIsShared = false;
+  let modalSplitMode = 'equal'; // 'equal' | 'manual'
+  let modalCheckedMembers = new Set(); // user_id-та, включени в разделянето
+  let modalManualShares = {}; // user_id -> ръчно въведена сума (пазим между рендерите)
+
   const eur = (n) => (Number(n) || 0).toLocaleString('bg-BG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
 
   // ===== Init flow =====
@@ -299,9 +357,27 @@
     (memberRows || []).forEach(m => { memberProfiles[m.user_id] = m.profiles || {}; });
     householdMemberCount = (memberRows || []).length || 1;
 
+    // По подразбиране всички членове участват в поравно разделяне
+    modalCheckedMembers = new Set(Object.keys(memberProfiles));
+    populatePaidBySelect();
+
     await loadCategories();
     await loadTransactions();
   })();
+
+  function memberLabel(userId) {
+    if (userId === currentUser.id) return 'Аз';
+    return memberProfiles[userId]?.full_name || memberProfiles[userId]?.email || 'Друг член';
+  }
+
+  function populatePaidBySelect() {
+    const select = document.getElementById('modal-tx-paidby');
+    if (!select) return;
+    select.innerHTML = Object.keys(memberProfiles).map(uid =>
+      `<option value="${uid}">${escapeHtml(memberLabel(uid))}</option>`
+    ).join('');
+    select.value = currentUser.id;
+  }
 
   // ===== Категории =====
   async function loadCategories() {
@@ -491,6 +567,140 @@
     populateModalCategorySelect();
   }
 
+  // ===== Споделен разход: показване/скриване на детайлите =====
+  function toggleModalShared() {
+    modalIsShared = document.getElementById('modal-tx-shared-toggle').checked;
+    document.getElementById('modal-shared-details').style.display = modalIsShared ? 'block' : 'none';
+    if (modalIsShared) renderSplitMembersUI();
+  }
+
+  function setSplitMode(mode) {
+    modalSplitMode = mode;
+    document.querySelectorAll('#split-mode-toggle .type-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+    renderSplitMembersUI();
+  }
+
+  // Рендира редовете с чекбоксове (+ полета за ръчна сума, ако е избран този режим)
+  function renderSplitMembersUI() {
+    const container = document.getElementById('split-members-list');
+    if (!container) return;
+
+    const memberIds = Object.keys(memberProfiles);
+    const checkedIds = memberIds.filter(uid => modalCheckedMembers.has(uid));
+
+    // Изчисляваме РЕАЛНОТО разпределение по същия начин като collectSplits()
+    // (при "поравно" последният получава остатъка от закръглянето), за да
+    // показаното на екрана ВИНАГИ съвпада с това, което реално ще се запази.
+    const equalShares = computeEqualShares(checkedIds);
+
+    container.innerHTML = memberIds.map(uid => {
+      const checked = modalCheckedMembers.has(uid);
+
+      if (modalSplitMode === 'manual') {
+        // При превключване към "Ръчно" пълним modalManualShares СРЕЩУ показаната
+        // стойност веднага — иначе полето изглежда попълнено, но вътрешното
+        // състояние остава 0, докато потребителят лично не пипне инпута.
+        if (checked && modalManualShares[uid] === undefined) {
+          modalManualShares[uid] = equalShares[uid] || 0;
+        }
+        const manualValue = checked ? (modalManualShares[uid] ?? 0) : '';
+        return `
+          <div class="split-member-row">
+            <label>
+              <input type="checkbox" ${checked ? 'checked' : ''}
+                onchange="toggleSplitMember('${uid}', this.checked)">
+              ${escapeHtml(memberLabel(uid))}
+            </label>
+            <input type="number" step="0.01" min="0" value="${manualValue}" ${checked ? '' : 'disabled'}
+              onchange="modalManualShares['${uid}'] = parseFloat(this.value) || 0; refreshSplitSummary();">
+          </div>`;
+      }
+
+      return `
+        <div class="split-member-row">
+          <label>
+            <input type="checkbox" ${checked ? 'checked' : ''}
+              onchange="toggleSplitMember('${uid}', this.checked)">
+            ${escapeHtml(memberLabel(uid))}
+          </label>
+          <span class="hint" style="width:70px; text-align:right;">${checked ? eur(equalShares[uid] || 0) : '—'}</span>
+        </div>`;
+    }).join('');
+
+    refreshSplitSummary();
+  }
+
+  function toggleSplitMember(userId, isChecked) {
+    if (isChecked) modalCheckedMembers.add(userId);
+    else modalCheckedMembers.delete(userId);
+    renderSplitMembersUI();
+  }
+
+  // Изчислява поравно-дяловете за дадени участници (последният поема остатъка
+  // от закръглянето, за да сборът пасне точно на общата сума до стотинка).
+  function computeEqualShares(checkedIds) {
+    const totalAmount = parseFloat(document.getElementById('modal-tx-amount').value) || 0;
+    const shares = {};
+    if (!checkedIds.length) return shares;
+    const base = Math.floor((totalAmount / checkedIds.length) * 100) / 100;
+    checkedIds.forEach(uid => { shares[uid] = base; });
+    const distributed = base * checkedIds.length;
+    const leftover = Math.round((totalAmount - distributed) * 100) / 100;
+    const lastId = checkedIds[checkedIds.length - 1];
+    shares[lastId] = Math.round((shares[lastId] + leftover) * 100) / 100;
+    return shares;
+  }
+
+  // Малък живо-обновяван текст: колко общо се разпределя срещу общата сума
+  function refreshSplitSummary() {
+    const hint = document.getElementById('split-summary-hint');
+    if (!hint) return;
+    const totalAmount = parseFloat(document.getElementById('modal-tx-amount').value) || 0;
+    const splits = collectSplits();
+    const splitSum = splits.reduce((s, x) => s + x.share_amount, 0);
+    const diff = Math.round((totalAmount - splitSum) * 100) / 100;
+
+    if (modalSplitMode === 'equal') {
+      hint.textContent = `Разделя се поравно между ${splits.length} ${splits.length === 1 ? 'човек' : 'души'}.`;
+      hint.style.color = 'var(--text-secondary)';
+    } else {
+      hint.textContent = Math.abs(diff) < 0.01
+        ? `✓ Сборът съвпада с общата сума (${eur(totalAmount)}).`
+        : `Разпределени ${eur(splitSum)} от ${eur(totalAmount)} — разлика ${eur(diff)}.`;
+      hint.style.color = Math.abs(diff) < 0.01 ? 'var(--color-income)' : '#E53E3E';
+    }
+  }
+
+  // Връща масива [{user_id, share_amount}] според текущия режим.
+  // При 'equal' изчислява дела на момента (последният получава остатъка от
+  // закръгляването, за да сборът пасне на стотинка).
+  function collectSplits() {
+    const checkedIds = Object.keys(memberProfiles).filter(uid => modalCheckedMembers.has(uid));
+    if (!checkedIds.length) return [];
+
+    if (modalSplitMode === 'equal') {
+      const equalShares = computeEqualShares(checkedIds);
+      return checkedIds.map(uid => ({ user_id: uid, share_amount: equalShares[uid] || 0 }));
+    }
+
+    return checkedIds.map(uid => ({
+      user_id: uid,
+      share_amount: Math.round((modalManualShares[uid] || 0) * 100) / 100,
+    }));
+  }
+
+  function resetSharedSectionDefaults() {
+    modalIsShared = false;
+    modalSplitMode = 'equal';
+    modalCheckedMembers = new Set(Object.keys(memberProfiles));
+    modalManualShares = {};
+    document.getElementById('modal-tx-shared-toggle').checked = false;
+    document.getElementById('modal-shared-details').style.display = 'none';
+    document.getElementById('modal-shared-section').style.display = householdMemberCount > 1 ? 'block' : 'none';
+    populatePaidBySelect();
+    setSplitMode('equal');
+  }
+
   function openAddModal() {
     editingTransactionId = null;
     document.getElementById('tx-modal-title').textContent = 'Нова транзакция';
@@ -500,11 +710,12 @@
     document.getElementById('modal-tx-date').valueAsDate = new Date();
     setModalType('expense');
     setModalMethod('card');
+    resetSharedSectionDefaults();
     setStatus('modal-tx-status', '', '');
     document.getElementById('tx-modal-overlay').style.display = 'flex';
   }
 
-  function openEditModal(id) {
+  async function openEditModal(id) {
     const tx = allTransactions.find(t => t.id === id);
     if (!tx) return;
     editingTransactionId = id;
@@ -520,6 +731,33 @@
     document.getElementById('modal-tx-date').value = tx.transaction_date;
     document.getElementById('modal-tx-category').value = tx.category_id;
     setStatus('modal-tx-status', '', '');
+
+    resetSharedSectionDefaults();
+
+    if (tx.is_shared && householdMemberCount > 1) {
+      document.getElementById('modal-tx-shared-toggle').checked = true;
+      modalIsShared = true;
+      document.getElementById('modal-shared-details').style.display = 'block';
+      document.getElementById('modal-tx-paidby').value = tx.user_id;
+
+      // Зареждаме съществуващото разделяне за тази транзакция
+      const { data: splitRows, error: splitError } = await supabaseClient
+        .from('transaction_splits')
+        .select('user_id, share_amount')
+        .eq('transaction_id', id);
+
+      if (!splitError && splitRows && splitRows.length) {
+        modalCheckedMembers = new Set(splitRows.map(s => s.user_id));
+        modalManualShares = {};
+        splitRows.forEach(s => { modalManualShares[s.user_id] = Number(s.share_amount); });
+
+        // Ако дяловете не са точно равни, показваме го в режим "Ръчно",
+        // за да не подмени тихомълком вече зададено ръчно разделяне.
+        const equalShare = Math.round((Number(tx.amount) / splitRows.length) * 100) / 100;
+        const looksEqual = splitRows.every(s => Math.abs(Number(s.share_amount) - equalShare) < 0.02);
+        setSplitMode(looksEqual ? 'equal' : 'manual');
+      }
+    }
 
     document.getElementById('tx-modal-overlay').style.display = 'flex';
   }
@@ -551,28 +789,68 @@
       return;
     }
 
+    // Валидация на споделянето, ако е активирано
+    let splits = [];
+    if (modalIsShared) {
+      splits = collectSplits();
+      if (!splits.length) {
+        setStatus('modal-tx-status', 'Изберете поне един член за разделянето.', 'error');
+        return;
+      }
+      const splitSum = Math.round(splits.reduce((s, x) => s + x.share_amount, 0) * 100) / 100;
+      if (modalSplitMode === 'manual' && Math.abs(splitSum - Math.round(amount * 100) / 100) > 0.01) {
+        setStatus('modal-tx-status', `Сборът на дяловете (${eur(splitSum)}) трябва да е равен на общата сума (${eur(amount)}).`, 'error');
+        return;
+      }
+    }
+
     const btn = document.getElementById('modal-tx-submit');
     btn.disabled = true;
     const isEditing = editingTransactionId !== null;
     setStatus('modal-tx-status', isEditing ? 'Запазване…' : 'Добавяне…', '');
 
+    const paidBy = modalIsShared ? (document.getElementById('modal-tx-paidby').value || currentUser.id) : currentUser.id;
+
     const payload = {
       household_id: currentHouseholdId,
-      user_id: currentUser.id,
+      user_id: paidBy,
       category_id: categoryId,
       amount: Math.round(amount * 100) / 100,
       description: document.getElementById('modal-tx-description').value.trim(),
       transaction_date: txDate,
       payment_method: modalMethod,
+      is_shared: modalIsShared,
     };
 
     let resultError = null;
+    let transactionId = editingTransactionId;
+
     if (isEditing) {
       const { error } = await supabaseClient.from('transactions').update(payload).eq('id', editingTransactionId);
       resultError = error;
     } else {
-      const { error } = await supabaseClient.from('transactions').insert([payload]);
+      const { data, error } = await supabaseClient.from('transactions').insert([payload]).select('id').single();
       resultError = error;
+      if (data) transactionId = data.id;
+    }
+
+    if (!resultError && transactionId) {
+      // Пресъздаваме разделянето от нулата — по-просто и сигурно от diff логика.
+      const { error: deleteSplitsError } = await supabaseClient
+        .from('transaction_splits').delete().eq('transaction_id', transactionId);
+      if (deleteSplitsError) resultError = deleteSplitsError;
+
+      if (!resultError && modalIsShared && splits.length) {
+        const { error: insertSplitsError } = await supabaseClient
+          .from('transaction_splits')
+          .insert(splits.map(s => ({
+            transaction_id: transactionId,
+            household_id: currentHouseholdId,
+            user_id: s.user_id,
+            share_amount: s.share_amount,
+          })));
+        if (insertSplitsError) resultError = insertSplitsError;
+      }
     }
 
     btn.disabled = false;

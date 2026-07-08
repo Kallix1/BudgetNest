@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B1%3C/text%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Цели — BudgetNest</title>
+<meta name="description" content="Цели за спестяване в BudgetNest — задай сума, следи прогреса.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css?v=14">
+<link rel="stylesheet" href="css/dashboard.css?v=13">
+<link rel="stylesheet" href="css/datepicker.css?v=1">
+<script src="datepicker.js?v=2" defer></script>
+<script src="nav.js?v=10" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+  body.dashboard-body {
+    display: flex !important;
+    align-items: stretch !important;
+    min-height: 100vh !important;
+    margin: 0;
+    background: var(--bg-void);
+  }
+
+  .goals-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+
+  .goal-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-soft);
+    border-radius: 14px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .goal-card.completed {
+    border-color: var(--nest-gold-accent);
+    background: linear-gradient(180deg, rgba(212,175,55,0.08), transparent 40%), var(--bg-card);
+  }
+
+  .goal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .goal-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    cursor: pointer;
+  }
+
+  .goal-icon { font-size: 24px; flex-shrink: 0; }
+
+  .goal-name {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .goal-delete-btn {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px 6px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .goal-delete-btn:hover { color: #E53E3E; }
+
+  .goal-complete-badge {
+    font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 999px;
+    background: rgba(212,175,55,0.18); color: var(--nest-gold-accent);
+    white-space: nowrap;
+  }
+
+  .goal-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+  .goal-stats b { color: var(--text-primary); font-family: 'IBM Plex Mono', monospace; }
+
+  .goal-date-hint { font-size: 12px; color: var(--text-dim); }
+
+  .goal-contribute-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .goal-contribute-row input {
+    flex: 1;
+    min-width: 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    padding: 9px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--input-border);
+    background: var(--input-bg);
+    color: var(--text-primary);
+  }
+  .goal-contribute-row button {
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    font-weight: 700;
+    border-radius: 8px;
+    padding: 0 12px;
+    cursor: pointer;
+    border: 1px solid var(--input-border);
+    background: var(--surface-alt);
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+  .goal-contribute-row button.add { color: var(--nest-green-mid); border-color: var(--nest-green-mid); }
+  .goal-contribute-row button.withdraw { color: #E53E3E; border-color: rgba(229,62,62,0.4); }
+
+  .goal-history {
+    margin-top: 6px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-soft);
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .goal-history-row { display: flex; justify-content: space-between; padding: 3px 0; }
+  .goal-history-empty { color: var(--text-dim); font-style: italic; }
+</style>
+</head>
+<body class="dashboard-body">
+
+<div class="bg-glow"></div>
+<div class="bg-grid"></div>
+
+<nav class="navbar">
+  <div class="nav-left">
+    <div class="nav-left-header">
+      <div class="brand-mark">BudgetNest</div>
+      <button class="nav-toggle" type="button" aria-label="Меню" aria-expanded="false" aria-controls="nav-links">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="nav-links" id="nav-links">
+      <a href="dashboard.html" class="nav-link">Табло</a>
+      <a href="transactions.html" class="nav-link">Транзакции</a>
+      <a href="budgets.html" class="nav-link">Бюджети</a>
+      <a href="wallets.html" class="nav-link">Портфейл</a>
+      <a href="goals.html" class="nav-link active">Цели</a>
+      <a href="recurring.html" class="nav-link">Периодични</a>
+      <a href="settle.html" class="nav-link">Споделено</a>
+      <a href="reviews.html" class="nav-link">Отзиви</a>
+      <a href="settings.html" class="nav-link">Настройки</a>
+      <a href="admin.html" class="nav-link" id="admin-nav-link" style="display:none;">Админ</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <span class="household-pill" id="household-name">…</span>
+    <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Смяна на тема"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-toggle-icon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button>
+    <button class="btn-ghost" onclick="handleSignOut()">Изход</button>
+  </div>
+</nav>
+
+<main class="dashboard-main" id="page-main" style="display:none;">
+
+  <div class="page-header">
+    <h1>Цели за спестяване</h1>
+    <span class="hint" style="color: var(--text-secondary); font-size: 13px;">задай сума, следи прогреса</span>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Нова цел</div>
+    <form id="goal-form" class="quick-add-grid" onsubmit="handleAddGoal(event)">
+      <div class="field" style="grid-column: span 1;">
+        <label>Икона (емоджи)</label>
+        <input type="text" id="goal-icon" maxlength="4" placeholder="🎯">
+      </div>
+      <div class="field" style="grid-column: span 1;">
+        <label>Целева сума (€)</label>
+        <input type="number" id="goal-target" step="0.01" min="0.01" placeholder="0.00" required>
+      </div>
+      <div class="field full">
+        <label>Име на целта</label>
+        <input type="text" id="goal-name" placeholder="напр. Ваканция в Гърция, Спешен фонд" required>
+      </div>
+      <div class="field full">
+        <label>Целева дата <span class="hint">(незадължително)</span></label>
+        <input type="date" id="goal-date">
+      </div>
+      <div class="field full">
+        <div class="status-msg" id="goal-form-status"></div>
+        <button type="submit" class="submit" style="width: 100%; margin-top: 6px;">Добави цел</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      Твоите цели
+      <span class="hint" id="goals-count-label"></span>
+    </div>
+    <div id="goals-list">
+      <div class="skeleton-row"><span class="skeleton skeleton-circle"></span><span class="skeleton-lines"><span class="skeleton skeleton-line medium"></span><span class="skeleton skeleton-line short"></span></span></div>
+      <div class="skeleton-row"><span class="skeleton skeleton-circle"></span><span class="skeleton-lines"><span class="skeleton skeleton-line medium"></span><span class="skeleton skeleton-line short"></span></span></div>
+    </div>
+  </div>
+
+</main>
+
+<!-- МОДАЛ: Редакция на цел -->
+<div class="overlay" id="goal-edit-overlay" style="display:none;">
+  <div class="overlay-card" style="max-width: 420px;">
+    <h2>Редакция на цел</h2>
+    <form id="goal-edit-form" class="quick-add-grid" onsubmit="handleSaveGoalEdit(event)">
+      <div class="field" style="grid-column: span 1;">
+        <label>Икона</label>
+        <input type="text" id="goal-edit-icon" maxlength="4">
+      </div>
+      <div class="field" style="grid-column: span 1;">
+        <label>Целева сума (€)</label>
+        <input type="number" id="goal-edit-target" step="0.01" min="0.01" required>
+      </div>
+      <div class="field full">
+        <label>Име</label>
+        <input type="text" id="goal-edit-name" required>
+      </div>
+      <div class="field full">
+        <label>Целева дата</label>
+        <input type="date" id="goal-edit-date">
+      </div>
+      <div class="field full">
+        <div class="status-msg" id="goal-edit-status"></div>
+        <div style="display:flex; gap:10px; margin-top:6px;">
+          <button type="submit" class="submit" style="width: 100%; margin: 0;">Запази</button>
+          <button type="button" class="btn-ghost" style="flex: 1;" onclick="closeGoalEditModal()">Отказ</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- МОДАЛ: Потвърждение за изтриване -->
+<div class="overlay" id="app-confirm-overlay" style="display:none; z-index: 9999;">
+  <div class="overlay-card" style="max-width: 420px; text-align: center; padding: 30px;">
+    <div style="font-size: 40px; margin-bottom: 15px;">⚠️</div>
+    <h3 id="app-confirm-title" style="margin-bottom: 10px; font-family: 'Space Grotesk', sans-serif; font-size: 20px; color: var(--text-primary);">Потвърждение</h3>
+    <p id="app-confirm-message" style="color: var(--text-secondary); margin-bottom: 25px; font-size: 14px; line-height: 1.5;"></p>
+    <div style="display: flex; gap: 12px; justify-content: center;">
+      <button type="button" id="app-confirm-cancel-btn" style="flex: 1; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: var(--text-secondary); background: var(--surface-alt); border: 1px solid var(--border-soft); border-radius: 10px; padding: 12px; cursor: pointer;">Отказ</button>
+      <button type="button" id="app-confirm-ok-btn" style="flex: 1; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: #FFFFFF; background: #EF4444; border: 1px solid #DC2626; border-radius: 10px; padding: 12px; cursor: pointer;">Да, продължи</button>
+    </div>
+  </div>
+</div>
+
+<div id="app-toast-container" style="position: fixed; top: 24px; right: 24px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; align-items: flex-end;"></div>
+
+<script>
+  function showToast(message, type) {
+    const container = document.getElementById('app-toast-container');
+    const toast = document.createElement('div');
+    const palette = {
+      error:   { bg: '#7F1D1D', border: '#EF4444' },
+      success: { bg: '#14532D', border: '#22C55E' },
+      info:    { bg: '#1E3A5F', border: '#3B82F6' },
+    };
+    const c = palette[type] || palette.info;
+    toast.style.cssText = `background:${c.bg}; border:1px solid ${c.border}; color:#fff; padding:14px 18px; border-radius:10px; font-family:'Inter',sans-serif; font-size:13px; font-weight:500; box-shadow:0 8px 24px rgba(0,0,0,0.35); max-width:340px; line-height:1.45;`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.style.transition = 'opacity 0.3s ease';
+      toast.style.opacity = '0';
+      setTimeout(() => toast.remove(), 300);
+    }, 4200);
+  }
+
+  // ===== Модал за потвърждение (замества confirm()) =====
+  function showConfirm(message, title) {
+    return new Promise((resolve) => {
+      document.getElementById('app-confirm-title').textContent = title || 'Потвърждение';
+      document.getElementById('app-confirm-message').textContent = message;
+      const overlay = document.getElementById('app-confirm-overlay');
+      overlay.style.display = 'flex';
+
+      const okBtn = document.getElementById('app-confirm-ok-btn');
+      const cancelBtn = document.getElementById('app-confirm-cancel-btn');
+
+      function cleanup(result) {
+        overlay.style.display = 'none';
+        okBtn.removeEventListener('click', onOk);
+        cancelBtn.removeEventListener('click', onCancel);
+        resolve(result);
+      }
+      function onOk() { cleanup(true); }
+      function onCancel() { cleanup(false); }
+
+      okBtn.addEventListener('click', onOk);
+      cancelBtn.addEventListener('click', onCancel);
+    });
+  }
+</script>
+
+<script>
+  // ===== Тъмна тема =====
+  const SUN_ICON_PATH = '<circle cx="12" cy="12" r="4"></circle><line x1="12" y1="2" x2="12" y2="4"></line><line x1="12" y1="20" x2="12" y2="22"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="2" y1="12" x2="4" y2="12"></line><line x1="20" y1="12" x2="22" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+  const MOON_ICON_PATH = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    const btn = document.getElementById('theme-toggle-btn');
+    if (btn) btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-toggle-icon">' + (theme === 'dark' ? SUN_ICON_PATH : MOON_ICON_PATH) + '</svg>';
+    localStorage.setItem('budgetnest-theme', theme);
+  }
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme') || 'light';
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  }
+  applyTheme(localStorage.getItem('budgetnest-theme') || 'light');
+
+  // ===== Supabase конфигурация =====
+  const SUPABASE_URL = 'https://fvorpmajvrsxrwtscmwk.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_KmFRXFvW-wCf5LJXMgHejQ__3CH2PB7';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const ADMIN_EMAILS = ['choko2009vr@gmail.com']; // <-- замени с истинския си имейл
+
+  let currentUser = null;
+  let currentHouseholdId = null;
+  let goals = [];
+  let contributionsByGoal = {}; // goal_id -> [{user_id, amount, note, created_at}]
+  let memberProfiles = {};      // user_id -> { full_name, email }
+  let editingGoalId = null;
+
+  const eur = (n) => (Number(n) || 0).toLocaleString('bg-BG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function setStatus(id, message, type) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = message;
+    el.style.color = type === 'error' ? '#E53E3E' : (type === 'success' ? 'var(--color-income)' : 'var(--text-secondary)');
+  }
+
+  // ===== Init flow =====
+  (async function init() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) { window.location.href = 'login.html'; return; }
+    currentUser = session.user;
+
+    if (ADMIN_EMAILS.map(e => e.toLowerCase()).includes((currentUser.email || '').toLowerCase())) {
+      document.getElementById('admin-nav-link').style.display = 'flex';
+    }
+
+    const { data: memberships, error } = await supabaseClient
+      .from('household_members')
+      .select('household_id, households(name)')
+      .eq('user_id', currentUser.id)
+      .limit(1);
+
+    if (error) { console.error(error); return; }
+
+    if (!memberships || memberships.length === 0) {
+      window.location.href = 'dashboard.html';
+      return;
+    }
+
+    currentHouseholdId = memberships[0].household_id;
+    document.getElementById('household-name').textContent = memberships[0].households.name;
+    document.getElementById('page-main').style.display = 'block';
+
+    const { data: memberRows } = await supabaseClient
+      .from('household_members')
+      .select('user_id, profiles(full_name, email)')
+      .eq('household_id', currentHouseholdId);
+    memberProfiles = {};
+    (memberRows || []).forEach(m => { memberProfiles[m.user_id] = m.profiles || {}; });
+
+    await loadGoals();
+  })();
+
+  function memberLabel(userId) {
+    if (userId === currentUser.id) return 'Аз';
+    return memberProfiles[userId]?.full_name || memberProfiles[userId]?.email || 'Друг член';
+  }
+
+  // ===== Зареждане на целите + последните вноски =====
+  async function loadGoals() {
+    const { data: goalRows, error } = await supabaseClient
+      .from('savings_goals')
+      .select('*')
+      .eq('household_id', currentHouseholdId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error(error);
+      document.getElementById('goals-list').innerHTML =
+        '<div class="empty-state" style="color:#DC2626;">Грешка при зареждане: ' + escapeHtml(error.message) + '</div>';
+      return;
+    }
+
+    goals = goalRows || [];
+
+    const { data: contribRows, error: contribError } = await supabaseClient
+      .from('savings_goal_contributions')
+      .select('goal_id, user_id, amount, note, created_at')
+      .eq('household_id', currentHouseholdId)
+      .order('created_at', { ascending: false });
+
+    if (contribError) { console.error(contribError); }
+
+    contributionsByGoal = {};
+    (contribRows || []).forEach(c => {
+      if (!contributionsByGoal[c.goal_id]) contributionsByGoal[c.goal_id] = [];
+      contributionsByGoal[c.goal_id].push(c);
+    });
+
+    renderGoals();
+  }
+
+  // ===== Рендиране =====
+  function renderGoals() {
+    const container = document.getElementById('goals-list');
+    document.getElementById('goals-count-label').textContent = goals.length ? goals.length + (goals.length === 1 ? ' цел' : ' цели') : '';
+
+    if (!goals.length) {
+      container.innerHTML = '<div class="empty-state">Все още няма зададени цели. Добави първата по-горе — например „Спешен фонд" или „Ваканция".</div>';
+      return;
+    }
+
+    container.innerHTML = '<div class="goals-grid">' + goals.map(g => {
+      const target = Number(g.target_amount);
+      const current = Number(g.current_amount);
+      const pct = target > 0 ? Math.min((current / target) * 100, 100) : 0;
+      const isOver = current >= target;
+      const remaining = Math.max(target - current, 0);
+
+      let dateHint = '';
+      if (g.target_date) {
+        const days = Math.ceil((new Date(g.target_date) - new Date(new Date().toDateString())) / 86400000);
+        const dateLabel = new Date(g.target_date).toLocaleDateString('bg-BG');
+        dateHint = `<div class="goal-date-hint">🗓 до ${dateLabel}${days >= 0 ? ` · остават ${days} ${days === 1 ? 'ден' : 'дни'}` : ' · датата е минала'}</div>`;
+      }
+
+      const recentContribs = (contributionsByGoal[g.id] || []).slice(0, 4);
+      const historyHtml = recentContribs.length
+        ? recentContribs.map(c => `
+            <div class="goal-history-row">
+              <span>${escapeHtml(memberLabel(c.user_id))} ${c.amount >= 0 ? 'добави' : 'изтегли'}</span>
+              <span style="font-family:'IBM Plex Mono',monospace; color:${c.amount >= 0 ? 'var(--color-income)' : '#E53E3E'};">${c.amount >= 0 ? '+' : ''}${eur(c.amount)}</span>
+            </div>`).join('')
+        : '<div class="goal-history-empty">Още няма вноски.</div>';
+
+      return `
+        <div class="goal-card ${isOver ? 'completed' : ''}" data-goal="${g.id}">
+          <div class="goal-head">
+            <div class="goal-title" onclick="openGoalEditModal('${g.id}')" title="Редактирай">
+              <span class="goal-icon">${escapeHtml(g.icon || '🎯')}</span>
+              <span class="goal-name">${escapeHtml(g.name)}</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              ${isOver ? '<span class="goal-complete-badge">🎉 Постигната</span>' : ''}
+              <button type="button" class="goal-delete-btn" onclick="deleteGoal('${g.id}')" title="Изтрий">✕</button>
+            </div>
+          </div>
+
+          <div class="compare-track"><div class="compare-fill" style="width:${pct}%"></div></div>
+
+          <div class="goal-stats">
+            <span>Събрано: <b>${eur(current)}</b></span>
+            <span>Цел: <b>${eur(target)}</b></span>
+          </div>
+          ${!isOver ? `<div class="goal-stats"><span>Остават: <b>${eur(remaining)}</b></span><span>${Math.round(pct)}%</span></div>` : ''}
+          ${dateHint}
+
+          <div class="goal-contribute-row">
+            <input type="number" step="0.01" min="0.01" placeholder="0.00" id="goal-amount-${g.id}">
+            <button type="button" class="add" onclick="addContribution('${g.id}', 1)">+ Добави</button>
+            <button type="button" class="withdraw" onclick="addContribution('${g.id}', -1)">− Изтегли</button>
+          </div>
+
+          <div class="goal-history">${historyHtml}</div>
+        </div>`;
+    }).join('') + '</div>';
+  }
+
+  // ===== Добавяне на нова цел =====
+  async function handleAddGoal(event) {
+    event.preventDefault();
+
+    const icon = document.getElementById('goal-icon').value.trim() || '🎯';
+    const name = document.getElementById('goal-name').value.trim();
+    const target = parseFloat(document.getElementById('goal-target').value);
+    const targetDate = document.getElementById('goal-date').value || null;
+
+    if (!name) { setStatus('goal-form-status', 'Въведете име на целта.', 'error'); return; }
+    if (isNaN(target) || target <= 0) { setStatus('goal-form-status', 'Въведете целева сума по-голяма от 0.', 'error'); return; }
+
+    setStatus('goal-form-status', 'Добавяне…', '');
+
+    const { error } = await supabaseClient
+      .from('savings_goals')
+      .insert([{
+        household_id: currentHouseholdId,
+        created_by: currentUser.id,
+        icon, name,
+        target_amount: Math.round(target * 100) / 100,
+        target_date: targetDate,
+      }]);
+
+    if (error) {
+      setStatus('goal-form-status', 'Грешка: ' + error.message, 'error');
+      return;
+    }
+
+    document.getElementById('goal-form').reset();
+    setStatus('goal-form-status', '', '');
+    showToast('Целта е добавена ✓', 'success');
+    await loadGoals();
+  }
+
+  // ===== Вноска / теглене =====
+  async function addContribution(goalId, sign) {
+    const input = document.getElementById('goal-amount-' + goalId);
+    const raw = parseFloat(input.value);
+
+    if (isNaN(raw) || raw <= 0) {
+      showToast('Въведете валидна сума по-голяма от 0.', 'error');
+      return;
+    }
+
+    const amount = sign * (Math.round(raw * 100) / 100);
+
+    const { error } = await supabaseClient
+      .from('savings_goal_contributions')
+      .insert([{
+        goal_id: goalId,
+        household_id: currentHouseholdId,
+        user_id: currentUser.id,
+        amount,
+      }]);
+
+    if (error) {
+      showToast('Грешка: ' + error.message, 'error');
+      return;
+    }
+
+    input.value = '';
+    showToast(sign > 0 ? 'Сумата е добавена ✓' : 'Сумата е изтеглена ✓', 'success');
+    await loadGoals();
+  }
+
+  // ===== Редакция =====
+  function openGoalEditModal(goalId) {
+    const g = goals.find(x => x.id === goalId);
+    if (!g) return;
+    editingGoalId = goalId;
+    document.getElementById('goal-edit-icon').value = g.icon || '🎯';
+    document.getElementById('goal-edit-name').value = g.name;
+    document.getElementById('goal-edit-target').value = g.target_amount;
+    document.getElementById('goal-edit-date').value = g.target_date || '';
+    setStatus('goal-edit-status', '', '');
+    document.getElementById('goal-edit-overlay').style.display = 'flex';
+  }
+
+  function closeGoalEditModal() {
+    document.getElementById('goal-edit-overlay').style.display = 'none';
+    editingGoalId = null;
+  }
+
+  async function handleSaveGoalEdit(event) {
+    event.preventDefault();
+    if (!editingGoalId) return;
+
+    const icon = document.getElementById('goal-edit-icon').value.trim() || '🎯';
+    const name = document.getElementById('goal-edit-name').value.trim();
+    const target = parseFloat(document.getElementById('goal-edit-target').value);
+    const targetDate = document.getElementById('goal-edit-date').value || null;
+
+    if (!name) { setStatus('goal-edit-status', 'Въведете име.', 'error'); return; }
+    if (isNaN(target) || target <= 0) { setStatus('goal-edit-status', 'Невалидна сума.', 'error'); return; }
+
+    const { error } = await supabaseClient
+      .from('savings_goals')
+      .update({ icon, name, target_amount: Math.round(target * 100) / 100, target_date: targetDate })
+      .eq('id', editingGoalId);
+
+    if (error) {
+      setStatus('goal-edit-status', 'Грешка: ' + error.message, 'error');
+      return;
+    }
+
+    closeGoalEditModal();
+    showToast('Целта е обновена ✓', 'success');
+    await loadGoals();
+  }
+
+  // ===== Изтриване =====
+  async function deleteGoal(goalId) {
+    const g = goals.find(x => x.id === goalId);
+    if (!g) return;
+
+    const ok = await showConfirm(`Сигурни ли сте, че искате да изтриете целта „${g.name}"? Историята на вноските също ще бъде изтрита.`, 'Изтриване на цел');
+    if (!ok) return;
+
+    const { error } = await supabaseClient.from('savings_goals').delete().eq('id', goalId);
+    if (error) {
+      showToast('Грешка: ' + error.message, 'error');
+      return;
+    }
+
+    showToast('Целта е изтрита', 'success');
+    await loadGoals();
+  }
+
+  // ===== Изход =====
+  async function handleSignOut() {
+    await supabaseClient.auth.signOut();
+    window.location.href = 'login.html';
+  }
+</script>
+
+</body>
+</html>

@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css?v=14">
 <link rel="stylesheet" href="css/dashboard.css?v=13">
-<script src="nav.js?v=9" defer></script>
+<script src="nav.js?v=10" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -67,7 +67,9 @@
       <a href="transactions.html" class="nav-link">Транзакции</a>
       <a href="budgets.html" class="nav-link active">Бюджети</a>
       <a href="wallets.html" class="nav-link">Портфейл</a>
+      <a href="goals.html" class="nav-link">Цели</a>
       <a href="recurring.html" class="nav-link">Периодични</a>
+      <a href="settle.html" class="nav-link">Споделено</a>
       <a href="reviews.html" class="nav-link">Отзиви</a>
       <a href="settings.html" class="nav-link">Настройки</a>
       <a href="admin.html" class="nav-link" id="admin-nav-link" style="display:none;">Админ</a>
@@ -150,8 +152,10 @@
   let currentUser = null;
   let currentHouseholdId = null;
   let expenseCategories = [];
-  let budgetsByCategory = {}; // category_id -> { id, monthly_limit }
+  let budgetsByCategory = {}; // category_id -> { id, monthly_limit, rollover_enabled }
   let spentByCategory = {};   // category_id -> сума похарчено този месец
+  let rolloverInByCategory = {}; // category_id -> пренесена сума за ТЕКУЩИЯ месец
+  const ROLLOVER_LOOKBACK_MONTHS = 12;
 
   const eur = (n) => (Number(n) || 0).toLocaleString('bg-BG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
 
@@ -202,6 +206,11 @@
   })();
 
   // ===== Зареждане на категории, бюджети и текущи разходи =====
+  // За "Пренасяне на бюджет" освен текущия месец се тегли и историята на
+  // разходите за последните (най-много) 12 месеца назад, за да се изчисли
+  // веригата от пренесени суми месец по месец. Опростяване: приемаме, че
+  // месечният лимит е бил същият през целия този прозорец (иначе би трябвало
+  // да пазим лимита исторически по месеци, което е излишно за домашен бюджет).
   async function loadData() {
     const { data: cats, error: catError } = await supabaseClient
       .from('categories')
@@ -238,9 +247,96 @@
     (txs || []).forEach(t => {
       spentByCategory[t.category_id] = (spentByCategory[t.category_id] || 0) + Number(t.amount);
     });
+
+    await loadRolloverHistory(now);
+  }
+
+  async function loadRolloverHistory(now) {
+    rolloverInByCategory = {};
+
+    const rolloverCategoryIds = expenseCategories
+      .filter(c => budgetsByCategory[c.id]?.rollover_enabled)
+      .map(c => c.id);
+
+    if (!rolloverCategoryIds.length) return;
+
+    const historyStart = new Date(now.getFullYear(), now.getMonth() - ROLLOVER_LOOKBACK_MONTHS, 1);
+    const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    // ВАЖНО: месеците, преди да е имало КАКВАТО И ДА Е транзакция в домакинството
+    // (напр. преди да съществува акаунтът), НЕ трябва да се броят като "похарчени
+    // 0 € и следователно пренесени изцяло" — иначе за ново домакинство или
+    // новосъздадена категория веригата компаундира лимита неограничено назад
+    // и пренася нереалистично голяма сума ("безплатни" месеци отпреди акаунта).
+    // Затова първо намираме реалното начало на историята на домакинството.
+    const { data: earliestTxRows, error: earliestError } = await supabaseClient
+      .from('transactions')
+      .select('transaction_date')
+      .eq('household_id', currentHouseholdId)
+      .order('transaction_date', { ascending: true })
+      .limit(1);
+
+    if (earliestError) { console.error(earliestError); return; }
+
+    const earliestDate = earliestTxRows && earliestTxRows.length
+      ? new Date(earliestTxRows[0].transaction_date)
+      : currentMonthStart; // няма никакви транзакции все още -> няма история за пренасяне
+    const earliestMonthStart = new Date(earliestDate.getFullYear(), earliestDate.getMonth(), 1);
+
+    const { data: histTxs, error } = await supabaseClient
+      .from('transactions')
+      .select('category_id, amount, transaction_date')
+      .eq('household_id', currentHouseholdId)
+      .in('category_id', rolloverCategoryIds)
+      .gte('transaction_date', historyStart.toISOString().slice(0, 10))
+      .lt('transaction_date', currentMonthStart.toISOString().slice(0, 10));
+
+    if (error) { console.error(error); return; }
+
+    // spentByMonth['YYYY-M']['category_id'] = сума
+    const spentByMonth = {};
+    (histTxs || []).forEach(t => {
+      const d = new Date(t.transaction_date);
+      const key = d.getFullYear() + '-' + d.getMonth();
+      if (!spentByMonth[key]) spentByMonth[key] = {};
+      spentByMonth[key][t.category_id] = (spentByMonth[key][t.category_id] || 0) + Number(t.amount);
+    });
+
+    rolloverCategoryIds.forEach(categoryId => {
+      const monthlyLimit = Number(budgetsByCategory[categoryId]?.monthly_limit) || 0;
+      let rolloverIn = 0; // преди реалната история на домакинството няма какво да се пренася
+
+      for (let i = ROLLOVER_LOOKBACK_MONTHS; i >= 1; i--) {
+        const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        if (monthDate < earliestMonthStart) continue; // все още няма история за този месец — пропускаме го
+
+        const key = monthDate.getFullYear() + '-' + monthDate.getMonth();
+        const spentThatMonth = spentByMonth[key]?.[categoryId] || 0;
+        const effectiveLimitThatMonth = monthlyLimit + rolloverIn;
+        rolloverIn = Math.max(0, Math.round((effectiveLimitThatMonth - spentThatMonth) * 100) / 100);
+      }
+
+      rolloverInByCategory[categoryId] = rolloverIn;
+    });
   }
 
   // ===== Рендиране на списъка =====
+  // Базов лимит + пренесена сума (ако е активирано пренасянето за категорията)
+  function getEffectiveLimit(cat) {
+    const budget = budgetsByCategory[cat.id];
+    const base = budget ? Number(budget.monthly_limit) : 0;
+    const rolloverEnabled = !!budget?.rollover_enabled;
+    const rolloverIn = rolloverEnabled ? (rolloverInByCategory[cat.id] || 0) : 0;
+    return {
+      budget,
+      base,
+      rolloverEnabled,
+      rolloverIn,
+      effective: base + rolloverIn,
+      hasLimit: !!budget && base > 0,
+    };
+  }
+
   function renderBudgets() {
     const container = document.getElementById('budgets-list');
 
@@ -250,10 +346,9 @@
     }
 
     container.innerHTML = expenseCategories.map(cat => {
-      const budget = budgetsByCategory[cat.id];
-      const limit = budget ? Number(budget.monthly_limit) : 0;
+      const { budget, base, rolloverEnabled, rolloverIn, effective, hasLimit } = getEffectiveLimit(cat);
+      const limit = effective; // от тук надолу цялата логика гледа ЕФЕКТИВНИЯ лимит (база + пренесено)
       const spent = spentByCategory[cat.id] || 0;
-      const hasLimit = !!budget && limit > 0;
       const rawPct = hasLimit ? (spent / limit) * 100 : 0;
       const pct = hasLimit ? Math.min(rawPct, 100) : 0;
       const isOver = hasLimit && spent > limit;
@@ -267,6 +362,10 @@
       } else if (hasLimit) {
         badge = `<span class="budget-badge ok">${Math.round(rawPct)}%</span>`;
       }
+
+      const rolloverHint = (rolloverEnabled && hasLimit && Math.abs(rolloverIn) >= 0.01)
+        ? `<div class="hint" style="margin-top:4px;">↻ база ${eur(base)} + пренесено ${eur(rolloverIn)} = ефективен лимит ${eur(effective)}</div>`
+        : '';
 
       const statsHtml = hasLimit
         ? `<div class="budget-stats">
@@ -297,13 +396,19 @@
             </div>
             <div class="budget-controls">
               <input type="number" class="budget-input" id="budget-input-${cat.id}" min="0" step="0.01"
-                     placeholder="Лимит €" value="${budget ? limit : ''}">
+                     placeholder="Лимит €" value="${budget ? base : ''}">
               <button type="button" class="budget-save-btn" onclick="saveBudget('${cat.id}')">Запази</button>
               ${budget ? `<button type="button" class="budget-clear-btn" onclick="clearBudget('${cat.id}')">Изчисти</button>` : ''}
             </div>
           </div>
+          <label style="display:flex; align-items:center; gap:6px; margin-top:6px; font-size:12.5px; color:var(--text-secondary); cursor:pointer;">
+            <input type="checkbox" id="budget-rollover-${cat.id}" style="width:auto;" ${rolloverEnabled ? 'checked' : ''}
+              onchange="saveBudgetRollover('${cat.id}', this.checked)">
+            Пренасяй неизползвания остатък към следващия месец
+          </label>
           ${trackHtml}
           ${statsHtml}
+          ${rolloverHint}
           ${warnHtml}
         </div>`;
     }).join('');
@@ -317,13 +422,11 @@
     if (!labelEl) return;
     let over = 0, near = 0;
     expenseCategories.forEach(cat => {
-      const budget = budgetsByCategory[cat.id];
-      if (!budget) return;
-      const limit = Number(budget.monthly_limit);
-      if (limit <= 0) return;
+      const { hasLimit, effective } = getEffectiveLimit(cat);
+      if (!hasLimit) return;
       const spent = spentByCategory[cat.id] || 0;
-      const pct = (spent / limit) * 100;
-      if (spent > limit) over++;
+      const pct = (spent / effective) * 100;
+      if (spent > effective) over++;
       else if (pct >= 80) near++;
     });
     if (over === 0 && near === 0) {
@@ -346,10 +449,14 @@
       return;
     }
 
+    // Пазим текущото състояние на "пренасяне", за да не се нулира при запис на лимита
+    const rolloverCheckbox = document.getElementById('budget-rollover-' + categoryId);
+    const rolloverEnabled = rolloverCheckbox ? rolloverCheckbox.checked : !!budgetsByCategory[categoryId]?.rollover_enabled;
+
     const { error } = await supabaseClient
       .from('budgets')
       .upsert(
-        { household_id: currentHouseholdId, category_id: categoryId, monthly_limit: value },
+        { household_id: currentHouseholdId, category_id: categoryId, monthly_limit: value, rollover_enabled: rolloverEnabled },
         { onConflict: 'household_id,category_id' }
       );
 
@@ -358,6 +465,32 @@
       return;
     }
 
+    await loadData();
+    renderBudgets();
+  }
+
+  // ===== Включване/изключване на пренасянето на бюджет =====
+  async function saveBudgetRollover(categoryId, enabled) {
+    const existing = budgetsByCategory[categoryId];
+    if (!existing) {
+      showToast('Първо запазете лимит за тази категория.', 'error');
+      const checkbox = document.getElementById('budget-rollover-' + categoryId);
+      if (checkbox) checkbox.checked = false;
+      return;
+    }
+
+    const { error } = await supabaseClient
+      .from('budgets')
+      .update({ rollover_enabled: enabled })
+      .eq('household_id', currentHouseholdId)
+      .eq('category_id', categoryId);
+
+    if (error) {
+      showToast('Грешка: ' + error.message, 'error');
+      return;
+    }
+
+    showToast(enabled ? 'Пренасянето е включено ✓' : 'Пренасянето е изключено', 'success');
     await loadData();
     renderBudgets();
   }
