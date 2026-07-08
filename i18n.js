@@ -92,6 +92,7 @@
       'goals.confirm_delete_message': 'Сигурни ли сте, че искате да изтриете целта „{name}"? Историята на вноските също ще бъде изтрита.',
 
       // ===== Табло (dashboard.html) =====
+      'dashboard.page_title': 'Табло — Бюджет',
       'dashboard.summary_income': 'Приходи този месец',
       'dashboard.summary_expense': 'Разходи този месец',
       'dashboard.summary_card': 'В картата',
@@ -624,6 +625,7 @@
       'goals.confirm_delete_message': 'Are you sure you want to delete the goal "{name}"? Its contribution history will be deleted too.',
 
       // ===== Dashboard (dashboard.html) =====
+      'dashboard.page_title': 'Dashboard — Budget',
       'dashboard.summary_income': 'Income this month',
       'dashboard.summary_expense': 'Expenses this month',
       'dashboard.summary_card': 'On card',
