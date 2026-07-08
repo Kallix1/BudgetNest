@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="css/datepicker.css?v=1">
 <script src="datepicker.js?v=2" defer></script>
 <script src="nav.js?v=10" defer></script>
+<script src="i18n.js?v=1" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -67,22 +68,23 @@
       </button>
     </div>
     <div class="nav-links" id="nav-links">
-      <a href="dashboard.html" class="nav-link">Табло</a>
-      <a href="transactions.html" class="nav-link active">Транзакции</a>
-      <a href="budgets.html" class="nav-link">Бюджети</a>
-      <a href="wallets.html" class="nav-link">Портфейл</a>
-      <a href="goals.html" class="nav-link">Цели</a>
-      <a href="recurring.html" class="nav-link">Периодични</a>
-      <a href="settle.html" class="nav-link">Споделено</a>
-      <a href="reviews.html" class="nav-link">Отзиви</a>
-      <a href="settings.html" class="nav-link">Настройки</a>
-      <a href="admin.html" class="nav-link" id="admin-nav-link" style="display:none;">Админ</a>
+      <a href="dashboard.html" class="nav-link" data-i18n="nav.dashboard">Табло</a>
+      <a href="transactions.html" class="nav-link active" data-i18n="nav.transactions">Транзакции</a>
+      <a href="budgets.html" class="nav-link" data-i18n="nav.budgets">Бюджети</a>
+      <a href="wallets.html" class="nav-link" data-i18n="nav.wallets">Портфейл</a>
+      <a href="goals.html" class="nav-link" data-i18n="nav.goals">Цели</a>
+      <a href="recurring.html" class="nav-link" data-i18n="nav.recurring">Периодични</a>
+      <a href="settle.html" class="nav-link" data-i18n="nav.settle">Споделено</a>
+      <a href="reviews.html" class="nav-link" data-i18n="nav.reviews">Отзиви</a>
+      <a href="settings.html" class="nav-link" data-i18n="nav.settings">Настройки</a>
+      <a href="admin.html" class="nav-link" id="admin-nav-link" style="display:none;"><span data-i18n="nav.admin">Админ</span></a>
     </div>
   </div>
   <div class="nav-right">
     <span class="household-pill" id="household-name">…</span>
-    <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Смяна на тема"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-toggle-icon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button>
-    <button class="btn-ghost" onclick="handleSignOut()">Изход</button>
+    <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" data-i18n-title="nav.theme_toggle_title" title="Смяна на тема"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-toggle-icon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button>
+    <button class="theme-toggle" id="lang-toggle-btn" onclick="toggleLang()" data-i18n-title="nav.lang_toggle_title" title="Смяна на език">EN</button>
+    <button class="btn-ghost" onclick="handleSignOut()" data-i18n="nav.signout">Изход</button>
   </div>
 </nav>
 

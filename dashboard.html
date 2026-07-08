@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B1%3C/text%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Табло — Бюджет</title>
+<title data-i18n="dashboard.page_title">Табло — Бюджет</title>
 <meta name="description" content="Табло на BudgetNest — общ преглед на приходите, разходите и баланса на домакинството.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght=500;600;700&family=Inter:wght=400;500;600;700&family=IBM+Plex+Mono:wght=400;500&display=swap" rel="stylesheet">
@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="css/datepicker.css?v=1">
 <script src="datepicker.js?v=2" defer></script>
 <script src="nav.js?v=10" defer></script>
+<script src="i18n.js?v=1" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 
@@ -63,22 +64,23 @@
       </button>
     </div>
     <div class="nav-links" id="nav-links">
-      <a href="dashboard.html" class="nav-link active">Табло</a>
-      <a href="transactions.html" class="nav-link">Транзакции</a>
-      <a href="budgets.html" class="nav-link">Бюджети</a>
-      <a href="wallets.html" class="nav-link">Портфейл</a>
-      <a href="goals.html" class="nav-link">Цели</a>
-      <a href="recurring.html" class="nav-link">Периодични</a>
-      <a href="settle.html" class="nav-link">Споделено</a>
-      <a href="reviews.html" class="nav-link">Отзиви</a>
-      <a href="settings.html" class="nav-link">Настройки</a>
-      <a href="admin.html" class="nav-link" id="admin-nav-link" style="display:none;">Админ</a>
+      <a href="dashboard.html" class="nav-link active" data-i18n="nav.dashboard">Табло</a>
+      <a href="transactions.html" class="nav-link" data-i18n="nav.transactions">Транзакции</a>
+      <a href="budgets.html" class="nav-link" data-i18n="nav.budgets">Бюджети</a>
+      <a href="wallets.html" class="nav-link" data-i18n="nav.wallets">Портфейл</a>
+      <a href="goals.html" class="nav-link" data-i18n="nav.goals">Цели</a>
+      <a href="recurring.html" class="nav-link" data-i18n="nav.recurring">Периодични</a>
+      <a href="settle.html" class="nav-link" data-i18n="nav.settle">Споделено</a>
+      <a href="reviews.html" class="nav-link" data-i18n="nav.reviews">Отзиви</a>
+      <a href="settings.html" class="nav-link" data-i18n="nav.settings">Настройки</a>
+      <a href="admin.html" class="nav-link" id="admin-nav-link" style="display:none;"><span data-i18n="nav.admin">Админ</span></a>
     </div>
   </div>
   <div class="nav-right">
     <span class="household-pill" id="household-name">…</span>
-    <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Смяна на тема"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-toggle-icon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button>
-    <button class="btn-ghost" onclick="handleSignOut()">Изход</button>
+    <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" data-i18n-title="nav.theme_toggle_title" title="Смяна на тема"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-toggle-icon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button>
+    <button class="theme-toggle" id="lang-toggle-btn" onclick="toggleLang()" data-i18n-title="nav.lang_toggle_title" title="Смяна на език">EN</button>
+    <button class="btn-ghost" onclick="handleSignOut()" data-i18n="nav.signout">Изход</button>
   </div>
 </nav>
 
@@ -86,23 +88,23 @@
 
   <div class="summary-row">
     <div class="summary-card">
-      <div class="summary-label">Приходи този месец</div>
+      <div class="summary-label" data-i18n="dashboard.summary_income">Приходи този месец</div>
       <div class="summary-value income" id="summary-income">0.00 €</div>
     </div>
     <div class="summary-card">
-      <div class="summary-label">Разходи този месец</div>
+      <div class="summary-label" data-i18n="dashboard.summary_expense">Разходи този месец</div>
       <div class="summary-value expense" id="summary-expense">0.00 €</div>
     </div>
-    <div class="summary-card" style="cursor:pointer;" onclick="window.location.href='wallets.html'" title="Виж портфейла">
-      <div class="summary-label">В картата</div>
+    <div class="summary-card" style="cursor:pointer;" onclick="window.location.href='wallets.html'" data-i18n-title="dashboard.view_wallet_title" title="Виж портфейла">
+      <div class="summary-label" data-i18n="dashboard.summary_card">В картата</div>
       <div class="summary-value card-balance" id="summary-card-balance">0.00 €</div>
     </div>
-    <div class="summary-card" style="cursor:pointer;" onclick="window.location.href='wallets.html'" title="Виж портфейла">
-      <div class="summary-label">В брой</div>
+    <div class="summary-card" style="cursor:pointer;" onclick="window.location.href='wallets.html'" data-i18n-title="dashboard.view_wallet_title" title="Виж портфейла">
+      <div class="summary-label" data-i18n="dashboard.summary_cash">В брой</div>
       <div class="summary-value cash-balance" id="summary-cash-balance">0.00 €</div>
     </div>
-    <div class="summary-card" style="cursor:pointer;" onclick="window.location.href='wallets.html'" title="Виж портфейла">
-      <div class="summary-label">Общо</div>
+    <div class="summary-card" style="cursor:pointer;" onclick="window.location.href='wallets.html'" data-i18n-title="dashboard.view_wallet_title" title="Виж портфейла">
+      <div class="summary-label" data-i18n="dashboard.summary_total">Общо</div>
       <div class="summary-value balance" id="summary-total-balance">0.00 €</div>
     </div>
   </div>
@@ -113,30 +115,30 @@
     <div>
       <div class="card">
         <div class="card-title">
-          <span id="chart-card-title">Разходи по категория</span>
+          <span id="chart-card-title" data-i18n="dashboard.chart_expense_title">Разходи по категория</span>
           <span class="hint" id="chart-month-label"></span>
         </div>
         <div class="chart-switch-row">
-          <button type="button" class="chart-arrow" onclick="toggleChartView()" aria-label="Предишна диаграма">←</button>
+          <button type="button" class="chart-arrow" onclick="toggleChartView()" data-i18n-title="dashboard.chart_prev" aria-label="Предишна диаграма">←</button>
           <div class="chart-wrap" id="chart-wrap">
             <canvas id="expense-chart"></canvas>
             <div class="legend" id="chart-legend"></div>
           </div>
-          <button type="button" class="chart-arrow" onclick="toggleChartView()" aria-label="Следваща диаграма">→</button>
+          <button type="button" class="chart-arrow" onclick="toggleChartView()" data-i18n-title="dashboard.chart_next" aria-label="Следваща диаграма">→</button>
         </div>
 
         <div class="chart-nav" id="chart-nav" style="display: flex; align-items: center; justify-content: center; margin-top: 16px;">
-          <span id="chart-view-label" style="font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 14px; color: var(--text-primary); text-align: center;">Разходи</span>
+          <span id="chart-view-label" style="font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 14px; color: var(--text-primary); text-align: center;" data-i18n="dashboard.chart_view_expense">Разходи</span>
         </div>
 
-        <div class="empty-state" id="chart-empty" style="display:none;">Все още няма данни за този месец.</div>
+        <div class="empty-state" id="chart-empty" data-i18n="dashboard.chart_empty_expense" style="display:none;">Все още няма данни за този месец.</div>
       </div>
 
       <div class="card" id="card-recent" data-card-key="recent">
         <div class="card-title">
-          Последни транзакции
+          <span data-i18n="dashboard.recent_tx_title">Последни транзакции</span>
           <span class="card-title-right">
-            <button type="button" class="card-visibility-toggle" onclick="toggleCardVisibility('recent')" aria-label="Скрий/покажи блока" title="Скрий/покажи блока">
+            <button type="button" class="card-visibility-toggle" onclick="toggleCardVisibility('recent')" aria-label="Скрий/покажи блока" data-i18n-title="dashboard.toggle_visibility_title" title="Скрий/покажи блока">
               <svg id="eye-icon-recent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
             </button>
           </span>
@@ -150,7 +152,7 @@
 
           <div class="tx-nav" id="tx-nav" style="display: none; align-items: center; justify-content: center; gap: 20px; margin-top: 20px; border-top: 1px solid var(--border-soft); padding-top: 15px;">
             <button type="button" onclick="changeTxPage(-1)" style="background: var(--bg-void); border: 1px solid var(--border-soft); border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); font-weight: bold; transition: all 0.2s; font-size: 14px;" onmouseover="this.style.background='#E2E8F0'" onmouseout="this.style.background='var(--bg-void)'">←</button>
-            <span id="tx-page-label" style="font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 14px; color: var(--text-primary); min-width: 130px; text-align: center;">Страница 1 от 1</span>
+            <span id="tx-page-label" style="font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 14px; color: var(--text-primary); min-width: 130px; text-align: center;" data-i18n="dashboard.page_label">Страница 1 от 1</span>
             <button type="button" onclick="changeTxPage(1)" style="background: var(--bg-void); border: 1px solid var(--border-soft); border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); font-weight: bold; transition: all 0.2s; font-size: 14px;" onmouseover="this.style.background='#E2E8F0'" onmouseout="this.style.background='var(--bg-void)'">→</button>
           </div>
         </div>
@@ -158,10 +160,10 @@
 
       <div class="card" id="card-compare" data-card-key="compare">
         <div class="card-title">
-          Ти срещу средното в България
+          <span data-i18n="dashboard.compare_title">Ти срещу средното в България</span>
           <span class="card-title-right">
-            <span class="hint">в евро, на домакинство</span>
-            <button type="button" class="card-visibility-toggle" onclick="toggleCardVisibility('compare')" aria-label="Скрий/покажи блока" title="Скрий/покажи блока">
+            <span class="hint" data-i18n="dashboard.compare_hint">в евро, на домакинство</span>
+            <button type="button" class="card-visibility-toggle" onclick="toggleCardVisibility('compare')" aria-label="Скрий/покажи блока" data-i18n-title="dashboard.toggle_visibility_title" title="Скрий/покажи блока">
               <svg id="eye-icon-compare" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
             </button>
           </span>
@@ -175,46 +177,46 @@
     <div>
       <div class="card" id="card-templates" data-card-key="templates">
         <div class="card-title">
-          Бързи шаблони
+          <span data-i18n="dashboard.templates_title">Бързи шаблони</span>
           <span class="card-title-right">
-            <span class="hint">едно докосване = записана транзакция</span>
-            <button type="button" class="card-visibility-toggle" onclick="toggleCardVisibility('templates')" aria-label="Скрий/покажи блока" title="Скрий/покажи блока">
+            <span class="hint" data-i18n="dashboard.templates_hint">едно докосване = записана транзакция</span>
+            <button type="button" class="card-visibility-toggle" onclick="toggleCardVisibility('templates')" aria-label="Скрий/покажи блока" data-i18n-title="dashboard.toggle_visibility_title" title="Скрий/покажи блока">
               <svg id="eye-icon-templates" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
             </button>
           </span>
         </div>
         <div class="card-collapsible-body" id="card-templates-body">
           <div class="template-chips" id="template-chips">
-            <span class="hint" style="font-size:13px;">Зареждане…</span>
+            <span class="hint" data-i18n="dashboard.templates_loading" style="font-size:13px;">Зареждане…</span>
           </div>
-          <button type="button" class="template-add-btn" id="template-add-toggle" onclick="toggleTemplateForm()">+ Нов шаблон</button>
+          <button type="button" class="template-add-btn" id="template-add-toggle" onclick="toggleTemplateForm()" data-i18n="dashboard.template_add_btn">+ Нов шаблон</button>
 
           <form id="template-form" class="quick-add-grid" style="display:none; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-soft);" onsubmit="handleSaveTemplate(event)">
             <div class="type-toggle">
-              <button type="button" class="type-btn active" data-type="expense" onclick="setTemplateType('expense')">Разход</button>
-              <button type="button" class="type-btn" data-type="income" onclick="setTemplateType('income')">Приход</button>
+              <button type="button" class="type-btn active" data-type="expense" onclick="setTemplateType('expense')" data-i18n="dashboard.type_expense">Разход</button>
+              <button type="button" class="type-btn" data-type="income" onclick="setTemplateType('income')" data-i18n="dashboard.type_income">Приход</button>
             </div>
 
             <div class="field full">
-              <label>Име на шаблона</label>
-              <input type="text" id="tpl-name" placeholder="напр. Цигари" required>
+              <label data-i18n="dashboard.template_name_label">Име на шаблона</label>
+              <input type="text" id="tpl-name" data-i18n-placeholder="dashboard.template_name_placeholder" placeholder="напр. Цигари" required>
             </div>
 
             <div class="field">
-              <label>Сума (€)</label>
+              <label data-i18n="dashboard.amount_label">Сума (€)</label>
               <input type="number" id="tpl-amount" step="0.01" min="0.01" placeholder="0.00" required>
             </div>
 
             <div class="field">
-              <label>Категория</label>
+              <label data-i18n="dashboard.category_label">Категория</label>
               <select id="tpl-category" required></select>
             </div>
 
             <div class="field full">
               <div class="status-msg" id="tpl-status"></div>
               <div style="display: flex; gap: 10px; margin-top: 6px;">
-                <button type="submit" class="submit" style="width: 100%; margin: 0;">Запази шаблон</button>
-                <button type="button" class="btn-ghost" style="color: var(--text-secondary); border-color: var(--input-border); white-space: nowrap;" onclick="toggleTemplateForm()">Отказ</button>
+                <button type="submit" class="submit" data-i18n="dashboard.save_template_btn" style="width: 100%; margin: 0;">Запази шаблон</button>
+                <button type="button" class="btn-ghost" style="color: var(--text-secondary); border-color: var(--input-border); white-space: nowrap;" onclick="toggleTemplateForm()" data-i18n="common.cancel">Отказ</button>
               </div>
             </div>
           </form>
@@ -222,35 +224,35 @@
       </div>
 
       <div class="card">
-        <div class="card-title" id="form-title">Бърза транзакция</div>
+        <div class="card-title" id="form-title" data-i18n="dashboard.form_title_quick">Бърза транзакция</div>
         <form id="quick-add-form" class="quick-add-grid" onsubmit="handleAddTransaction(event)">
           <div class="type-toggle" id="tx-type-toggle">
-            <button type="button" class="type-btn active" data-type="expense" onclick="setTxType('expense')">Разход</button>
-            <button type="button" class="type-btn" data-type="income" onclick="setTxType('income')">Приход</button>
+            <button type="button" class="type-btn active" data-type="expense" onclick="setTxType('expense')" data-i18n="dashboard.type_expense">Разход</button>
+            <button type="button" class="type-btn" data-type="income" onclick="setTxType('income')" data-i18n="dashboard.type_income">Приход</button>
           </div>
 
           <div class="method-toggle" id="tx-method-toggle">
-            <button type="button" class="method-btn active" data-method="card" onclick="setQuickMethod('card')">💳 Карта</button>
-            <button type="button" class="method-btn" data-method="cash" onclick="setQuickMethod('cash')">💵 В брой</button>
+            <button type="button" class="method-btn active" data-method="card" onclick="setQuickMethod('card')" data-i18n="dashboard.method_card">💳 Карта</button>
+            <button type="button" class="method-btn" data-method="cash" onclick="setQuickMethod('cash')" data-i18n="dashboard.method_cash">💵 В брой</button>
           </div>
 
           <div class="field full">
-            <label>Сума (€)</label>
+            <label data-i18n="dashboard.amount_label">Сума (€)</label>
             <input type="number" id="tx-amount" step="0.01" min="0.01" placeholder="0.00" required>
           </div>
 
           <div class="field full">
-            <label>Категория</label>
+            <label data-i18n="dashboard.category_label">Категория</label>
             <select id="tx-category" required></select>
           </div>
 
           <div class="field full">
-            <label>Описание</label>
-            <input type="text" id="tx-description" placeholder="напр. Пазар от Kaufland">
+            <label data-i18n="dashboard.description_label">Описание</label>
+            <input type="text" id="tx-description" data-i18n-placeholder="dashboard.description_placeholder_expense" placeholder="напр. Пазар от Kaufland">
           </div>
 
           <div class="field full">
-            <label>Дата</label>
+            <label data-i18n="dashboard.date_label">Дата</label>
             <input type="date" id="tx-date" required>
           </div>
 
@@ -258,11 +260,11 @@
             <div class="status-msg" id="tx-status"></div>
             
             <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 6px;">
-              <button type="submit" class="submit" id="tx-submit" style="width: 100%; margin: 0;">Добави</button>
+              <button type="submit" class="submit" id="tx-submit" data-i18n="dashboard.add_btn" style="width: 100%; margin: 0;">Добави</button>
               
               <div style="display: flex; gap: 10px; width: 100%;">
-                <button type="button" id="tx-cancel" style="display: none; flex: 1; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: #4A5568; background: #E2E8F0; border: 1px solid #CBD5E1; border-radius: 10px; padding: 12px; cursor: pointer;" onclick="cancelEditTransaction()">Отказ</button>
-                <button type="button" id="tx-delete" style="display: none; flex: 1; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: #FFFFFF; background: #EF4444; border: 1px solid #DC2626; border-radius: 10px; padding: 12px; cursor: pointer;" onclick="openDeleteModal()">Изтрий</button>
+                <button type="button" id="tx-cancel" style="display: none; flex: 1; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: #4A5568; background: #E2E8F0; border: 1px solid #CBD5E1; border-radius: 10px; padding: 12px; cursor: pointer;" onclick="cancelEditTransaction()" data-i18n="common.cancel">Отказ</button>
+                <button type="button" id="tx-delete" style="display: none; flex: 1; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: #FFFFFF; background: #EF4444; border: 1px solid #DC2626; border-radius: 10px; padding: 12px; cursor: pointer;" onclick="openDeleteModal()" data-i18n="common.delete">Изтрий</button>
               </div>
             </div>
 
@@ -275,10 +277,10 @@
   <!-- Тенденция по месеци (последните 6 месеца) -->
   <div class="card" id="card-trend" data-card-key="trend" style="margin-top: 24px;">
     <div class="card-title">
-      Тенденция по месеци
+      <span data-i18n="dashboard.trend_title">Тенденция по месеци</span>
       <span class="card-title-right">
-        <span class="hint">приходи и разходи, последните 6 месеца</span>
-        <button type="button" class="card-visibility-toggle" onclick="toggleCardVisibility('trend')" aria-label="Скрий/покажи блока" title="Скрий/покажи блока">
+        <span class="hint" data-i18n="dashboard.trend_hint">приходи и разходи, последните 6 месеца</span>
+        <button type="button" class="card-visibility-toggle" onclick="toggleCardVisibility('trend')" aria-label="Скрий/покажи блока" data-i18n-title="dashboard.toggle_visibility_title" title="Скрий/покажи блока">
           <svg id="eye-icon-trend" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
         </button>
       </span>
@@ -287,7 +289,7 @@
       <div id="trend-wrap" style="position: relative; height: 260px; margin-top: 8px;">
         <canvas id="trend-chart"></canvas>
       </div>
-      <div class="empty-state" id="trend-empty" style="display:none;">Нужни са данни поне от два месеца, за да се покаже тенденция.</div>
+      <div class="empty-state" id="trend-empty" data-i18n="dashboard.trend_empty" style="display:none;">Нужни са данни поне от два месеца, за да се покаже тенденция.</div>
     </div>
   </div>
 
@@ -295,15 +297,15 @@
 
 <div class="overlay" id="onboarding-overlay" style="display:none;">
   <div class="overlay-card">
-    <h2>Създайте домакинство</h2>
-    <p>Домакинството е споделеното пространство за бюджета ви. Поканете членове на семейството по-късно от Настройки.</p>
+    <h2 data-i18n="dashboard.onboarding_title">Създайте домакинство</h2>
+    <p data-i18n="dashboard.onboarding_text">Домакинството е споделеното пространство за бюджета ви. Поканете членове на семейството по-късно от Настройки.</p>
     <form id="household-form" onsubmit="handleCreateHousehold(event)">
       <div class="field" style="margin-bottom: 18px;">
-        <label for="household-input">Име на домакинството</label>
-        <input type="text" id="household-input" placeholder="напр. Семейство Иванови" required>
+        <label for="household-input" data-i18n="dashboard.household_name_label">Име на домакинството</label>
+        <input type="text" id="household-input" data-i18n-placeholder="dashboard.household_placeholder" placeholder="напр. Семейство Иванови" required>
       </div>
       <div class="status-msg" id="household-status"></div>
-      <button type="submit" class="submit" id="household-submit">Създай</button>
+      <button type="submit" class="submit" id="household-submit" data-i18n="dashboard.create_btn">Създай</button>
     </form>
   </div>
 </div>
@@ -311,11 +313,11 @@
 <div class="overlay" id="delete-modal-overlay" style="display:none; z-index: 9999;">
   <div class="overlay-card" style="max-width: 420px; text-align: center; padding: 30px;">
     <div style="font-size: 40px; margin-bottom: 15px;">⚠️</div>
-    <h3 style="margin-bottom: 10px; font-family: 'Space Grotesk', sans-serif; font-size: 20px; color: var(--text-primary);">Изтриване на транзакция</h3>
-    <p style="color: var(--text-secondary); margin-bottom: 25px; font-size: 14px; line-height: 1.5;">Сигурни ли сте, че искате окончателно да изтриете тази транзакция? Това действие е необратимо.</p>
+    <h3 data-i18n="dashboard.delete_tx_title" style="margin-bottom: 10px; font-family: 'Space Grotesk', sans-serif; font-size: 20px; color: var(--text-primary);">Изтриване на транзакция</h3>
+    <p data-i18n="dashboard.delete_tx_text" style="color: var(--text-secondary); margin-bottom: 25px; font-size: 14px; line-height: 1.5;">Сигурни ли сте, че искате окончателно да изтриете тази транзакция? Това действие е необратимо.</p>
     <div style="display: flex; gap: 12px; justify-content: center;">
-      <button type="button" style="flex: 1; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: var(--text-secondary); background: var(--surface-alt); border: 1px solid var(--border-soft); border-radius: 10px; padding: 12px; cursor: pointer;" onclick="closeDeleteModal()">Отказ</button>
-      <button type="button" style="flex: 1; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: #FFFFFF; background: #EF4444; border: 1px solid #DC2626; border-radius: 10px; padding: 12px; cursor: pointer;" onclick="confirmDeleteTransaction()">Да, изтрий</button>
+      <button type="button" style="flex: 1; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: var(--text-secondary); background: var(--surface-alt); border: 1px solid var(--border-soft); border-radius: 10px; padding: 12px; cursor: pointer;" onclick="closeDeleteModal()" data-i18n="common.cancel">Отказ</button>
+      <button type="button" style="flex: 1; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: #FFFFFF; background: #EF4444; border: 1px solid #DC2626; border-radius: 10px; padding: 12px; cursor: pointer;" onclick="confirmDeleteTransaction()" data-i18n="dashboard.delete_confirm_btn">Да, изтрий</button>
     </div>
   </div>
 </div>
@@ -323,13 +325,13 @@
 <div class="overlay" id="invite-modal-overlay" style="display:none; z-index: 9999;">
   <div class="overlay-card" style="max-width: 420px; text-align: center; padding: 30px;">
     <div style="font-size: 40px; margin-bottom: 15px;">🏠</div>
-    <h3 style="margin-bottom: 10px; font-family: 'Space Grotesk', sans-serif; font-size: 20px; color: var(--text-primary);">Покана за домакинство</h3>
-    <p style="color: var(--text-secondary); margin-bottom: 25px; font-size: 14px; line-height: 1.5;">
+    <h3 data-i18n="dashboard.invite_title" style="margin-bottom: 10px; font-family: 'Space Grotesk', sans-serif; font-size: 20px; color: var(--text-primary);">Покана за домакинство</h3>
+    <p id="invite-modal-text" style="color: var(--text-secondary); margin-bottom: 25px; font-size: 14px; line-height: 1.5;">
       Поканени сте да се присъедините към <b id="invite-household-name" style="color: var(--text-primary);">домакинство</b>. Искате ли да приемете поканата?
     </p>
     <div style="display: flex; gap: 12px; justify-content: center;">
-      <button type="button" id="invite-decline-btn" style="flex: 1; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: var(--text-secondary); background: var(--surface-alt); border: 1px solid var(--border-soft); border-radius: 10px; padding: 12px; cursor: pointer;" onclick="declineInvite()">Откажи</button>
-      <button type="button" id="invite-accept-btn" style="flex: 1; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: #FFFFFF; background: #166534; border: 1px solid #15803D; border-radius: 10px; padding: 12px; cursor: pointer;" onclick="acceptInvite()">Приеми</button>
+      <button type="button" id="invite-decline-btn" style="flex: 1; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: var(--text-secondary); background: var(--surface-alt); border: 1px solid var(--border-soft); border-radius: 10px; padding: 12px; cursor: pointer;" onclick="declineInvite()" data-i18n="dashboard.invite_decline">Откажи</button>
+      <button type="button" id="invite-accept-btn" style="flex: 1; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: #FFFFFF; background: #166534; border: 1px solid #15803D; border-radius: 10px; padding: 12px; cursor: pointer;" onclick="acceptInvite()" data-i18n="dashboard.invite_accept">Приеми</button>
     </div>
     <div class="status-msg" id="invite-modal-status" style="margin-top: 12px;"></div>
   </div>
@@ -397,14 +399,14 @@
 
   const CATEGORY_COLORS = ['#00E8FF', '#FF3EC9', '#8B5CF6', '#FFC24B', '#4BFFB0', '#FF7A7A', '#4B9FFF'];
   const DEFAULT_CATEGORIES = [
-    { name: 'Храна', icon: '🛒', type: 'expense' },
-    { name: 'Жилище и наем', icon: '🏠', type: 'expense' },
-    { name: 'Транспорт', icon: '🚗', type: 'expense' },
-    { name: 'Здраве', icon: '💊', type: 'expense' },
-    { name: 'Забавления', icon: '🎬', type: 'expense' },
-    { name: 'Друго', icon: '📦', type: 'expense' },
-    { name: 'Заплата', icon: '💶', type: 'income' },
-    { name: 'Друг приход', icon: '➕', type: 'income' },
+    { nameKey: 'dashboard.default_category_food', icon: '🛒', type: 'expense' },
+    { nameKey: 'dashboard.default_category_housing', icon: '🏠', type: 'expense' },
+    { nameKey: 'dashboard.default_category_transport', icon: '🚗', type: 'expense' },
+    { nameKey: 'dashboard.default_category_health', icon: '💊', type: 'expense' },
+    { nameKey: 'dashboard.default_category_fun', icon: '🎬', type: 'expense' },
+    { nameKey: 'dashboard.default_category_other', icon: '📦', type: 'expense' },
+    { nameKey: 'dashboard.default_category_salary', icon: '💶', type: 'income' },
+    { nameKey: 'dashboard.default_category_other_income', icon: '➕', type: 'income' },
   ];
 
   let currentUser = null;
@@ -422,8 +424,12 @@
   let currentTxPage = 1; // Следи текущата страница на списъка с транзакции
   let templates = [];
   let templateType = 'expense';
+  let pendingInviteHouseholdName = null;
 
-  const eur = (n) => (Number(n) || 0).toLocaleString('bg-BG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+  const tr = (key, vars) => window.BudgetNestI18n ? window.BudgetNestI18n.t(key, vars) : key;
+  function dashboardOtherLabel() { return tr('dashboard.other_category_label'); }
+  const getLang = () => window.BudgetNestI18n ? window.BudgetNestI18n.getLang() : 'bg';
+  const eur = (n) => (Number(n) || 0).toLocaleString(getLang() === 'bg' ? 'bg-BG' : 'en-IE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
 
   // ===== Escaping на потребителски текст преди вмъкване в innerHTML =====
   // ВАЖНО: никога не викаме .toISOString() върху дата, конструирана по
@@ -457,7 +463,7 @@
     // Placeholder според типа — за приход "Пазар от Kaufland" няма логика
     const descInput = document.getElementById('tx-description');
     if (descInput) {
-      descInput.placeholder = type === 'income' ? 'напр. Заплата, Хонорар' : 'напр. Пазар от Kaufland';
+      descInput.placeholder = type === 'income' ? tr('dashboard.description_placeholder_income') : tr('dashboard.description_placeholder_expense');
     }
     populateCategorySelect();
   }
@@ -510,7 +516,8 @@
     if (!invites || invites.length === 0) return false;
 
     const invite = invites[0];
-    document.getElementById('invite-household-name').textContent = invite.households?.name || 'домакинство';
+    pendingInviteHouseholdName = invite.households?.name || tr('dashboard.invite_default_household');
+    renderInviteText();
 
     const overlay = document.getElementById('invite-modal-overlay');
     overlay.dataset.inviteId = invite.id;
@@ -527,7 +534,7 @@
 
     document.getElementById('invite-accept-btn').disabled = true;
     document.getElementById('invite-decline-btn').disabled = true;
-    setStatus('invite-modal-status', 'Присъединяване…', '');
+    setStatus('invite-modal-status', tr('dashboard.joining_status'), '');
 
     const { error: joinError } = await supabaseClient
       .from('household_members')
@@ -536,7 +543,7 @@
     if (joinError) {
       document.getElementById('invite-accept-btn').disabled = false;
       document.getElementById('invite-decline-btn').disabled = false;
-      setStatus('invite-modal-status', 'Грешка: ' + joinError.message, 'error');
+      setStatus('invite-modal-status', tr('common.error_prefix') + joinError.message, 'error');
       return;
     }
 
@@ -553,7 +560,7 @@
 
     document.getElementById('invite-accept-btn').disabled = true;
     document.getElementById('invite-decline-btn').disabled = true;
-    setStatus('invite-modal-status', 'Отказване…', '');
+    setStatus('invite-modal-status', tr('dashboard.declining_status'), '');
 
     const { error } = await supabaseClient.from('household_invites').delete().eq('id', inviteId);
 
@@ -561,7 +568,7 @@
     document.getElementById('invite-decline-btn').disabled = false;
 
     if (error) {
-      setStatus('invite-modal-status', 'Грешка: ' + error.message, 'error');
+      setStatus('invite-modal-status', tr('common.error_prefix') + error.message, 'error');
       return;
     }
 
@@ -620,7 +627,7 @@
     const name = document.getElementById('household-input').value.trim();
     const btn = document.getElementById('household-submit');
     btn.disabled = true;
-    setStatus('household-status', 'Създаване…', '');
+    setStatus('household-status', tr('dashboard.creating_status'), '');
 
     const { data: household, error: hError } = await supabaseClient
       .from('households')
@@ -629,7 +636,7 @@
       .single();
 
     if (hError) {
-      setStatus('household-status', 'Грешка: ' + hError.message, 'error');
+      setStatus('household-status', tr('common.error_prefix') + hError.message, 'error');
       btn.disabled = false;
       return;
     }
@@ -639,17 +646,17 @@
       .insert([{ household_id: household.id, user_id: currentUser.id, role: 'owner' }]);
 
     if (mError) {
-      setStatus('household-status', 'Грешка: ' + mError.message, 'error');
+      setStatus('household-status', tr('common.error_prefix') + mError.message, 'error');
       btn.disabled = false;
       return;
     }
 
     const defaultRows = DEFAULT_CATEGORIES.map(c => ({
-      household_id: household.id, name: c.name, icon: c.icon, type: c.type, is_default: true
+      household_id: household.id, name: tr(c.nameKey), icon: c.icon, type: c.type, is_default: true
     }));
     await supabaseClient.from('categories').insert(defaultRows);
 
-    setStatus('household-status', 'Готово! Зареждане на таблото…', 'success');
+    setStatus('household-status', tr('dashboard.created_success'), 'success');
     setTimeout(() => window.location.reload(), 600);
   }
 
@@ -672,7 +679,8 @@
     const monthStart = toLocalISODate(new Date(now.getFullYear(), now.getMonth(), 1));
     const monthEnd = toLocalISODate(new Date(now.getFullYear(), now.getMonth() + 1, 0));
 
-    const monthNames = ['януари','февруари','март','април','май','юни','юли','август','септември','октомври','ноември','декември'];
+    const monthKeys = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+    const monthNames = monthKeys.map(k => tr('dashboard.month_' + k));
     document.getElementById('chart-month-label').textContent = monthNames[now.getMonth()] + ' ' + now.getFullYear();
 
     const { data: txs, error } = await supabaseClient
@@ -758,13 +766,13 @@
     let title, text;
 
     if (isOver) {
-      title = `${overCount} ${overCount === 1 ? 'категория надвиши' : 'категории надвишиха'} лимита`;
+      title = `${overCount} ${overCount === 1 ? tr('dashboard.alert_over_one') : tr('dashboard.alert_over_many')} ${tr('dashboard.alert_limit_suffix')}`;
       text = nearCount
-        ? `Още ${nearCount} ${nearCount === 1 ? 'категория е близо' : 'категории са близо'} до лимита си.`
-        : 'Прегледайте разходите си, за да върнете бюджета под контрол.';
+        ? tr(nearCount === 1 ? 'dashboard.alert_more_near_one' : 'dashboard.alert_more_near_many', { n: nearCount })
+        : tr('dashboard.alert_review_text');
     } else {
-      title = `${nearCount} ${nearCount === 1 ? 'категория е близо' : 'категории са близо'} до лимита`;
-      text = 'Наближавате зададените месечни лимити.';
+      title = `${nearCount} ${nearCount === 1 ? tr('dashboard.alert_near_one') : tr('dashboard.alert_near_many')} ${tr('dashboard.alert_limit_suffix')}`;
+      text = tr('dashboard.alert_approaching_text');
     }
 
     banner.innerHTML = `
@@ -774,7 +782,7 @@
           <div class="alert-title">${title}</div>
           <div class="alert-text">${text}</div>
         </div>
-        <a class="alert-link" href="budgets.html">Виж бюджетите →</a>
+        <a class="alert-link" href="budgets.html">${tr('dashboard.alert_view_budgets')}</a>
       </div>`;
     banner.style.display = 'block';
   }
@@ -795,7 +803,8 @@
     if (error) { console.error(error); return; }
 
     // Подготвяме 6 месечни кофи
-    const monthNamesShort = ['яну','фев','мар','апр','май','юни','юли','авг','сеп','окт','ное','дек'];
+    const monthKeysShort = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+    const monthNamesShort = monthKeysShort.map(k => tr('dashboard.month_short_' + k));
     const buckets = [];
     for (let i = 5; i >= 0; i--) {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
@@ -840,8 +849,8 @@
       data: {
         labels: buckets.map(b => b.label),
         datasets: [
-          { label: 'Приходи', data: buckets.map(b => Math.round(b.income)), backgroundColor: incomeColor, borderRadius: 6, maxBarThickness: 26 },
-          { label: 'Разходи', data: buckets.map(b => Math.round(b.expense)), backgroundColor: expenseColor, borderRadius: 6, maxBarThickness: 26 },
+          { label: tr('dashboard.trend_income'), data: buckets.map(b => Math.round(b.income)), backgroundColor: incomeColor, borderRadius: 6, maxBarThickness: 26 },
+          { label: tr('dashboard.trend_expense'), data: buckets.map(b => Math.round(b.expense)), backgroundColor: expenseColor, borderRadius: 6, maxBarThickness: 26 },
         ],
       },
       options: {
@@ -851,7 +860,7 @@
           legend: { position: 'top', labels: { color: textColor, usePointStyle: true, boxWidth: 8, padding: 16, font: { family: 'Inter', size: 12 } } },
           tooltip: {
             callbacks: {
-              label: (ctx) => ctx.dataset.label + ': ' + (ctx.parsed.y || 0).toLocaleString('bg-BG') + ' €',
+              label: (ctx) => ctx.dataset.label + ': ' + (ctx.parsed.y || 0).toLocaleString(getLang() === 'bg' ? 'bg-BG' : 'en-IE') + ' €',
             },
           },
         },
@@ -860,7 +869,7 @@
           y: {
             beginAtZero: true,
             grid: { color: gridColor },
-            ticks: { color: textColor, font: { family: 'Inter', size: 11 }, callback: (v) => v.toLocaleString('bg-BG') + ' €' },
+            ticks: { color: textColor, font: { family: 'Inter', size: 11 }, callback: (v) => v.toLocaleString(getLang() === 'bg' ? 'bg-BG' : 'en-IE') + ' €' },
           },
         },
       },
@@ -883,14 +892,14 @@
   function renderChart(txs) {
     const isExpenseView = currentChartViewType === 'expense';
     
-    document.getElementById('chart-card-title').textContent = isExpenseView ? 'Разходи по категория' : 'Приходи по категория';
-    document.getElementById('chart-view-label').textContent = isExpenseView ? 'Разходи' : 'Приходи';
-    document.getElementById('chart-empty').textContent = isExpenseView ? 'Все още няма разходи този месец.' : 'Все още няма приходи този месец.';
+    document.getElementById('chart-card-title').textContent = isExpenseView ? tr('dashboard.chart_expense_title') : tr('dashboard.chart_income_title');
+    document.getElementById('chart-view-label').textContent = isExpenseView ? tr('dashboard.chart_view_expense') : tr('dashboard.chart_view_income');
+    document.getElementById('chart-empty').textContent = isExpenseView ? tr('dashboard.chart_empty_expense') : tr('dashboard.chart_empty_income');
 
     const filteredTxs = txs.filter(t => t.categories?.type === currentChartViewType);
     const byCategory = {};
     filteredTxs.forEach(t => {
-      const name = t.categories?.name || 'Друго';
+      const name = t.categories?.name || dashboardOtherLabel();
       byCategory[name] = (byCategory[name] || 0) + Number(t.amount);
     });
 
@@ -950,7 +959,7 @@
     const pageLabel = document.getElementById('tx-page-label');
     
     if (!txs || !txs.length) {
-      list.innerHTML = '<div class="empty-state-rich"><span class="emoji">🌱</span><span class="title">Все още няма транзакции този месец</span><span class="sub">Започнете да следите бюджета си — добавете първия си приход или разход.</span><a class="cta-link" href="transactions.html">Добави транзакция →</a></div>';
+      list.innerHTML = '<div class="empty-state-rich"><span class="emoji">🌱</span><span class="title">' + escapeHtml(tr('dashboard.recent_empty_title')) + '</span><span class="sub">' + escapeHtml(tr('dashboard.recent_empty_sub')) + '</span><a class="cta-link" href="transactions.html">' + escapeHtml(tr('dashboard.recent_empty_cta')) + '</a></div>';
       nav.style.display = 'none';
       return;
     }
@@ -965,7 +974,7 @@
     // Скриване или показване на бутоните спрямо общия брой елементи
     if (totalPages > 1) {
       nav.style.display = 'flex';
-      pageLabel.textContent = `Страница ${currentTxPage} от ${totalPages}`;
+      pageLabel.textContent = tr('dashboard.page_label', { current: currentTxPage, total: totalPages });
     } else {
       nav.style.display = 'none';
     }
@@ -978,14 +987,14 @@
       const isIncome = t.categories?.type === 'income';
       const sign = isIncome ? '+' : '−';
       const actorName = householdMemberCount > 1
-        ? `<span style="color: var(--nest-gold); font-size: 11px; margin-left: 6px; font-weight:600;">· ${escapeHtml(t.user_id === currentUser.id ? 'Аз' : (memberProfiles[t.user_id]?.full_name || memberProfiles[t.user_id]?.email || 'Друг член'))}</span>`
+        ? `<span style="color: var(--nest-gold); font-size: 11px; margin-left: 6px; font-weight:600;">· ${escapeHtml(t.user_id === currentUser.id ? tr('dashboard.you_label') : (memberProfiles[t.user_id]?.full_name || memberProfiles[t.user_id]?.email || tr('dashboard.other_member_label')))}</span>`
         : '';
       return `
-        <div class="tx-row" onclick="prepareEditTransaction('${t.id}')" style="cursor: pointer;" title="Кликни за редакция или изтриване">
+        <div class="tx-row" onclick="prepareEditTransaction('${t.id}')" style="cursor: pointer;" title="${escapeHtml(tr('dashboard.tx_edit_hint'))}">
           <div class="tx-icon">${escapeHtml(t.categories?.icon) || '💰'}</div>
           <div class="tx-info">
-            <div class="tx-desc">${escapeHtml(t.description || t.categories?.name) || 'Транзакция'}</div>
-            <div class="tx-meta">${t.payment_method === 'cash' ? '💵' : t.payment_method === 'card' ? '💳' : ''} ${escapeHtml(t.transaction_date)} <span style="color: var(--nest-gold); font-size: 11px; margin-left: 6px; font-weight:600;">✏️ Промени</span>${actorName}</div>
+            <div class="tx-desc">${escapeHtml(t.description || t.categories?.name) || '—'}</div>
+            <div class="tx-meta">${t.payment_method === 'cash' ? '💵' : t.payment_method === 'card' ? '💳' : ''} ${escapeHtml(t.transaction_date)} <span style="color: var(--nest-gold); font-size: 11px; margin-left: 6px; font-weight:600;">${escapeHtml(tr('dashboard.edit_hint_inline'))}</span>${actorName}</div>
           </div>
           <div class="tx-amount ${isIncome ? 'income' : 'expense'}">${sign} ${eur(t.amount)}</div>
         </div>`;
@@ -999,7 +1008,7 @@
     const expenseTxs = txs.filter(t => t.categories?.type === 'expense');
     const byCategory = {};
     expenseTxs.forEach(t => {
-      const name = t.categories?.name || 'Друго';
+      const name = t.categories?.name || dashboardOtherLabel();
       byCategory[name] = (byCategory[name] || 0) + Number(t.amount);
     });
 
@@ -1018,7 +1027,7 @@
       row.innerHTML = `
         <div class="compare-labels">
           <span class="cat-name">${escapeHtml(avg.category_name)}</span>
-          <span class="cat-amounts">${eur(yours)} · БГ средно ${eur(avg.avg_amount_per_household)}</span>
+          <span class="cat-amounts">${eur(yours)} · ${tr('dashboard.compare_avg_label')} ${eur(avg.avg_amount_per_household)}</span>
         </div>
         <div class="compare-track">
           <div class="compare-fill ${isOver ? 'over' : ''}" style="width:${yourPct}%"></div>
@@ -1035,8 +1044,8 @@
 
     editingTransactionId = id;
     
-    document.getElementById('form-title').textContent = 'Редактиране на транзакция';
-    document.getElementById('tx-submit').textContent = 'Запази';
+    document.getElementById('form-title').textContent = tr('dashboard.form_title_edit');
+    document.getElementById('tx-submit').textContent = tr('common.save');
     
     document.getElementById('tx-cancel').style.display = 'block';
     document.getElementById('tx-delete').style.display = 'block';
@@ -1054,8 +1063,8 @@
   // ===== Отказване от редакция / Нулиране на формата =====
   function cancelEditTransaction() {
     editingTransactionId = null;
-    document.getElementById('form-title').textContent = 'Бърза транзакция';
-    document.getElementById('tx-submit').textContent = 'Добави';
+    document.getElementById('form-title').textContent = tr('dashboard.form_title_quick');
+    document.getElementById('tx-submit').textContent = tr('dashboard.add_btn');
     
     document.getElementById('tx-cancel').style.display = 'none';
     document.getElementById('tx-delete').style.display = 'none';
@@ -1084,7 +1093,7 @@
 
     const btn = document.getElementById('tx-delete');
     btn.disabled = true;
-    setStatus('tx-status', 'Изтриване…', '');
+    setStatus('tx-status', tr('dashboard.deleting_status'), '');
 
     const { error } = await supabaseClient
       .from('transactions')
@@ -1094,11 +1103,11 @@
     btn.disabled = false;
 
     if (error) {
-      setStatus('tx-status', 'Грешка при изтриване: ' + error.message, 'error');
+      setStatus('tx-status', tr('dashboard.delete_error_prefix') + error.message, 'error');
       return;
     }
 
-    setStatus('tx-status', 'Транзакцията е изтрита ✓', 'success');
+    setStatus('tx-status', tr('dashboard.tx_deleted_success'), 'success');
     
     cancelEditTransaction();
     await loadDashboard();
@@ -1113,7 +1122,7 @@
     btn.disabled = true;
 
     const isEditing = editingTransactionId !== null;
-    setStatus('tx-status', isEditing ? 'Запазване на промените…' : 'Добавяне…', '');
+    setStatus('tx-status', isEditing ? tr('dashboard.saving_changes_status') : tr('dashboard.adding_status'), '');
 
     const payload = {
       household_id: currentHouseholdId,
@@ -1143,11 +1152,11 @@
     btn.disabled = false;
 
     if (resultError) {
-      setStatus('tx-status', 'Грешка: ' + resultError.message, 'error');
+      setStatus('tx-status', tr('common.error_prefix') + resultError.message, 'error');
       return;
     }
 
-    setStatus('tx-status', isEditing ? 'Промените са запазени ✓' : 'Добавено ✓', 'success');
+    setStatus('tx-status', isEditing ? tr('dashboard.changes_saved_success') : tr('dashboard.added_success'), 'success');
     cancelEditTransaction();
     await loadDashboard();
     setTimeout(() => setStatus('tx-status', '', ''), 2000);
@@ -1203,15 +1212,15 @@
   function renderTemplates() {
     const container = document.getElementById('template-chips');
     if (!templates.length) {
-      container.innerHTML = '<span class="hint" style="font-size:13px;">Все още нямаш шаблони — добави първия по-долу.</span>';
+      container.innerHTML = '<span class="hint" style="font-size:13px;">' + escapeHtml(tr('dashboard.templates_empty')) + '</span>';
       return;
     }
     container.innerHTML = templates.map(t => `
-      <span class="template-chip" onclick="handleUseTemplate('${t.id}')" title="Добави транзакция от този шаблон">
+      <span class="template-chip" onclick="handleUseTemplate('${t.id}')" title="${escapeHtml(tr('dashboard.template_use_title'))}">
         <span>${escapeHtml(t.icon) || (t.categories?.icon || '⚡')}</span>
         <span>${escapeHtml(t.name)}</span>
         <span class="tpl-amount">${t.categories?.type === 'income' ? '+' : '−'} ${eur(t.amount)}</span>
-        <span class="tpl-remove" onclick="event.stopPropagation(); handleDeleteTemplate('${t.id}')" title="Изтрий шаблона">×</span>
+        <span class="tpl-remove" onclick="event.stopPropagation(); handleDeleteTemplate('${t.id}')" title="${escapeHtml(tr('dashboard.template_remove_title'))}">×</span>
       </span>`).join('');
   }
 
@@ -1222,11 +1231,11 @@
     const categoryId = document.getElementById('tpl-category').value;
 
     if (!categoryId) {
-      setStatus('tpl-status', 'Няма налична категория за този тип.', 'error');
+      setStatus('tpl-status', tr('dashboard.no_category_error'), 'error');
       return;
     }
 
-    setStatus('tpl-status', 'Запазване…', '');
+    setStatus('tpl-status', tr('dashboard.saving_status'), '');
 
     const { error } = await supabaseClient
       .from('spending_templates')
@@ -1240,7 +1249,7 @@
       }]);
 
     if (error) {
-      setStatus('tpl-status', 'Грешка: ' + error.message, 'error');
+      setStatus('tpl-status', tr('common.error_prefix') + error.message, 'error');
       return;
     }
 
@@ -1267,12 +1276,12 @@
       }]);
 
     if (error) {
-      setStatus('tx-status', 'Грешка при добавяне от шаблон: ' + error.message, 'error');
+      setStatus('tx-status', tr('common.error_prefix') + error.message, 'error');
       setTimeout(() => setStatus('tx-status', '', ''), 3000);
       return;
     }
 
-    setStatus('tx-status', `„${tpl.name}“ е добавен ✓`, 'success');
+    setStatus('tx-status', tr('dashboard.template_used_success', { name: tpl.name }), 'success');
     setTimeout(() => setStatus('tx-status', '', ''), 2000);
     await loadDashboard();
   }
@@ -1292,6 +1301,26 @@
     await supabaseClient.auth.signOut();
     window.location.href = 'login.html';
   }
+
+  // ===== Покана: изгражда изречението наново на текущия език, с вградено име на домакинството =====
+  function renderInviteText() {
+    if (!pendingInviteHouseholdName) return;
+    const el = document.getElementById('invite-modal-text');
+    if (!el) return;
+    const householdHtml = '<b id="invite-household-name" style="color: var(--text-primary);">' + escapeHtml(pendingInviteHouseholdName) + '</b>';
+    el.innerHTML = tr('dashboard.invite_text', { household: householdHtml });
+  }
+
+  // ===== Смяна на език: презареждаме динамично рендерираните части =====
+  window.onLanguageChange = function () {
+    renderInviteText();
+    if (currentHouseholdId) {
+      populateCategorySelect();
+      populateTemplateCategorySelect();
+      renderTemplates();
+      loadDashboard();
+    }
+  };
 
   function setStatus(elId, message, type) {
     const el = document.getElementById(elId);
