@@ -70,7 +70,7 @@
       <a href="wallets.html" class="nav-link" data-i18n="nav.wallets">Портфейл</a>
       <a href="goals.html" class="nav-link" data-i18n="nav.goals">Цели</a>
       <a href="recurring.html" class="nav-link" data-i18n="nav.recurring">Периодични</a>
-      <a href="settle.html" class="nav-link" data-i18n="nav.settle">Споделено</a>
+      <a href="settle.html" class="nav-link" id="settle-nav-link" style="display:none;" data-i18n="nav.settle">Споделено</a>
       <a href="reviews.html" class="nav-link" data-i18n="nav.reviews">Отзиви</a>
       <a href="settings.html" class="nav-link" data-i18n="nav.settings">Настройки</a>
       <a href="admin.html" class="nav-link" id="admin-nav-link" style="display:none;"><span data-i18n="nav.admin">Админ</span></a>
@@ -394,6 +394,24 @@
   const SUPABASE_ANON_KEY = 'sb_publishable_KmFRXFvW-wCf5LJXMgHejQ__3CH2PB7';
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+  // Показва връзката "Споделено" в менюто само ако домакинството има повече от 1 член
+  async function updateSettleNavVisibility(userId) {
+    const link = document.getElementById('settle-nav-link');
+    if (!link) return;
+    const { data: myMembership } = await supabaseClient
+      .from('household_members')
+      .select('household_id')
+      .eq('user_id', userId)
+      .limit(1)
+      .maybeSingle();
+    if (!myMembership) { link.style.display = 'none'; return; }
+    const { count } = await supabaseClient
+      .from('household_members')
+      .select('*', { count: 'exact', head: true })
+      .eq('household_id', myMembership.household_id);
+    link.style.display = (count && count > 1) ? 'flex' : 'none';
+  }
+
   // Само за показване на линка "Админ" в менюто — реалната защита е в SQL (is_admin())
   const ADMIN_EMAILS = ['choko2009vr@gmail.com']; // <-- замени с истинския си имейл
 
@@ -489,6 +507,7 @@
       return;
     }
     currentUser = session.user;
+    updateSettleNavVisibility(currentUser.id);
     document.getElementById('tx-date').valueAsDate = new Date();
 
     if (ADMIN_EMAILS.map(e => e.toLowerCase()).includes((currentUser.email || '').toLowerCase())) {
