@@ -426,6 +426,15 @@
   const eur = (n) => (Number(n) || 0).toLocaleString('bg-BG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
 
   // ===== Escaping на потребителски текст преди вмъкване в innerHTML =====
+  // ВАЖНО: никога не викаме .toISOString() върху дата, конструирана по
+  // МЕСТНО време (new Date(y, m, d)) — тя винаги минава през UTC и може да
+  // размести деня (а понякога и месеца) според часовата зона на браузъра.
+  // Форматираме годината/месеца/деня директно, без UTC конверсия.
+  function pad2(n) { return String(n).padStart(2, '0'); }
+  function toLocalISODate(d) {
+    return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+  }
+
   function escapeHtml(str) {
     if (str === null || str === undefined) return '';
     return String(str)
@@ -660,8 +669,8 @@
   // ===== Зареждане на таблото =====
   async function loadDashboard() {
     const now = new Date();
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
-    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().slice(0, 10);
+    const monthStart = toLocalISODate(new Date(now.getFullYear(), now.getMonth(), 1));
+    const monthEnd = toLocalISODate(new Date(now.getFullYear(), now.getMonth() + 1, 0));
 
     const monthNames = ['януари','февруари','март','април','май','юни','юли','август','септември','октомври','ноември','декември'];
     document.getElementById('chart-month-label').textContent = monthNames[now.getMonth()] + ' ' + now.getFullYear();
@@ -775,7 +784,7 @@
     const now = new Date();
     // Начало на прозореца: първи ден на месеца преди 5 месеца
     const windowStart = new Date(now.getFullYear(), now.getMonth() - 5, 1);
-    const startStr = windowStart.toISOString().slice(0, 10);
+    const startStr = toLocalISODate(windowStart);
 
     const { data: txs, error } = await supabaseClient
       .from('transactions')
@@ -1244,7 +1253,7 @@
     const tpl = templates.find(t => t.id === templateId);
     if (!tpl) return;
 
-    const today = new Date().toISOString().slice(0, 10);
+    const today = toLocalISODate(new Date());
 
     const { error } = await supabaseClient
       .from('transactions')

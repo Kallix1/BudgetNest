@@ -461,6 +461,16 @@
     await loadRecurring();
   }
 
+  // ВАЖНО: никога не викаме .toISOString() върху дата, конструирана по
+  // МЕСТНО време (new Date(y, m, d)) — toISOString() винаги минава през UTC
+  // и може да размести деня (а понякога и целия месец), в зависимост от
+  // часовата зона на браузъра. Вместо това форматираме годината/месеца/деня
+  // директно от локалните им стойности, без никаква UTC конверсия.
+  function pad2(n) { return String(n).padStart(2, '0'); }
+  function toLocalISODate(d) {
+    return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+  }
+
   // Първата следваща дата за месечно правило: ако денят този месец вече е минал, взимаме следващия месец
   function computeNextMonthlyRunDate(today, day) {
     const y = today.getFullYear();
@@ -470,12 +480,12 @@
     const candidateThisMonth = new Date(y, m, clampedThisMonth);
 
     if (candidateThisMonth >= new Date(y, m, today.getDate())) {
-      return candidateThisMonth.toISOString().slice(0, 10);
+      return toLocalISODate(candidateThisMonth);
     }
 
     const daysInNextMonth = new Date(y, m + 2, 0).getDate();
     const clampedNextMonth = Math.min(day, daysInNextMonth);
-    return new Date(y, m + 1, clampedNextMonth).toISOString().slice(0, 10);
+    return toLocalISODate(new Date(y, m + 1, clampedNextMonth));
   }
 
   // Първата следваща дата за седмично правило: следващият ден от седмицата (0=нед..6=съб) на/след днес
@@ -483,7 +493,7 @@
     const result = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     const diff = (weekday - result.getDay() + 7) % 7;
     result.setDate(result.getDate() + diff);
-    return result.toISOString().slice(0, 10);
+    return toLocalISODate(result);
   }
 
   // ===== Пауза / възобновяване =====

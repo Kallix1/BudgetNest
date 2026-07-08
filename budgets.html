@@ -160,6 +160,15 @@
   const eur = (n) => (Number(n) || 0).toLocaleString('bg-BG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
 
   // ===== Escaping на потребителски текст преди вмъкване в innerHTML =====
+  // ВАЖНО: никога не викаме .toISOString() върху дата, конструирана по
+  // МЕСТНО време (new Date(y, m, d)) — тя винаги минава през UTC и може да
+  // размести деня (а понякога и месеца) според часовата зона на браузъра.
+  // Форматираме годината/месеца/деня директно, без UTC конверсия.
+  function pad2(n) { return String(n).padStart(2, '0'); }
+  function toLocalISODate(d) {
+    return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+  }
+
   function escapeHtml(str) {
     if (str === null || str === undefined) return '';
     return String(str)
@@ -232,8 +241,8 @@
     (budgets || []).forEach(b => { budgetsByCategory[b.category_id] = b; });
 
     const now = new Date();
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
-    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().slice(0, 10);
+    const monthStart = toLocalISODate(new Date(now.getFullYear(), now.getMonth(), 1));
+    const monthEnd = toLocalISODate(new Date(now.getFullYear(), now.getMonth() + 1, 0));
 
     const { data: txs, error: txError } = await supabaseClient
       .from('transactions')
@@ -288,8 +297,8 @@
       .select('category_id, amount, transaction_date')
       .eq('household_id', currentHouseholdId)
       .in('category_id', rolloverCategoryIds)
-      .gte('transaction_date', historyStart.toISOString().slice(0, 10))
-      .lt('transaction_date', currentMonthStart.toISOString().slice(0, 10));
+      .gte('transaction_date', toLocalISODate(historyStart))
+      .lt('transaction_date', toLocalISODate(currentMonthStart));
 
     if (error) { console.error(error); return; }
 
