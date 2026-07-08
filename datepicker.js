@@ -89,7 +89,15 @@
 
     document.addEventListener('click', (e) => {
       if (!activeCtx) return;
-      if (panelEl.contains(e.target) || e.target === activeCtx.fakeInput) return;
+      // Забележка: проверяваме дали кликът е някъде в целия "wrap"
+      // (фалшивото поле + иконата с календарче), а не само точно
+      // fakeInput. Иначе клик върху иконата (която също отваря панела
+      // чрез своя собствен click listener по-рано в същото събитие)
+      // веднага биваше третиран като "клик извън" и затваряше панела,
+      // който тъкмо се отвори — потребителят никога не успяваше да
+      // отвори picker-а чрез иконата, само чрез самото поле.
+      const wrap = activeCtx.fakeInput.closest('.dnp-input-wrap');
+      if (panelEl.contains(e.target) || (wrap && wrap.contains(e.target))) return;
       closePanel();
     });
 
