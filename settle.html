@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css?v=14">
-<link rel="stylesheet" href="css/dashboard.css?v=13">
+<link rel="stylesheet" href="css/dashboard.css?v=14">
 <script src="nav.js?v=10" defer></script>
 <script src="i18n.js?v=5" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -334,7 +334,7 @@
 
     const { data: txRows, error: txError } = await supabaseClient
       .from('transactions')
-      .select('id, user_id, amount, description, transaction_date, category_id, categories(name, icon)')
+      .select('id, user_id, amount, description, transaction_date, category_id, categories(name, icon, type)')
       .eq('household_id', currentHouseholdId)
       .eq('is_shared', true)
       .order('transaction_date', { ascending: false });
@@ -376,11 +376,20 @@
 
     sharedTransactions.forEach(tx => {
       if (net[tx.user_id] === undefined) net[tx.user_id] = 0;
-      net[tx.user_id] += Number(tx.amount); // платецът е "финансирал" цялата сума
+
+      // ВАЖНО: при разход платецът е "финансирал" сумата и другите му я
+      // дължат обратно (+ на платеца, − на всеки участник). При ПРИХОД
+      // логиката е обратна: човекът, при когото е постъпил приходът,
+      // всъщност ДЪЛЖИ на останалите техния дял (той временно държи чужди
+      // пари), затова знакът се обръща.
+      const isIncome = tx.categories?.type === 'income';
+      const sign = isIncome ? -1 : 1;
+
+      net[tx.user_id] += sign * Number(tx.amount);
 
       (splitsByTx[tx.id] || []).forEach(s => {
         if (net[s.user_id] === undefined) net[s.user_id] = 0;
-        net[s.user_id] -= Number(s.share_amount); // всеки участник дължи своя дял
+        net[s.user_id] -= sign * Number(s.share_amount);
       });
     });
 
@@ -470,13 +479,15 @@
       const splits = splitsByTx[tx.id] || [];
       const splitLabel = splits.map(s => `${escapeHtml(nameOf(s.user_id))}: ${eur(s.share_amount)}`).join(' · ');
       const dateLabel = new Date(tx.transaction_date).toLocaleDateString(getLang() === 'bg' ? 'bg-BG' : 'en-GB');
+      const isIncome = tx.categories?.type === 'income';
+      const metaKey = isIncome ? 'settle.received_by_meta' : 'settle.paid_by_meta';
       return `
         <div class="shared-tx-row">
           <div>
             <div class="shared-tx-desc">${escapeHtml(tx.categories?.icon || '💰')} ${escapeHtml(tx.description || tx.categories?.name) || escapeHtml(tr('settle.tx_default_desc'))}</div>
-            <div class="shared-tx-meta">${escapeHtml(tr('settle.paid_by_meta', { name: nameOf(tx.user_id), date: dateLabel, splits: splitLabel }))}</div>
+            <div class="shared-tx-meta">${escapeHtml(tr(metaKey, { name: nameOf(tx.user_id), date: dateLabel, splits: splitLabel }))}</div>
           </div>
-          <div class="shared-tx-amount">${eur(tx.amount)}</div>
+          <div class="shared-tx-amount" style="${isIncome ? 'color: var(--color-income);' : ''}">${isIncome ? '+' : ''}${eur(tx.amount)}</div>
         </div>`;
     }).join('');
   }
