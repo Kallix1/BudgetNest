@@ -8,10 +8,11 @@
 <meta name="description" content="Автоматични повтарящи се приходи и разходи в BudgetNest.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=14">
-<link rel="stylesheet" href="css/dashboard.css?v=14">
+<link rel="stylesheet" href="css/style.css?v=15">
+<link rel="stylesheet" href="css/dashboard.css?v=15">
 <script src="nav.js?v=10" defer></script>
-<script src="i18n.js?v=5" defer></script>
+<script src="i18n.js?v=8" defer></script>
+<script src="icons.js?v=1" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -69,22 +70,22 @@
 <nav class="navbar">
   <div class="nav-left">
     <div class="nav-left-header">
-      <a href="dashboard.html" class="brand-mark" style="text-decoration:none; cursor:pointer;">BudgetNest</a>
+      <a href="dashboard.html" class="brand-mark" id="brand-mark-link" style="text-decoration:none; cursor:pointer;">BudgetNest</a>
       <button class="nav-toggle" type="button" aria-label="Меню" aria-expanded="false" aria-controls="nav-links">
         <span></span><span></span><span></span>
       </button>
     </div>
     <div class="nav-links" id="nav-links">
-      <a href="dashboard.html" class="nav-link" data-i18n="nav.dashboard">Табло</a>
-      <a href="transactions.html" class="nav-link" data-i18n="nav.transactions">Транзакции</a>
-      <a href="budgets.html" class="nav-link" data-i18n="nav.budgets">Бюджети</a>
-      <a href="wallets.html" class="nav-link" data-i18n="nav.wallets">Портфейл</a>
-      <a href="goals.html" class="nav-link" data-i18n="nav.goals">Цели</a>
-      <a href="recurring.html" class="nav-link active" data-i18n="nav.recurring">Периодични</a>
-      <a href="settle.html" class="nav-link" id="settle-nav-link" style="display:none;" data-i18n="nav.settle">Споделено</a>
-      <a href="reviews.html" class="nav-link" data-i18n="nav.reviews">Отзиви</a>
-      <a href="settings.html" class="nav-link" data-i18n="nav.settings">Настройки</a>
-      <a href="admin.html" class="nav-link" id="admin-nav-link" style="display:none;"><span data-i18n="nav.admin">Админ</span></a>
+      <a href="dashboard.html" class="nav-link"><span class="nav-icon" id="nav-icon-dashboard"></span><span data-i18n="nav.dashboard">Табло</span></a>
+      <a href="transactions.html" class="nav-link"><span class="nav-icon" id="nav-icon-transactions"></span><span data-i18n="nav.transactions">Транзакции</span></a>
+      <a href="budgets.html" class="nav-link"><span class="nav-icon" id="nav-icon-budgets"></span><span data-i18n="nav.budgets">Бюджети</span></a>
+      <a href="wallets.html" class="nav-link"><span class="nav-icon" id="nav-icon-wallet"></span><span data-i18n="nav.wallets">Портфейл</span></a>
+      <a href="goals.html" class="nav-link"><span class="nav-icon" id="nav-icon-goals"></span><span data-i18n="nav.goals">Цели</span></a>
+      <a href="recurring.html" class="nav-link active"><span class="nav-icon" id="nav-icon-recurring"></span><span data-i18n="nav.recurring">Периодични</span></a>
+      <a href="settle.html" class="nav-link" id="settle-nav-link" style="display:none;"><span class="nav-icon" id="nav-icon-settle"></span><span data-i18n="nav.settle">Споделено</span></a>
+      <a href="reviews.html" class="nav-link"><span class="nav-icon" id="nav-icon-reviews"></span><span data-i18n="nav.reviews">Отзиви</span></a>
+      <a href="settings.html" class="nav-link"><span class="nav-icon" id="nav-icon-settings"></span><span data-i18n="nav.settings">Настройки</span></a>
+      <a href="admin.html" class="nav-link" id="admin-nav-link" style="display:none;"><span class="nav-icon" id="nav-icon-admin"></span><span data-i18n="nav.admin">Админ</span></a>
     </div>
   </div>
   <div class="nav-right">

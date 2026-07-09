@@ -10,52 +10,104 @@
    ============================================ */
 
 (function () {
+  const t = (key, fallback) => (window.BudgetNestI18n ? window.BudgetNestI18n.t(key) : fallback);
+
   const GROUPS = [
     {
-      label: 'Храна и пазар',
+      key: 'group_food', fallback: 'Храна и пазар',
       emoji: ['🍎', '🍌', '🍕', '🍔', '🍟', '🌭', '🥪', '🌮', '🍣', '🍜', '🍰', '🍩', '☕', '🍺', '🍷', '🥑', '🥦', '🍇', '🍫', '🛒', '🍞', '🥚']
     },
     {
-      label: 'Дом',
+      key: 'group_home', fallback: 'Дом',
       emoji: ['🏠', '🛋️', '💡', '🔧', '🧹', '🛏️', '🚿', '🪑', '🖼️', '🌱', '🧺', '🔥']
     },
     {
-      label: 'Транспорт',
+      key: 'group_transport', fallback: 'Транспорт',
       emoji: ['🚗', '🚌', '🚕', '🚆', '🚲', '⛽', '🅿️', '✈️', '🛴', '🚦', '🛣️']
     },
     {
-      label: 'Пазаруване',
+      key: 'group_shopping', fallback: 'Пазаруване',
       emoji: ['🛍️', '👗', '👟', '👜', '💄', '🎁', '💍', '👔', '🧢']
     },
     {
-      label: 'Сметки и финанси',
+      key: 'group_finance', fallback: 'Сметки и финанси',
       emoji: ['💰', '💳', '🏦', '📈', '📉', '🧾', '💵', '💶', '💸', '🪙']
     },
     {
-      label: 'Забавление',
+      key: 'group_fun', fallback: 'Забавление',
       emoji: ['🎮', '🎬', '🎵', '🎧', '🎉', '🎨', '📚', '🎯', '🕹️', '🎸']
     },
     {
-      label: 'Здраве',
+      key: 'group_health', fallback: 'Здраве',
       emoji: ['💊', '🏥', '🩺', '🦷', '💉', '🧴', '🧘']
     },
     {
-      label: 'Образование',
+      key: 'group_education', fallback: 'Образование',
       emoji: ['📖', '✏️', '🎓', '🏫']
     },
     {
-      label: 'Пътувания',
+      key: 'group_travel', fallback: 'Пътувания',
       emoji: ['🧳', '🏖️', '🗺️', '🏕️', '⛺']
     },
     {
-      label: 'Любимци',
+      key: 'group_pets', fallback: 'Любимци',
       emoji: ['🐶', '🐱', '🐹', '🐦', '🐟']
     },
     {
-      label: 'Друго',
+      key: 'group_other', fallback: 'Друго',
       emoji: ['📦', '❓', '⭐', '🔒', '🔑', '📌', '🗂️', '👶', '🎂', '💼']
     }
   ];
+
+  // Ключови думи за търсене — поддържаме и български, и английски, защото
+  // панелът трябва да работи, независимо кой от двата езика е избран.
+  const KEYWORDS_EN = {
+    'food': ['🍎', '🍌', '🍕', '🍔', '🍟', '🌭', '🥪', '🌮', '🍣', '🍜', '🍰', '🍩', '🍞', '🥚', '🛒'],
+    'groceries': ['🛒', '🛍️', '🍎'],
+    'coffee': ['☕'],
+    'drinks': ['☕', '🍺', '🍷'],
+    'alcohol': ['🍺', '🍷'],
+    'home': ['🏠', '🛋️', '💡', '🔧', '🧹', '🛏️', '🚿', '🪑'],
+    'rent': ['🏠', '🔑'],
+    'electricity': ['💡'],
+    'water': ['🚿'],
+    'transport': ['🚗', '🚌', '🚕', '🚆', '🚲', '⛽'],
+    'car': ['🚗', '⛽', '🅿️'],
+    'fuel': ['⛽'],
+    'plane': ['✈️'],
+    'flight': ['✈️'],
+    'clothes': ['👗', '👟', '👜', '👔'],
+    'clothing': ['👗', '👟', '👜', '👔'],
+    'shoes': ['👟'],
+    'gift': ['🎁'],
+    'money': ['💰', '💵', '💶', '💸', '🪙', '💳'],
+    'bank': ['🏦', '💳'],
+    'bills': ['🧾', '💡'],
+    'savings': ['💰', '📈'],
+    'fun': ['🎮', '🎬', '🎵', '🎉', '🎨'],
+    'entertainment': ['🎮', '🎬', '🎵', '🎉', '🎨'],
+    'movie': ['🎬'],
+    'music': ['🎵', '🎧'],
+    'games': ['🎮', '🕹️'],
+    'health': ['💊', '🏥', '🩺', '💉'],
+    'doctor': ['🏥', '🩺'],
+    'medicine': ['💊'],
+    'teeth': ['🦷'],
+    'dentist': ['🦷'],
+    'education': ['📖', '✏️', '🎓', '🏫'],
+    'school': ['🏫', '✏️'],
+    'books': ['📖', '📚'],
+    'travel': ['🧳', '🏖️', '🗺️', '✈️'],
+    'vacation': ['🏖️', '🧳'],
+    'pet': ['🐶', '🐱', '🐹', '🐦', '🐟'],
+    'pets': ['🐶', '🐱', '🐹', '🐦', '🐟'],
+    'dog': ['🐶'],
+    'cat': ['🐱'],
+    'baby': ['👶'],
+    'work': ['💼'],
+    'sport': ['🎯'],
+    'plant': ['🌱'],
+  };
 
   // Прости ключови думи за търсене (на кирилица) → списък от емоджита
   const KEYWORDS = {
@@ -110,6 +162,9 @@
     Object.keys(KEYWORDS).forEach((key) => {
       if (key.includes(q)) KEYWORDS[key].forEach((e) => matches.add(e));
     });
+    Object.keys(KEYWORDS_EN).forEach((key) => {
+      if (key.includes(q)) KEYWORDS_EN[key].forEach((e) => matches.add(e));
+    });
     return Array.from(matches);
   }
 
@@ -122,7 +177,7 @@
     panelEl.className = 'emp-panel';
     panelEl.innerHTML = `
       <div class="emp-search-row">
-        <input type="text" class="emp-search" placeholder="🔍 Търсене на икона…" autocomplete="off">
+        <input type="text" class="emp-search" placeholder="${t('emojipicker.search_placeholder', '🔍 Търсене на икона…')}" autocomplete="off">
       </div>
       <div class="emp-scroll"></div>
     `;
@@ -186,7 +241,7 @@
       if (filtered.length === 0) {
         const empty = document.createElement('div');
         empty.className = 'emp-empty';
-        empty.textContent = 'Няма намерени икони';
+        empty.textContent = t('emojipicker.no_results', 'Няма намерени икони');
         scrollEl.appendChild(empty);
       } else {
         scrollEl.appendChild(buildGrid(filtered));
@@ -197,7 +252,7 @@
     GROUPS.forEach((group) => {
       const label = document.createElement('div');
       label.className = 'emp-group-label';
-      label.textContent = group.label;
+      label.textContent = t('emojipicker.' + group.key, group.fallback);
       scrollEl.appendChild(label);
       scrollEl.appendChild(buildGrid(group.emoji));
     });
@@ -228,6 +283,7 @@
     if (wrap) wrap.classList.add('emp-open');
 
     const searchInput = panelEl.querySelector('.emp-search');
+    searchInput.placeholder = t('emojipicker.search_placeholder', '🔍 Търсене на икона…');
     searchInput.value = '';
     renderGrid('');
 

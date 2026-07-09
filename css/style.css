@@ -18,8 +18,8 @@
   --nest-green-dark: #1A3326;   /* Дълбоко горско зелено */
   --nest-green-mid: #254A37;    /* Основно зелено */
   --nest-green-light: #366A4F;  /* Светло зелено */
-  --nest-gold: #D4AF37;         /* Златно от логото */
-  --nest-gold-accent: #C5A028;  /* Тъмно златно за бутони */
+  --nest-gold: #2E9E44;         /* Зелен акцент (преди: златно) */
+  --nest-gold-accent: #21813A;  /* Тъмно зелено за бутони */
 
   /* Текст */
   --text-primary: #1A202C;
@@ -29,9 +29,10 @@
   /* Системни цветове */
   --color-income: #254A37;
   --color-expense: #E53E3E;
+  --color-warning: #C5A028;  /* Кехлибарено предупреждение (напр. "наближавате лимита") — умишлено НЕ е обвързано с брандовия акцент */
 
   --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
-  --btn-shadow: 0 4px 10px rgba(197, 160, 40, 0.2);
+  --btn-shadow: 0 4px 10px rgba(67, 162, 72, 0.2);
 
   /* Акцентен цвят за заглавия на карти — четим и в двете теми */
   --heading-accent: #1A3326;
@@ -39,21 +40,21 @@
 
 /* ===== Тъмна тема ===== */
 [data-theme="dark"] {
-  --bg-void: #0F1E17;
-  --bg-panel: #16261D;
-  --bg-card: #1C2E23;
-  --border-soft: rgba(255, 255, 255, 0.08);
+  --bg-void: #0A0F14;
+  --bg-panel: #10161C;
+  --bg-card: #10161C;
+  --border-soft: rgba(255, 255, 255, 0.06);
 
-  --surface-alt: #223528;
-  --input-bg: #16261D;
-  --input-border: #34493C;
-  --track-bg: #223528;
+  --surface-alt: #151B21;
+  --input-bg: #10161C;
+  --input-border: #232B32;
+  --track-bg: #151B21;
 
-  --nest-green-dark: #0C1912;
-  --nest-green-mid: #3E7A5A;
-  --nest-green-light: #56916D;
-  --nest-gold: #E3C067;
-  --nest-gold-accent: #D4AF37;
+  --nest-green-dark: #0A0F14;
+  --nest-green-mid: #2E5A3D;
+  --nest-green-light: #3E7A50;
+  --nest-gold: #43A248;
+  --nest-gold-accent: #368A3C;
 
   --text-primary: #F1F5F1;
   --text-secondary: #A9BDAF;
@@ -61,6 +62,7 @@
 
   --color-income: #6FCF97;
   --color-expense: #FF8A8A;
+  --color-warning: #D4AF37;
 
   --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
   --btn-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
@@ -190,7 +192,7 @@ body {
   position: relative;
   background:
     radial-gradient(circle at 20% 15%, rgba(37,74,55,0.04), transparent 55%),
-    radial-gradient(circle at 85% 85%, rgba(212,175,55,0.06), transparent 55%),
+    radial-gradient(circle at 85% 85%, rgba(67,162,72,0.06), transparent 55%),
     var(--bg-panel);
   border-right: 1px solid var(--border-soft);
 }
@@ -207,9 +209,20 @@ body {
 }
 
 .brand-mark::before {
-  content: "🌱";
-  font-size: 16px;
+  display: none;
+  content: none;
 }
+
+.brand-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: var(--nest-gold);
+  flex-shrink: 0;
+}
+.brand-badge svg { width: 100%; height: 100%; }
 
 .brand-headline {
   font-family: 'Space Grotesk', sans-serif;
@@ -354,7 +367,7 @@ button.submit {
   font-weight: 600;
   font-size: 15px;
   color: var(--nest-green-dark);
-  background: linear-gradient(120deg, #EAD493, var(--nest-gold));
+  background: linear-gradient(120deg, #8CDB8F, var(--nest-gold));
   border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: 10px;
   padding: 15px 20px;
@@ -366,8 +379,8 @@ button.submit {
 
 button.submit:hover {
   transform: translateY(-1px);
-  background: linear-gradient(120deg, #EAD493, var(--nest-gold-accent));
-  box-shadow: 0 6px 14px rgba(197, 160, 40, 0.35);
+  background: linear-gradient(120deg, #8CDB8F, var(--nest-gold-accent));
+  box-shadow: 0 6px 14px rgba(67, 162, 72, 0.35);
 }
 
 button.submit:active {

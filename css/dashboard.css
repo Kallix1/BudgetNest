@@ -72,6 +72,15 @@ body.dashboard-body {
   box-sizing: border-box;
 }
 
+.nav-icon {
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+.nav-icon svg { width: 100%; height: 100%; }
+
 .nav-link::before {
   content: "";
   position: absolute;
@@ -101,8 +110,8 @@ body.dashboard-body {
 
 .nav-link.active {
   color: #FFFFFF;
-  background: linear-gradient(120deg, rgba(212,175,55,0.22), rgba(212,175,55,0.08));
-  box-shadow: inset 0 0 0 1px rgba(212,175,55,0.35);
+  background: linear-gradient(120deg, rgba(67,162,72,0.22), rgba(67,162,72,0.08));
+  box-shadow: inset 0 0 0 1px rgba(67,162,72,0.35);
 }
 
 .nav-link.active::before {
@@ -492,7 +501,7 @@ body.dashboard-body {
 .budget-alert.near {
   background: rgba(197, 160, 40, 0.10);
   border-color: rgba(197, 160, 40, 0.35);
-  color: var(--nest-gold-accent);
+  color: var(--color-warning);
 }
 .budget-alert .alert-icon { font-size: 20px; line-height: 1; flex-shrink: 0; }
 .budget-alert .alert-body { flex: 1; min-width: 0; }
@@ -671,7 +680,7 @@ body.dashboard-body {
 .method-btn.active[data-method="card"] {
   border-color: var(--nest-gold-accent);
   color: var(--nest-gold-accent);
-  background: rgba(212, 175, 55, 0.14);
+  background: rgba(67, 162, 72, 0.14);
 }
 
 .method-btn.active[data-method="cash"] {
@@ -841,7 +850,7 @@ body.dashboard-body {
   font-weight: 600;
   font-size: 14px;
   color: var(--nest-green-dark);
-  background: linear-gradient(120deg, #EAD493, var(--nest-gold));
+  background: linear-gradient(120deg, #8CDB8F, var(--nest-gold));
   border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: 10px;
   padding: 12px 22px;
@@ -928,7 +937,7 @@ body.dashboard-body {
   font-weight: 600;
   font-size: 13px;
   color: var(--nest-green-dark);
-  background: linear-gradient(120deg, #EAD493, var(--nest-gold));
+  background: linear-gradient(120deg, #8CDB8F, var(--nest-gold));
   border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: 8px;
   padding: 9px 16px;
@@ -1315,7 +1324,7 @@ table.admin-table tr:last-child td { border-bottom: none; }
   font-weight: 700;
   padding: 3px 9px;
   border-radius: 999px;
-  background: rgba(212,175,55,0.15);
+  background: rgba(67,162,72,0.15);
   color: var(--nest-gold-accent);
 }
 
