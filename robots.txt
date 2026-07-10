@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+Allow: /index.html
+Allow: /login.html
+Allow: /privacy.html
+
+# Private application pages (require login — no value in indexing)
+Disallow: /dashboard.html
+Disallow: /transactions.html
+Disallow: /budgets.html
+Disallow: /wallets.html
+Disallow: /goals.html
+Disallow: /recurring.html
+Disallow: /settle.html
+Disallow: /reviews.html
+Disallow: /settings.html
+Disallow: /admin.html
+Disallow: /reset-password.html
+Disallow: /email-confirmed.html
+
+Sitemap: https://budgetnest.bond/sitemap.xml

@@ -48,6 +48,7 @@
       'common.day_plural': 'дни',
 
       // ===== Цели за спестяване (goals.html) =====
+      'goals.doc_title': 'Цели — BudgetNest',
       'goals.page_title': 'Цели за спестяване',
       'goals.page_subtitle': 'задай сума, следи прогреса',
       'goals.new_goal_card_title': 'Нова цел',
@@ -92,7 +93,7 @@
       'goals.confirm_delete_message': 'Сигурни ли сте, че искате да изтриете целта „{name}"? Историята на вноските също ще бъде изтрита.',
 
       // ===== Табло (dashboard.html) =====
-      'dashboard.page_title': 'Табло — Бюджет',
+      'dashboard.page_title': 'Табло — BudgetNest',
       'dashboard.summary_income': 'Приходи този месец',
       'dashboard.summary_expense': 'Разходи този месец',
       'dashboard.summary_card': 'В картата',
@@ -662,7 +663,7 @@
       'privacy.back_link': '← Обратно към началото',
 
       // ===== Вход / Регистрация (login.html) =====
-      'login.page_title': 'Влизане — Бюджет',
+      'login.page_title': 'Влизане — BudgetNest',
       'login.brand_mark': 'Бюджет · Домакинство',
       'login.brand_headline_line1': 'Всяко евро,',
       'login.brand_headline_line2': 'под контрол.',
@@ -720,6 +721,7 @@
       'common.day_plural': 'days',
 
       // ===== Savings goals (goals.html) =====
+      'goals.doc_title': 'Goals — BudgetNest',
       'goals.page_title': 'Savings Goals',
       'goals.page_subtitle': 'set an amount, track your progress',
       'goals.new_goal_card_title': 'New Goal',
@@ -764,7 +766,7 @@
       'goals.confirm_delete_message': 'Are you sure you want to delete the goal "{name}"? Its contribution history will be deleted too.',
 
       // ===== Dashboard (dashboard.html) =====
-      'dashboard.page_title': 'Dashboard — Budget',
+      'dashboard.page_title': 'Dashboard — BudgetNest',
       'dashboard.summary_income': 'Income this month',
       'dashboard.summary_expense': 'Expenses this month',
       'dashboard.summary_card': 'On card',
@@ -1334,7 +1336,7 @@
       'privacy.back_link': '← Back to home',
 
       // ===== Login / Signup (login.html) =====
-      'login.page_title': 'Log in — Budget',
+      'login.page_title': 'Log in — BudgetNest',
       'login.brand_mark': 'Budget · Household',
       'login.brand_headline_line1': 'Every euro,',
       'login.brand_headline_line2': 'under control.',

@@ -51,11 +51,24 @@
 <body>
   <div class="mark">🌱</div>
   <div class="code">404</div>
-  <h1>Тази страница я няма</h1>
-  <p>Изглежда сте попаднали на несъществуващ адрес. Да ви върнем при бюджета?</p>
+  <h1 id="t-title">Тази страница я няма</h1>
+  <p id="t-text">Изглежда сте попаднали на несъществуващ адрес. Да ви върнем при бюджета?</p>
   <div class="actions">
-    <a href="dashboard.html" class="btn btn-primary">Към таблото</a>
-    <a href="index.html" class="btn btn-ghost">Начална страница</a>
+    <a href="dashboard.html" class="btn btn-primary" id="t-dash">Към таблото</a>
+    <a href="index.html" class="btn btn-ghost" id="t-home">Начална страница</a>
   </div>
+  <script>
+    (function () {
+      var lang = 'bg';
+      try { lang = localStorage.getItem('budgetnest-lang') || 'bg'; } catch (e) {}
+      if (lang !== 'en') return;
+      document.documentElement.lang = 'en';
+      document.title = 'Page not found — BudgetNest';
+      document.getElementById('t-title').textContent = 'This page doesn’t exist';
+      document.getElementById('t-text').textContent = 'Looks like you landed on an address that isn’t here. Shall we take you back to your budget?';
+      document.getElementById('t-dash').textContent = 'Go to dashboard';
+      document.getElementById('t-home').textContent = 'Home page';
+    })();
+  </script>
 </body>
 </html>
