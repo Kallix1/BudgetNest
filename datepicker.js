@@ -10,11 +10,22 @@
    ============================================ */
 
 (function () {
+  const t = (key, fallback) => (window.BudgetNestI18n ? window.BudgetNestI18n.t(key) : fallback);
+  const getLang = () => (window.BudgetNestI18n ? window.BudgetNestI18n.getLang() : 'bg');
+
   const MONTHS_BG = [
     'януари', 'февруари', 'март', 'април', 'май', 'юни',
     'юли', 'август', 'септември', 'октомври', 'ноември', 'декември'
   ];
+  const MONTHS_EN = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
   const WEEKDAYS_BG = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'нд'];
+  const WEEKDAYS_EN = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+
+  function months() { return getLang() === 'bg' ? MONTHS_BG : MONTHS_EN; }
+  function weekdays() { return getLang() === 'bg' ? WEEKDAYS_BG : WEEKDAYS_EN; }
 
   const CAL_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="3"/><path d="M3 9.5h18"/><path d="M8 3v3M16 3v3"/></svg>`;
 
@@ -32,7 +43,8 @@
   function formatDisplay(str) {
     const p = parseISO(str);
     if (!p) return '';
-    return `${pad2(p.d)}.${pad2(p.m + 1)}.${p.y} г.`;
+    if (getLang() === 'bg') return `${pad2(p.d)}.${pad2(p.m + 1)}.${p.y} г.`;
+    return `${pad2(p.d)}/${pad2(p.m + 1)}/${p.y}`;
   }
 
   function sameDay(a, b) {
@@ -42,6 +54,7 @@
   /* ===== Единствен споделен панел за целия сайт (както при нативния picker) ===== */
   let panelEl = null;
   let activeCtx = null; // { fakeInput, realInput, viewYear, viewMonth }
+  const enhancedInputs = []; // { realInput, fakeInput } — за опресняване при смяна на език
 
   function ensurePanel() {
     if (panelEl) return panelEl;
@@ -50,20 +63,20 @@
     panelEl.innerHTML = `
       <div class="dnp-header">
         <div class="dnp-nav-group">
-          <button type="button" class="dnp-nav-btn" data-act="prev-year" title="Предишна година">«</button>
-          <button type="button" class="dnp-nav-btn" data-act="prev-month" title="Предишен месец">‹</button>
+          <button type="button" class="dnp-nav-btn" data-act="prev-year" title="${t('datepicker.prev_year', 'Предишна година')}">«</button>
+          <button type="button" class="dnp-nav-btn" data-act="prev-month" title="${t('datepicker.prev_month', 'Предишен месец')}">‹</button>
         </div>
         <span class="dnp-title"></span>
         <div class="dnp-nav-group">
-          <button type="button" class="dnp-nav-btn" data-act="next-month" title="Следващ месец">›</button>
-          <button type="button" class="dnp-nav-btn" data-act="next-year" title="Следваща година">»</button>
+          <button type="button" class="dnp-nav-btn" data-act="next-month" title="${t('datepicker.next_month', 'Следващ месец')}">›</button>
+          <button type="button" class="dnp-nav-btn" data-act="next-year" title="${t('datepicker.next_year', 'Следваща година')}">»</button>
         </div>
       </div>
-      <div class="dnp-weekdays">${WEEKDAYS_BG.map(w => `<span>${w}</span>`).join('')}</div>
+      <div class="dnp-weekdays">${weekdays().map(w => `<span>${w}</span>`).join('')}</div>
       <div class="dnp-days"></div>
       <div class="dnp-footer">
-        <button type="button" class="dnp-clear-btn" data-act="clear">Изчистване</button>
-        <button type="button" class="dnp-today-btn" data-act="today">Днес</button>
+        <button type="button" class="dnp-clear-btn" data-act="clear">${t('datepicker.clear', 'Изчистване')}</button>
+        <button type="button" class="dnp-today-btn" data-act="today">${t('datepicker.today', 'Днес')}</button>
       </div>
     `;
     document.body.appendChild(panelEl);
@@ -141,7 +154,9 @@
   function renderDays() {
     const { realInput, viewYear, viewMonth } = activeCtx;
     const titleEl = panelEl.querySelector('.dnp-title');
-    titleEl.textContent = `${MONTHS_BG[viewMonth]} ${viewYear} г.`;
+    titleEl.textContent = getLang() === 'bg'
+      ? `${months()[viewMonth]} ${viewYear} г.`
+      : `${months()[viewMonth]} ${viewYear}`;
 
     const daysEl = panelEl.querySelector('.dnp-days');
     daysEl.innerHTML = '';
@@ -308,7 +323,7 @@
     fakeInput.type = 'text';
     fakeInput.className = 'dnp-fake';
     fakeInput.readOnly = true;
-    fakeInput.placeholder = 'ДД.ММ.ГГГГ г.';
+    fakeInput.placeholder = t('datepicker.placeholder', 'ДД.ММ.ГГГГ г.');
     fakeInput.autocomplete = 'off';
     if (realInput.id) fakeInput.dataset.for = realInput.id;
 
@@ -320,6 +335,8 @@
     wrap.appendChild(realInput);
     wrap.appendChild(fakeInput);
     wrap.appendChild(icon);
+
+    enhancedInputs.push({ realInput, fakeInput });
 
     function syncFakeFromReal() {
       fakeInput.value = realInput.value ? formatDisplay(realInput.value) : '';
@@ -345,6 +362,27 @@
     (root || document).querySelectorAll('input[type="date"]:not([data-dnp-skip])').forEach(enhance);
   }
 
+  // При смяна на език: презареждаме статичния текст в панела (ако вече
+  // съществува), плейсхолдърите на всички вече активирани полета, и
+  // форматирания текст на вече избраните дати (напр. 09.07.2026 г. → 09/07/2026).
+  function refreshLanguage() {
+    if (panelEl) {
+      panelEl.querySelector('[data-act="prev-year"]').title = t('datepicker.prev_year', 'Предишна година');
+      panelEl.querySelector('[data-act="prev-month"]').title = t('datepicker.prev_month', 'Предишен месец');
+      panelEl.querySelector('[data-act="next-month"]').title = t('datepicker.next_month', 'Следващ месец');
+      panelEl.querySelector('[data-act="next-year"]').title = t('datepicker.next_year', 'Следваща година');
+      panelEl.querySelector('.dnp-clear-btn').textContent = t('datepicker.clear', 'Изчистване');
+      panelEl.querySelector('.dnp-today-btn').textContent = t('datepicker.today', 'Днес');
+      const weekdayEls = panelEl.querySelectorAll('.dnp-weekdays span');
+      weekdays().forEach((w, i) => { if (weekdayEls[i]) weekdayEls[i].textContent = w; });
+      if (activeCtx) renderDays();
+    }
+    enhancedInputs.forEach(({ realInput, fakeInput }) => {
+      fakeInput.placeholder = t('datepicker.placeholder', 'ДД.ММ.ГГГГ г.');
+      fakeInput.value = realInput.value ? formatDisplay(realInput.value) : '';
+    });
+  }
+
   function init() {
     enhanceAll(document);
     // Наблюдаваме за динамично добавени input[type="date"] (модали, форми и т.н.)
@@ -359,6 +397,17 @@
     });
     observer.observe(document.body, { childList: true, subtree: true });
   }
+
+  // ВАЖНО: datepicker.js се зарежда ПРЕДИ i18n.js в <head> на повечето
+  // страници. Ако регистрираме onChange веднага (синхронно, докато този
+  // defer скрипт се изпълнява), window.BudgetNestI18n още няма да съществува,
+  // защото defer скриптовете се изпълняват последователно в реда си в
+  // документа. Затова закачаме регистрацията за DOMContentLoaded — това
+  // събитие пука едва СЛЕД като абсолютно всички defer скриптове (вкл.
+  // i18n.js, независимо от реда му) вече са приключили изпълнението си.
+  document.addEventListener('DOMContentLoaded', () => {
+    if (window.BudgetNestI18n) window.BudgetNestI18n.onChange(refreshLanguage);
+  });
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);

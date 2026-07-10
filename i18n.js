@@ -134,8 +134,8 @@
       'dashboard.save_template_btn': 'Запази шаблон',
       'dashboard.form_title_quick': 'Бърза транзакция',
       'dashboard.form_title_edit': 'Редактиране на транзакция',
-      'dashboard.method_card': '💳 Карта',
-      'dashboard.method_cash': '💵 В брой',
+      'dashboard.method_card': 'Карта',
+      'dashboard.method_cash': 'В брой',
       'dashboard.description_label': 'Описание',
       'dashboard.description_placeholder_expense': 'напр. Пазар от Kaufland',
       'dashboard.description_placeholder_income': 'напр. Заплата, Хонорар',
@@ -521,6 +521,36 @@
       'admin.confirm_delete_review_message': 'Сигурни ли сте, че искате да изтриете този отзив? Действието е необратимо.',
       'admin.err_deleting': 'Грешка при изтриване.',
       'admin.toast_review_deleted': 'Отзивът беше изтрит.',
+      'admin.visitors_title': 'Уникални посетители на сайта',
+      'admin.visitors_hint': 'анонимно, по браузър — не изисква акаунт',
+      'admin.visitors_today': 'Днес',
+      'admin.visitors_7d': 'Последните 7 дни',
+      'admin.visitors_30d': 'Последните 30 дни',
+      'admin.visitors_total': 'Общо, откакто следим',
+
+      // ===== Emoji picker (emojipicker.js — споделен компонент) =====
+      'emojipicker.search_placeholder': '🔍 Търсене на икона…',
+      'emojipicker.no_results': 'Няма намерени икони',
+      'emojipicker.group_food': 'Храна и пазар',
+      'emojipicker.group_home': 'Дом',
+      'emojipicker.group_transport': 'Транспорт',
+      'emojipicker.group_shopping': 'Пазаруване',
+      'emojipicker.group_finance': 'Сметки и финанси',
+      'emojipicker.group_fun': 'Забавление',
+      'emojipicker.group_health': 'Здраве',
+      'emojipicker.group_education': 'Образование',
+      'emojipicker.group_travel': 'Пътувания',
+      'emojipicker.group_pets': 'Любимци',
+      'emojipicker.group_other': 'Друго',
+
+      // ===== Календар (datepicker.js — споделен компонент) =====
+      'datepicker.prev_year': 'Предишна година',
+      'datepicker.prev_month': 'Предишен месец',
+      'datepicker.next_month': 'Следващ месец',
+      'datepicker.next_year': 'Следваща година',
+      'datepicker.clear': 'Изчистване',
+      'datepicker.today': 'Днес',
+      'datepicker.placeholder': 'ДД.ММ.ГГГГ г.',
 
       // ===== Кой на кого дължи (settle.html) =====
       'settle.page_title': 'Споделено — BudgetNest',
@@ -569,10 +599,10 @@
       'landing.preview_income': 'Приходи',
       'landing.preview_expense': 'Разходи',
       'landing.preview_remaining': 'Остават',
-      'landing.preview_food': '🛒 Храна',
-      'landing.preview_housing': '🏠 Жилище',
-      'landing.preview_transport': '🚗 Транспорт',
-      'landing.preview_fun': '🎬 Забавления',
+      'landing.preview_food': 'Храна',
+      'landing.preview_housing': 'Жилище',
+      'landing.preview_transport': 'Транспорт',
+      'landing.preview_fun': 'Забавления',
       'landing.features_title': 'Всичко за домашните финанси',
       'landing.features_sub': 'Прости, но мощни инструменти, които правят проследяването на парите лесно за цялото семейство.',
       'landing.feature1_title': 'Споделено домакинство',
@@ -776,8 +806,8 @@
       'dashboard.save_template_btn': 'Save template',
       'dashboard.form_title_quick': 'Quick transaction',
       'dashboard.form_title_edit': 'Edit transaction',
-      'dashboard.method_card': '💳 Card',
-      'dashboard.method_cash': '💵 Cash',
+      'dashboard.method_card': 'Card',
+      'dashboard.method_cash': 'Cash',
       'dashboard.description_label': 'Description',
       'dashboard.description_placeholder_expense': 'e.g. Groceries at Kaufland',
       'dashboard.description_placeholder_income': 'e.g. Salary, Freelance payment',
@@ -1163,6 +1193,36 @@
       'admin.confirm_delete_review_message': 'Are you sure you want to delete this review? This action cannot be undone.',
       'admin.err_deleting': 'Error deleting.',
       'admin.toast_review_deleted': 'The review has been deleted.',
+      'admin.visitors_title': 'Unique website visitors',
+      'admin.visitors_hint': 'anonymous, per browser — no account required',
+      'admin.visitors_today': 'Today',
+      'admin.visitors_7d': 'Last 7 days',
+      'admin.visitors_30d': 'Last 30 days',
+      'admin.visitors_total': 'Total since tracking began',
+
+      // ===== Emoji picker (emojipicker.js — shared component) =====
+      'emojipicker.search_placeholder': '🔍 Search for an icon…',
+      'emojipicker.no_results': 'No icons found',
+      'emojipicker.group_food': 'Food & groceries',
+      'emojipicker.group_home': 'Home',
+      'emojipicker.group_transport': 'Transport',
+      'emojipicker.group_shopping': 'Shopping',
+      'emojipicker.group_finance': 'Bills & finance',
+      'emojipicker.group_fun': 'Entertainment',
+      'emojipicker.group_health': 'Health',
+      'emojipicker.group_education': 'Education',
+      'emojipicker.group_travel': 'Travel',
+      'emojipicker.group_pets': 'Pets',
+      'emojipicker.group_other': 'Other',
+
+      // ===== Calendar (datepicker.js — shared component) =====
+      'datepicker.prev_year': 'Previous year',
+      'datepicker.prev_month': 'Previous month',
+      'datepicker.next_month': 'Next month',
+      'datepicker.next_year': 'Next year',
+      'datepicker.clear': 'Clear',
+      'datepicker.today': 'Today',
+      'datepicker.placeholder': 'DD/MM/YYYY',
 
       // ===== Who owes whom (settle.html) =====
       'settle.page_title': 'Shared — BudgetNest',
@@ -1211,10 +1271,10 @@
       'landing.preview_income': 'Income',
       'landing.preview_expense': 'Expenses',
       'landing.preview_remaining': 'Remaining',
-      'landing.preview_food': '🛒 Food',
-      'landing.preview_housing': '🏠 Housing',
-      'landing.preview_transport': '🚗 Transport',
-      'landing.preview_fun': '🎬 Entertainment',
+      'landing.preview_food': 'Food',
+      'landing.preview_housing': 'Housing',
+      'landing.preview_transport': 'Transport',
+      'landing.preview_fun': 'Entertainment',
       'landing.features_title': 'Everything for your household finances',
       'landing.features_sub': "Simple but powerful tools that make tracking money easy for the whole family.",
       'landing.feature1_title': 'Shared household',
@@ -1357,13 +1417,25 @@
     if (typeof window.onLanguageChange === 'function') {
       window.onLanguageChange(lang);
     }
+    changeListeners.forEach((cb) => {
+      try { cb(lang); } catch (e) { console.error('BudgetNestI18n onChange listener error:', e); }
+    });
+  }
+
+  // Позволява на СПОДЕЛЕНИ компоненти (datepicker.js, emojipicker.js и т.н.),
+  // всеки различен от страницата си собствен window.onLanguageChange, да се
+  // регистрират ОТДЕЛНО за известяване при смяна на език, без да се
+  // презаписват взаимно.
+  const changeListeners = [];
+  function onChange(callback) {
+    if (typeof callback === 'function') changeListeners.push(callback);
   }
 
   function toggleLang() {
     setLang(getLang() === 'bg' ? 'en' : 'bg');
   }
 
-  window.BudgetNestI18n = { t, getLang, setLang, toggleLang, applyTranslations };
+  window.BudgetNestI18n = { t, getLang, setLang, toggleLang, applyTranslations, onChange };
   window.toggleLang = toggleLang; // за директен onclick="toggleLang()" в HTML
 
   function init() {

@@ -7,16 +7,17 @@
 <title data-i18n="privacy.page_title">Поверителност — BudgetNest</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="i18n.js?v=5" defer></script>
+<script src="i18n.js?v=9" defer></script>
+<script src="analytics.js?v=1" defer></script>
 <style>
   :root {
     --bg-void:#F4F6F8; --bg-panel:#FFFFFF; --border-soft:#E2E8F0;
-    --nest-green-mid:#254A37; --nest-green-light:#366A4F; --nest-gold-accent:#C5A028;
+    --nest-green-mid:#254A37; --nest-green-light:#366A4F; --nest-gold-accent:#21813A;
     --text-primary:#1A202C; --text-secondary:#4A5568; --text-dim:#718096;
   }
   [data-theme="dark"] {
-    --bg-void:#0F1E17; --bg-panel:#16261D; --border-soft:rgba(255,255,255,0.08);
-    --nest-green-mid:#3E7A5A; --nest-green-light:#56916D; --nest-gold-accent:#D4AF37;
+    --bg-void:#0A0F14; --bg-panel:#10161C; --border-soft:rgba(255,255,255,0.06);
+    --nest-green-mid:#2E5A3D; --nest-green-light:#3E7A50; --nest-gold-accent:#368A3C;
     --text-primary:#F1F5F1; --text-secondary:#A9BDAF; --text-dim:#6E8577;
   }
   body { transition: background-color 0.25s ease, color 0.25s ease; }
@@ -28,7 +29,7 @@
     padding:16px 24px; border-bottom:1px solid var(--border-soft);
   }
   .logo { display:flex; align-items:center; gap:8px; font-weight:700; font-size:19px; text-decoration:none; color:inherit; }
-  .logo-mark { width:28px; height:28px; border-radius:8px; background:linear-gradient(135deg,var(--nest-green-mid),var(--nest-green-light)); display:flex; align-items:center; justify-content:center; }
+  .logo-mark { width:22px; height:22px; color:var(--nest-gold); display:flex; align-items:center; justify-content:center; } .logo-mark svg { width:100%; height:100%; }
   .header-actions { display:flex; align-items:center; gap:14px; }
   .theme-toggle {
     display:flex; align-items:center; justify-content:center;
@@ -58,7 +59,7 @@
 </head>
 <body>
 <header>
-  <a href="index.html" class="logo"><span class="logo-mark">🌱</span> BudgetNest</a>
+  <a href="index.html" class="logo"><span class="logo-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 9.8V19a1.3 1.3 0 0 0 1.3 1.3h10.4A1.3 1.3 0 0 0 18.5 19V9.8"></path><path d="M9.2 19v-4.2c0-1.1.6-1.9 1.6-2.3.9-.3 1.6-1.1 1.6-2.1 0-1.2-1-2.1-2.1-1.9-.8.1-1.4.7-1.6 1.4"></path></svg></span> BudgetNest</a>
   <div class="header-actions">
     <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" data-i18n-title="nav.theme_toggle_title" title="Смяна на тема" aria-label="Смяна на тема"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-toggle-icon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button>
     <button class="theme-toggle" id="lang-toggle-btn" onclick="toggleLang()" data-i18n-title="nav.lang_toggle_title" title="Смяна на език">EN</button>

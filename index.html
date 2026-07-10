@@ -9,7 +9,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="i18n.js?v=5" defer></script>
+<script src="i18n.js?v=9" defer></script>
+<script src="analytics.js?v=1" defer></script>
 <style>
   :root {
     --bg-void: #F4F6F8;
@@ -18,21 +19,21 @@
     --nest-green-dark: #1A3326;
     --nest-green-mid: #254A37;
     --nest-green-light: #366A4F;
-    --nest-gold: #D4AF37;
-    --nest-gold-accent: #C5A028;
+    --nest-gold: #2E9E44;
+    --nest-gold-accent: #21813A;
     --text-primary: #1A202C;
     --text-secondary: #4A5568;
     --text-dim: #718096;
   }
   [data-theme="dark"] {
-    --bg-void: #0F1E17;
-    --bg-panel: #16261D;
-    --border-soft: rgba(255,255,255,0.08);
-    --nest-green-dark: #0C1912;
-    --nest-green-mid: #3E7A5A;
-    --nest-green-light: #56916D;
-    --nest-gold: #E3C067;
-    --nest-gold-accent: #D4AF37;
+    --bg-void: #0A0F14;
+    --bg-panel: #10161C;
+    --border-soft: rgba(255,255,255,0.06);
+    --nest-green-dark: #0A0F14;
+    --nest-green-mid: #2E5A3D;
+    --nest-green-light: #3E7A50;
+    --nest-gold: #43A248;
+    --nest-gold-accent: #368A3C;
     --text-primary: #F1F5F1;
     --text-secondary: #A9BDAF;
     --text-dim: #6E8577;
@@ -89,10 +90,10 @@
   .btn-ghost:hover { background: var(--bg-panel); }
   .btn-primary {
     background: linear-gradient(135deg, var(--nest-gold), var(--nest-gold-accent));
-    color: #1A1200;
-    box-shadow: 0 4px 14px rgba(197,160,40,0.28);
+    color: var(--nest-green-dark);
+    box-shadow: 0 4px 14px rgba(67,162,72,0.28);
   }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(197,160,40,0.38); }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(67,162,72,0.38); }
 
   /* ===== Hero ===== */
   .hero {
@@ -145,7 +146,8 @@
   .stat-card .lbl { font-size: 12px; color: var(--text-dim); margin-bottom: 6px; }
   .stat-card .val { font-size: 22px; font-weight: 700; font-family: 'Fraunces', serif; }
   .bar-row { display: flex; align-items: center; gap: 12px; }
-  .bar-name { font-size: 13px; color: var(--text-secondary); width: 90px; flex-shrink: 0; }
+  .bar-name { font-size: 13px; color: var(--text-secondary); width: 90px; flex-shrink: 0; display: flex; align-items: center; gap: 6px; }
+  .bar-name svg { width: 14px; height: 14px; flex-shrink: 0; }
   .bar-track { flex: 1; height: 9px; background: var(--border-soft); border-radius: 999px; overflow: hidden; }
   .bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--nest-green-mid), var(--nest-green-light)); }
 
@@ -164,10 +166,12 @@
   }
   .feature:hover { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(0,0,0,0.08); }
   .feature-icon {
-    width: 46px; height: 46px; border-radius: 12px; font-size: 22px;
+    width: 46px; height: 46px; border-radius: 12px;
     display: flex; align-items: center; justify-content: center; margin-bottom: 16px;
     background: color-mix(in srgb, var(--nest-green-light) 14%, transparent);
+    color: var(--nest-gold);
   }
+  .feature-icon svg { width: 22px; height: 22px; }
   .feature h3 { font-size: 18px; margin-bottom: 8px; }
   .feature p { font-size: 14.5px; color: var(--text-secondary); }
 
@@ -178,7 +182,7 @@
     width: 44px; height: 44px; border-radius: 50%; margin: 0 auto 14px;
     display: flex; align-items: center; justify-content: center;
     font-family: 'Fraunces', serif; font-weight: 700; font-size: 18px;
-    color: #1A1200; background: linear-gradient(135deg, var(--nest-gold), var(--nest-gold-accent));
+    color: var(--nest-green-dark); background: linear-gradient(135deg, var(--nest-gold), var(--nest-gold-accent));
   }
   .step h3 { font-size: 17px; margin-bottom: 6px; }
   .step p { font-size: 14px; color: var(--text-secondary); }
@@ -217,7 +221,7 @@
 
 <header>
   <a href="index.html" class="logo">
-    <span class="logo-mark">🌱</span>
+    <span class="logo-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 9.8V19a1.3 1.3 0 0 0 1.3 1.3h10.4A1.3 1.3 0 0 0 18.5 19V9.8"></path><path d="M9.2 19v-4.2c0-1.1.6-1.9 1.6-2.3.9-.3 1.6-1.1 1.6-2.1 0-1.2-1-2.1-2.1-1.9-.8.1-1.4.7-1.6 1.4"></path></svg></span>
     BudgetNest
   </a>
   <div class="header-actions">
@@ -257,10 +261,10 @@
         <div class="stat-card"><div class="lbl" data-i18n="landing.preview_remaining">Остават</div><div class="val">567 €</div></div>
       </div>
       <div style="display:grid; gap:12px; margin-top:4px;">
-        <div class="bar-row"><span class="bar-name" data-i18n="landing.preview_food">🛒 Храна</span><div class="bar-track"><div class="bar-fill" style="width:78%;"></div></div></div>
-        <div class="bar-row"><span class="bar-name" data-i18n="landing.preview_housing">🏠 Жилище</span><div class="bar-track"><div class="bar-fill" style="width:62%;"></div></div></div>
-        <div class="bar-row"><span class="bar-name" data-i18n="landing.preview_transport">🚗 Транспорт</span><div class="bar-track"><div class="bar-fill" style="width:41%;"></div></div></div>
-        <div class="bar-row"><span class="bar-name" data-i18n="landing.preview_fun">🎬 Забавления</span><div class="bar-track"><div class="bar-fill" style="width:28%;"></div></div></div>
+        <div class="bar-row"><span class="bar-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1.4"></circle><circle cx="18" cy="21" r="1.4"></circle><path d="M2.5 3h2.5l2.6 12.2a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 2-1.55L21.5 8H6.2"></path></svg><span data-i18n="landing.preview_food">Храна</span></span><div class="bar-track"><div class="bar-fill" style="width:78%;"></div></div></div>
+        <div class="bar-row"><span class="bar-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 11.5 12 4l8.5 7.5"></path><path d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9"></path><path d="M9.5 20v-6h5v6"></path></svg><span data-i18n="landing.preview_housing">Жилище</span></span><div class="bar-track"><div class="bar-fill" style="width:62%;"></div></div></div>
+        <div class="bar-row"><span class="bar-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16V9.5a1 1 0 0 1 .6-.9l2.4-1 1.3-2.6a1 1 0 0 1 .9-.6h5.6a1 1 0 0 1 .9.6l1.3 2.6 2.4 1a1 1 0 0 1 .6.9V16"></path><path d="M3 16h18v2.5a.5.5 0 0 1-.5.5H19a1 1 0 0 1-1-1v-.6H6v.6a1 1 0 0 1-1 1H3.5a.5.5 0 0 1-.5-.5V16Z"></path><circle cx="7.5" cy="16" r="1.4"></circle><circle cx="16.5" cy="16" r="1.4"></circle></svg><span data-i18n="landing.preview_transport">Транспорт</span></span><div class="bar-track"><div class="bar-fill" style="width:41%;"></div></div></div>
+        <div class="bar-row"><span class="bar-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M3 9h18M3 15h18M8 4v16M16 4v16"></path></svg><span data-i18n="landing.preview_fun">Забавления</span></span><div class="bar-track"><div class="bar-fill" style="width:28%;"></div></div></div>
       </div>
     </div>
   </div>
@@ -273,32 +277,32 @@
     <p class="section-sub" data-i18n="landing.features_sub">Прости, но мощни инструменти, които правят проследяването на парите лесно за цялото семейство.</p>
     <div class="features">
       <div class="feature">
-        <div class="feature-icon">👨‍👩‍👧</div>
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="3.2"></circle><circle cx="17" cy="9" r="2.6"></circle><path d="M2.5 20c0-3.3 2.5-5.8 5.5-5.8s5.5 2.5 5.5 5.8"></path><path d="M14.5 14.6c2.7.3 4.7 2.5 4.7 5.4"></path></svg></div>
         <h3 data-i18n="landing.feature1_title">Споделено домакинство</h3>
         <p data-i18n="landing.feature1_text">Поканете партньор или член на семейството и водете общ бюджет. Всеки вижда своя принос в реално време.</p>
       </div>
       <div class="feature">
-        <div class="feature-icon">🎯</div>
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"></circle><circle cx="12" cy="12" r="5"></circle><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"></circle></svg></div>
         <h3 data-i18n="landing.feature2_title">Месечни лимити</h3>
         <p data-i18n="landing.feature2_text">Задайте лимит за всяка категория и следете колко ви остава. Приложението ви предупреждава, преди да прекалите.</p>
       </div>
       <div class="feature">
-        <div class="feature-icon">📈</div>
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17 9 11l4 4 8-8"></path><path d="M15 7h6v6"></path></svg></div>
         <h3 data-i18n="landing.feature3_title">Тенденции във времето</h3>
         <p data-i18n="landing.feature3_text">Вижте как се движат разходите ви месец след месец и открийте къде можете да спестите.</p>
       </div>
       <div class="feature">
-        <div class="feature-icon">🥧</div>
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 9 9h-9V3Z"></path><path d="M15.5 3.5A9 9 0 0 1 20.5 8.5H15.5V3.5Z"></path></svg></div>
         <h3 data-i18n="landing.feature4_title">Разбивка по категория</h3>
         <p data-i18n="landing.feature4_text">Нагледни диаграми показват точно за какво отиват парите ви — без ровене в квитанции.</p>
       </div>
       <div class="feature">
-        <div class="feature-icon">🇧🇬</div>
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20v-4"></path><path d="M2 20h20"></path></svg></div>
         <h3 data-i18n="landing.feature5_title">Сравнение със средното</h3>
         <p data-i18n="landing.feature5_text">Разберете как разходите ви се сравняват със средните за българско домакинство.</p>
       </div>
       <div class="feature">
-        <div class="feature-icon">📤</div>
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M4 17v2.5a1.5 1.5 0 0 0 1.5 1.5h13a1.5 1.5 0 0 0 1.5-1.5V17"></path></svg></div>
         <h3 data-i18n="landing.feature6_title">Експорт на данни</h3>
         <p data-i18n="landing.feature6_text">Изтеглете транзакциите си като CSV файл по всяко време — вашите данни са си ваши.</p>
       </div>
@@ -342,7 +346,7 @@
 
 <footer>
   <div class="logo" style="font-size:16px;">
-    <span class="logo-mark" style="width:24px;height:24px;font-size:13px;">🌱</span>
+    <span class="logo-mark" style="width:20px;height:20px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 9.8V19a1.3 1.3 0 0 0 1.3 1.3h10.4A1.3 1.3 0 0 0 18.5 19V9.8"></path><path d="M9.2 19v-4.2c0-1.1.6-1.9 1.6-2.3.9-.3 1.6-1.1 1.6-2.1 0-1.2-1-2.1-2.1-1.9-.8.1-1.4.7-1.6 1.4"></path></svg></span>
     BudgetNest
   </div>
   <div class="footer-links">

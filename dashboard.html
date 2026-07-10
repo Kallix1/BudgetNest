@@ -8,12 +8,14 @@
 <meta name="description" content="Табло на BudgetNest — общ преглед на приходите, разходите и баланса на домакинството.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght=500;600;700&family=Inter:wght=400;500;600;700&family=IBM+Plex+Mono:wght=400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=14">
-<link rel="stylesheet" href="css/dashboard.css?v=14">
+<link rel="stylesheet" href="css/style.css?v=15">
+<link rel="stylesheet" href="css/dashboard.css?v=15">
 <link rel="stylesheet" href="css/datepicker.css?v=1">
-<script src="datepicker.js?v=2" defer></script>
+<script src="datepicker.js?v=3" defer></script>
 <script src="nav.js?v=10" defer></script>
-<script src="i18n.js?v=5" defer></script>
+<script src="i18n.js?v=9" defer></script>
+<script src="analytics.js?v=1" defer></script>
+<script src="icons.js?v=1" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 
@@ -58,22 +60,22 @@
 <nav class="navbar">
   <div class="nav-left">
     <div class="nav-left-header">
-      <a href="dashboard.html" class="brand-mark" style="text-decoration:none; cursor:pointer;">BudgetNest</a>
+      <a href="dashboard.html" class="brand-mark" id="brand-mark-link" style="text-decoration:none; cursor:pointer;">BudgetNest</a>
       <button class="nav-toggle" type="button" aria-label="Меню" aria-expanded="false" aria-controls="nav-links">
         <span></span><span></span><span></span>
       </button>
     </div>
     <div class="nav-links" id="nav-links">
-      <a href="dashboard.html" class="nav-link active" data-i18n="nav.dashboard">Табло</a>
-      <a href="transactions.html" class="nav-link" data-i18n="nav.transactions">Транзакции</a>
-      <a href="budgets.html" class="nav-link" data-i18n="nav.budgets">Бюджети</a>
-      <a href="wallets.html" class="nav-link" data-i18n="nav.wallets">Портфейл</a>
-      <a href="goals.html" class="nav-link" data-i18n="nav.goals">Цели</a>
-      <a href="recurring.html" class="nav-link" data-i18n="nav.recurring">Периодични</a>
-      <a href="settle.html" class="nav-link" id="settle-nav-link" style="display:none;" data-i18n="nav.settle">Споделено</a>
-      <a href="reviews.html" class="nav-link" data-i18n="nav.reviews">Отзиви</a>
-      <a href="settings.html" class="nav-link" data-i18n="nav.settings">Настройки</a>
-      <a href="admin.html" class="nav-link" id="admin-nav-link" style="display:none;"><span data-i18n="nav.admin">Админ</span></a>
+      <a href="dashboard.html" class="nav-link active"><span class="nav-icon" id="nav-icon-dashboard"></span><span data-i18n="nav.dashboard">Табло</span></a>
+      <a href="transactions.html" class="nav-link"><span class="nav-icon" id="nav-icon-transactions"></span><span data-i18n="nav.transactions">Транзакции</span></a>
+      <a href="budgets.html" class="nav-link"><span class="nav-icon" id="nav-icon-budgets"></span><span data-i18n="nav.budgets">Бюджети</span></a>
+      <a href="wallets.html" class="nav-link"><span class="nav-icon" id="nav-icon-wallet"></span><span data-i18n="nav.wallets">Портфейл</span></a>
+      <a href="goals.html" class="nav-link"><span class="nav-icon" id="nav-icon-goals"></span><span data-i18n="nav.goals">Цели</span></a>
+      <a href="recurring.html" class="nav-link"><span class="nav-icon" id="nav-icon-recurring"></span><span data-i18n="nav.recurring">Периодични</span></a>
+      <a href="settle.html" class="nav-link" id="settle-nav-link" style="display:none;"><span class="nav-icon" id="nav-icon-settle"></span><span data-i18n="nav.settle">Споделено</span></a>
+      <a href="reviews.html" class="nav-link"><span class="nav-icon" id="nav-icon-reviews"></span><span data-i18n="nav.reviews">Отзиви</span></a>
+      <a href="settings.html" class="nav-link"><span class="nav-icon" id="nav-icon-settings"></span><span data-i18n="nav.settings">Настройки</span></a>
+      <a href="admin.html" class="nav-link" id="admin-nav-link" style="display:none;"><span class="nav-icon" id="nav-icon-admin"></span><span data-i18n="nav.admin">Админ</span></a>
     </div>
   </div>
   <div class="nav-right">
@@ -232,8 +234,8 @@
           </div>
 
           <div class="method-toggle" id="tx-method-toggle">
-            <button type="button" class="method-btn active" data-method="card" onclick="setQuickMethod('card')" data-i18n="dashboard.method_card">💳 Карта</button>
-            <button type="button" class="method-btn" data-method="cash" onclick="setQuickMethod('cash')" data-i18n="dashboard.method_cash">💵 В брой</button>
+            <button type="button" class="method-btn active" data-method="card" onclick="setQuickMethod('card')"><span class="method-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-3px;margin-right:5px;"><rect x="2.5" y="5" width="19" height="14" rx="2.2"></rect><path d="M2.5 9.5h19"></path><path d="M6 14.5h4"></path></svg></span><span data-i18n="dashboard.method_card">Карта</span></button>
+            <button type="button" class="method-btn" data-method="cash" onclick="setQuickMethod('cash')"><span class="method-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-3px;margin-right:5px;"><rect x="2" y="6.5" width="20" height="11" rx="1.6"></rect><circle cx="12" cy="12" r="2.6"></circle><path d="M5.5 6.5v0M18.5 17.5v0"></path></svg></span><span data-i18n="dashboard.method_cash">В брой</span></button>
           </div>
 
           <div class="field full">
@@ -324,7 +326,7 @@
 
 <div class="overlay" id="invite-modal-overlay" style="display:none; z-index: 9999;">
   <div class="overlay-card" style="max-width: 420px; text-align: center; padding: 30px;">
-    <div style="font-size: 40px; margin-bottom: 15px;">🏠</div>
+    <div style="width: 40px; height: 40px; margin: 0 auto 15px; color: var(--nest-gold-accent);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="width:100%;height:100%;"><path d="M3.5 11.5 12 4l8.5 7.5"></path><path d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9"></path><path d="M9.5 20v-6h5v6"></path></svg></div>
     <h3 data-i18n="dashboard.invite_title" style="margin-bottom: 10px; font-family: 'Space Grotesk', sans-serif; font-size: 20px; color: var(--text-primary);">Покана за домакинство</h3>
     <p id="invite-modal-text" style="color: var(--text-secondary); margin-bottom: 25px; font-size: 14px; line-height: 1.5;">
       Поканени сте да се присъедините към <b id="invite-household-name" style="color: var(--text-primary);">домакинство</b>. Искате ли да приемете поканата?
@@ -351,6 +353,13 @@
   function toggleTheme() {
     const current = document.documentElement.getAttribute('data-theme') || 'light';
     applyTheme(current === 'dark' ? 'light' : 'dark');
+    // ВАЖНО: Chart.js рисува директно върху canvas и "запича" цветовете
+    // (текст на легендата, оси, мрежа) в момента на създаване на диаграмата —
+    // за разлика от обикновен HTML/CSS текст, той НЕ се обновява автоматично
+    // само защото CSS променливите за темата са се сменили. Затова пре-
+    // рендираме диаграмата за тенденция тук изрично, иначе текстът ѝ остава
+    // с цветовете от старата тема (напр. светъл текст върху светъл фон).
+    if (currentHouseholdId) loadTrend();
   }
 
   applyTheme(localStorage.getItem('budgetnest-theme') || 'light');
@@ -415,7 +424,16 @@
   // Само за показване на линка "Админ" в менюто — реалната защита е в SQL (is_admin())
   const ADMIN_EMAILS = ['choko2009vr@gmail.com']; // <-- замени с истинския си имейл
 
-  const CATEGORY_COLORS = ['#00E8FF', '#FF3EC9', '#8B5CF6', '#FFC24B', '#4BFFB0', '#FF7A7A', '#4B9FFF'];
+  // ===== Палитра за диаграмата — по-широк спектър (зелено→тюркоаз→синьо,
+  // плюс едно златно контра), за да се различават категориите ясно дори
+  // когато има много от тях, но усещането остава едно цяло, не дъга. =====
+  const CATEGORY_COLORS = ['#3E9C6A', '#2AB7A9', '#4FC3E0', '#1F6B4A', '#8FD9C4', '#D4AF37', '#6B8F71'];
+
+  // Custom SVG иконките (навигация, категории, лого) вече живеят в
+  // споделения icons.js — тук само правим удобен локален alias.
+  const renderCatIcon = (emoji, sizePx) =>
+    window.BudgetNestIcons ? window.BudgetNestIcons.renderCatIcon(emoji, sizePx) : escapeHtml(emoji || '💰');
+
   const DEFAULT_CATEGORIES = [
     { nameKey: 'dashboard.default_category_food', icon: '🛒', type: 'expense' },
     { nameKey: 'dashboard.default_category_housing', icon: '🏠', type: 'expense' },
@@ -934,13 +952,7 @@
       return;
     }
 
-    const colors = labels.map((_, i) => {
-      if (!isExpenseView) {
-        const incomeColors = ['#10B981', '#06B6D4', '#22C55E', '#3B82F6', '#84CC16', '#F59E0B', '#14B8A6'];
-        return incomeColors[i % incomeColors.length];
-      }
-      return CATEGORY_COLORS[i % CATEGORY_COLORS.length];
-    });
+    const colors = labels.map((_, i) => CATEGORY_COLORS[i % CATEGORY_COLORS.length]);
 
     if (dashboardChart) dashboardChart.destroy();
     dashboardChart = new Chart(document.getElementById('expense-chart'), {
@@ -1010,10 +1022,10 @@
         : '';
       return `
         <div class="tx-row" onclick="prepareEditTransaction('${t.id}')" style="cursor: pointer;" title="${escapeHtml(tr('dashboard.tx_edit_hint'))}">
-          <div class="tx-icon">${escapeHtml(t.categories?.icon) || '💰'}</div>
+          <div class="tx-icon">${renderCatIcon(t.categories?.icon, 22)}</div>
           <div class="tx-info">
             <div class="tx-desc">${escapeHtml(t.description || t.categories?.name) || '—'}</div>
-            <div class="tx-meta">${t.payment_method === 'cash' ? '💵' : t.payment_method === 'card' ? '💳' : ''} ${escapeHtml(t.transaction_date)} <span style="color: var(--nest-gold); font-size: 11px; margin-left: 6px; font-weight:600;">${escapeHtml(tr('dashboard.edit_hint_inline'))}</span>${actorName}</div>
+            <div class="tx-meta">${t.payment_method === 'cash' ? renderCatIcon('💵', 14) : t.payment_method === 'card' ? renderCatIcon('💳', 14) : ''} ${escapeHtml(t.transaction_date)} <span style="color: var(--nest-gold); font-size: 11px; margin-left: 6px; font-weight:600;">${escapeHtml(tr('dashboard.edit_hint_inline'))}</span>${actorName}</div>
           </div>
           <div class="tx-amount ${isIncome ? 'income' : 'expense'}">${sign} ${eur(t.amount)}</div>
         </div>`;
@@ -1236,7 +1248,7 @@
     }
     container.innerHTML = templates.map(t => `
       <span class="template-chip" onclick="handleUseTemplate('${t.id}')" title="${escapeHtml(tr('dashboard.template_use_title'))}">
-        <span>${escapeHtml(t.icon) || (t.categories?.icon || '⚡')}</span>
+        <span>${renderCatIcon(t.icon || t.categories?.icon || '⚡', 18)}</span>
         <span>${escapeHtml(t.name)}</span>
         <span class="tpl-amount">${t.categories?.type === 'income' ? '+' : '−'} ${eur(t.amount)}</span>
         <span class="tpl-remove" onclick="event.stopPropagation(); handleDeleteTemplate('${t.id}')" title="${escapeHtml(tr('dashboard.template_remove_title'))}">×</span>
