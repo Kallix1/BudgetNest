@@ -239,7 +239,7 @@ body.dashboard-body {
 .summary-value.expense { color: #DC2626; }
 .summary-value.balance { color: var(--text-primary); }
 .summary-value.card-balance { color: var(--nest-gold-accent); }
-.summary-value.cash-balance { color: var(--nest-green-mid); }
+.summary-value.cash-balance { color: var(--color-income); }
 
 /* ===== Портфейл (карта / в брой) ===== */
 .wallet-row {
@@ -278,7 +278,7 @@ body.dashboard-body {
 }
 
 .wallet-value.is-card { color: var(--nest-gold-accent); }
-.wallet-value.is-cash { color: var(--nest-green-mid); }
+.wallet-value.is-cash { color: var(--color-income); }
 
 .wallet-edit-row {
   display: flex;
