@@ -122,6 +122,12 @@
     align-items: center;
     gap: 10px;
     min-width: 0;
+    flex: 1;
+  }
+  /* Важно: вътрешната обвивка също трябва да може да се свива (min-width:0),
+     иначе дългите имена не се съкращават с многоточие и се застъпват с датата. */
+  .review-author-meta {
+    min-width: 0;
   }
   .review-avatar {
     width: 34px;
@@ -515,7 +521,7 @@
         <div class="review-card-head">
           <div class="review-author">
             <div class="review-avatar">${escapeHtml(initials(r.author_name))}</div>
-            <div>
+            <div class="review-author-meta">
               <div class="review-author-name">
                 ${escapeHtml(r.author_name)}
                 ${r.user_id === currentUser.id ? `<span class="mine-tag">${escapeHtml(tr('reviews.mine_tag'))}</span>` : ''}

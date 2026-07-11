@@ -215,6 +215,21 @@
     .features { grid-template-columns: 1fr; }
     .hero { padding-top: 50px; }
     section { padding: 50px 20px; }
+
+    /* Хедърът на телефон: компактни отстъпия и бутони, за да не излиза
+       бутонът „Създай акаунт" извън екрана и да не се налага скролване встрани. */
+    header { padding: 12px 14px; }
+    .header-actions { gap: 8px; }
+    .header-actions .btn { padding: 9px 14px; font-size: 13px; border-radius: 9px; }
+    .theme-toggle { width: 34px; height: 34px; font-size: 15px; }
+  }
+
+  /* На тесни телефони скриваме дублиращия бутон „Вход" (login.html така или
+     иначе има раздел за вход), за да остане място за основния призив
+     „Създай акаунт" и нищо да не изтича извън екрана. */
+  @media (max-width: 460px) {
+    .nav-login-link { display: none; }
+    .logo { font-size: 18px; }
   }
 </style>
 </head>
@@ -228,7 +243,7 @@
   <div class="header-actions">
     <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" data-i18n-title="nav.theme_toggle_title" title="Смяна на тема" aria-label="Смяна на тема"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-toggle-icon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button>
     <button class="theme-toggle" id="lang-toggle-btn" onclick="toggleLang()" data-i18n-title="nav.lang_toggle_title" title="Смяна на език">EN</button>
-    <a href="login.html" class="btn btn-ghost" data-i18n="landing.nav_login">Вход</a>
+    <a href="login.html" class="btn btn-ghost nav-login-link" data-i18n="landing.nav_login">Вход</a>
     <a href="login.html" class="btn btn-primary" data-i18n="landing.nav_signup">Създай акаунт</a>
   </div>
 </header>

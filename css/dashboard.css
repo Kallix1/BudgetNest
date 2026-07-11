@@ -1318,6 +1318,17 @@ table.admin-table td {
 
 table.admin-table tr:last-child td { border-bottom: none; }
 
+/* Клетката с текста на отзива трябва да се пренася на нови редове и да е
+   ограничена по ширина, за да не изтича върху колоните Дата/Статус/Действия
+   (глобалното правило за td е white-space: nowrap). */
+.admin-review-text {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  max-width: 360px;
+  min-width: 200px;
+  line-height: 1.5;
+}
+
 .admin-badge {
   display: inline-block;
   font-size: 11px;
