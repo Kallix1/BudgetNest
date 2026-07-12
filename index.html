@@ -8,7 +8,7 @@
 <meta name="description" data-i18n-content="landing.meta_description" content="BudgetNest е споделен семеен бюджет: следете приходи и разходи в евро, задавайте месечни лимити по категория и вижте къде отиват парите ви — заедно, в реално време.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="i18n.js?v=9" defer></script>
 <script src="analytics.js?v=1" defer></script>
 <script src="icons.js?v=2" defer></script>
@@ -62,7 +62,7 @@
   .logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 20px; }
   .logo-mark {
     width: 30px; height: 30px; border-radius: 8px;
-    background: linear-gradient(135deg, var(--nest-green-mid), var(--nest-green-light));
+    background: var(--nest-green-mid); color: #FFFFFF;
     display: flex; align-items: center; justify-content: center; font-size: 16px;
   }
   .header-actions { display: flex; align-items: center; gap: 10px; }
@@ -90,11 +90,13 @@
   .btn-ghost { background: transparent; color: var(--text-primary); border-color: var(--border-soft); }
   .btn-ghost:hover { background: var(--bg-panel); }
   .btn-primary {
-    background: linear-gradient(135deg, var(--nest-gold), var(--nest-gold-accent));
-    color: var(--nest-green-dark);
-    box-shadow: 0 4px 14px rgba(67,162,72,0.28);
+    background: var(--nest-gold-accent);
+    color: #FFFFFF;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
   }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(67,162,72,0.38); }
+  .btn-primary:hover { transform: translateY(-1px); background: color-mix(in srgb, var(--nest-gold-accent) 88%, black); box-shadow: 0 3px 8px rgba(0,0,0,0.12); }
+  [data-theme="dark"] .btn-primary { background: var(--nest-gold); color: var(--nest-green-dark); }
+  [data-theme="dark"] .btn-primary:hover { background: color-mix(in srgb, var(--nest-gold) 90%, white); }
 
   /* ===== Hero ===== */
   .hero {
@@ -108,14 +110,14 @@
     border: 1px solid color-mix(in srgb, var(--nest-green-light) 30%, transparent);
     padding: 6px 14px; border-radius: 999px; margin-bottom: 24px;
   }
+  .hero-badge svg { width: 17px; height: 12px; border-radius: 2px; flex-shrink: 0; box-shadow: 0 0 0 1px rgba(0,0,0,0.10); }
   .hero h1 {
-    font-family: 'Fraunces', serif; font-weight: 600;
+    font-family: 'Playfair Display', serif; font-weight: 600;
     font-size: clamp(34px, 6vw, 60px); line-height: 1.1;
     letter-spacing: -0.02em; margin-bottom: 20px;
   }
   .hero h1 .accent {
-    background: linear-gradient(120deg, var(--nest-green-light), var(--nest-gold));
-    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    color: var(--nest-gold-accent);
   }
   .hero p {
     font-size: clamp(16px, 2.2vw, 19px); color: var(--text-secondary);
@@ -131,7 +133,7 @@
   .preview-window {
     background: var(--bg-panel); border: 1px solid var(--border-soft);
     border-radius: 18px; overflow: hidden;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.12);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.10);
   }
   .preview-bar {
     display: flex; align-items: center; gap: 7px;
@@ -145,18 +147,18 @@
     border-radius: 12px; padding: 16px;
   }
   .stat-card .lbl { font-size: 12px; color: var(--text-dim); margin-bottom: 6px; }
-  .stat-card .val { font-size: 22px; font-weight: 700; font-family: 'Fraunces', serif; }
+  .stat-card .val { font-size: 22px; font-weight: 700; font-family: 'Playfair Display', serif; }
   .bar-row { display: flex; align-items: center; gap: 12px; }
   .bar-name { font-size: 13px; color: var(--text-secondary); width: 90px; flex-shrink: 0; display: flex; align-items: center; gap: 6px; }
   .bar-name svg { width: 14px; height: 14px; flex-shrink: 0; }
   .bar-track { flex: 1; height: 9px; background: var(--border-soft); border-radius: 999px; overflow: hidden; }
-  .bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--nest-green-mid), var(--nest-green-light)); }
+  .bar-fill { height: 100%; border-radius: 999px; background: var(--nest-green-mid); }
 
   /* ===== Features ===== */
   section { padding: 70px 24px; }
   .section-inner { max-width: 1100px; margin: 0 auto; }
   .section-title {
-    text-align: center; font-family: 'Fraunces', serif; font-weight: 600;
+    text-align: center; font-family: 'Playfair Display', serif; font-weight: 600;
     font-size: clamp(26px, 4vw, 38px); margin-bottom: 12px; letter-spacing: -0.01em;
   }
   .section-sub { text-align: center; color: var(--text-secondary); max-width: 560px; margin: 0 auto 46px; }
@@ -165,7 +167,7 @@
     background: var(--bg-panel); border: 1px solid var(--border-soft);
     border-radius: 16px; padding: 28px; transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
-  .feature:hover { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(0,0,0,0.08); }
+  .feature:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.06); }
   .feature-icon {
     width: 46px; height: 46px; border-radius: 12px;
     display: flex; align-items: center; justify-content: center; margin-bottom: 16px;
@@ -182,8 +184,8 @@
   .step-num {
     width: 44px; height: 44px; border-radius: 50%; margin: 0 auto 14px;
     display: flex; align-items: center; justify-content: center;
-    font-family: 'Fraunces', serif; font-weight: 700; font-size: 18px;
-    color: var(--nest-green-dark); background: linear-gradient(135deg, var(--nest-gold), var(--nest-gold-accent));
+    font-family: 'Playfair Display', serif; font-weight: 700; font-size: 18px;
+    color: #FFFFFF; background: var(--nest-gold-accent);
   }
   .step h3 { font-size: 17px; margin-bottom: 6px; }
   .step p { font-size: 14px; color: var(--text-secondary); }
@@ -191,10 +193,10 @@
   /* ===== CTA band ===== */
   .cta-band {
     max-width: 900px; margin: 0 auto; text-align: center;
-    background: linear-gradient(135deg, var(--nest-green-dark), var(--nest-green-mid));
+    background: #1A3326;
     border-radius: 24px; padding: 56px 32px; color: #fff;
   }
-  .cta-band h2 { font-family: 'Fraunces', serif; font-weight: 600; font-size: clamp(24px, 4vw, 34px); margin-bottom: 12px; }
+  .cta-band h2 { font-family: 'Playfair Display', serif; font-weight: 600; font-size: clamp(24px, 4vw, 34px); margin-bottom: 12px; }
   .cta-band p { color: rgba(255,255,255,0.85); margin-bottom: 28px; max-width: 480px; margin-left: auto; margin-right: auto; }
 
   /* ===== Footer ===== */
@@ -250,7 +252,7 @@
 
 <!-- HERO -->
 <div class="hero">
-  <div class="hero-badge" data-i18n="landing.hero_badge">🇧🇬 Създадено за български семейства · в евро</div>
+  <div class="hero-badge"><svg viewBox="0 0 24 16" aria-hidden="true"><rect width="24" height="16" fill="#FFFFFF"/><rect y="5.33" width="24" height="5.34" fill="#00966E"/><rect y="10.67" width="24" height="5.33" fill="#D62612"/></svg><span data-i18n="landing.hero_badge">Създадено за български семейства · в евро</span></div>
   <h1><span data-i18n="landing.hero_h1_line1">Семейният бюджет,</span><br><span class="accent" data-i18n="landing.hero_h1_accent">най-сетне на едно място</span></h1>
   <p data-i18n="landing.hero_p">
     BudgetNest събира приходите и разходите на цялото домакинство в общ, споделен бюджет.

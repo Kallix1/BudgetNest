@@ -229,7 +229,7 @@ body.dashboard-body {
 }
 
 .summary-value {
-  font-family: 'Fraunces', serif;
+  font-family: 'Playfair Display', serif;
   font-size: 32px;
   font-weight: 700;
   margin-top: 8px;
@@ -271,7 +271,7 @@ body.dashboard-body {
 }
 
 .wallet-value {
-  font-family: 'Fraunces', serif;
+  font-family: 'Playfair Display', serif;
   font-size: 30px;
   font-weight: 700;
   margin: 10px 0 16px;
@@ -342,7 +342,7 @@ body.dashboard-body {
 }
 
 .card-title {
-  font-family: 'Fraunces', serif;
+  font-family: 'Playfair Display', serif;
   font-size: 18px;
   font-weight: 700;
   color: var(--heading-accent);
@@ -839,7 +839,7 @@ body.dashboard-body {
 }
 
 .page-header h1 {
-  font-family: 'Fraunces', serif;
+  font-family: 'Playfair Display', serif;
   font-size: 33px;
   font-weight: 600;
   color: var(--heading-accent);
@@ -1010,7 +1010,7 @@ body.dashboard-body {
 }
 
 .overlay-card h2 {
-  font-family: 'Fraunces', serif;
+  font-family: 'Playfair Display', serif;
   font-size: 24px;
   color: var(--heading-accent);
   margin-bottom: 10px;
