@@ -1304,6 +1304,9 @@
         amount: tpl.amount,
         description: tpl.name,
         transaction_date: today,
+        // Без метод на плащане транзакцията "изчезва" от баланса карта/в брой
+        // (wallet_balances брои само card/cash). По подразбиране: карта.
+        payment_method: 'card',
       }]);
 
     if (error) {
