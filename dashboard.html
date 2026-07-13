@@ -199,6 +199,11 @@
               <button type="button" class="type-btn" data-type="income" onclick="setTemplateType('income')" data-i18n="dashboard.type_income">Приход</button>
             </div>
 
+            <div class="method-toggle" id="tpl-method-toggle">
+              <button type="button" class="method-btn active" data-method="card" onclick="setTemplateMethod('card')"><span class="method-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-3px;margin-right:5px;"><rect x="2.5" y="5" width="19" height="14" rx="2.2"></rect><path d="M2.5 9.5h19"></path><path d="M6 14.5h4"></path></svg></span><span data-i18n="dashboard.method_card">Карта</span></button>
+              <button type="button" class="method-btn" data-method="cash" onclick="setTemplateMethod('cash')"><span class="method-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-3px;margin-right:5px;"><rect x="2" y="6.5" width="20" height="11" rx="1.6"></rect><circle cx="12" cy="12" r="2.6"></circle><path d="M5.5 6.5v0M18.5 17.5v0"></path></svg></span><span data-i18n="dashboard.method_cash">В брой</span></button>
+            </div>
+
             <div class="field full">
               <label data-i18n="dashboard.template_name_label">Име на шаблона</label>
               <input type="text" id="tpl-name" data-i18n-placeholder="dashboard.template_name_placeholder" placeholder="напр. Цигари" required>
@@ -460,6 +465,7 @@
   let currentTxPage = 1; // Следи текущата страница на списъка с транзакции
   let templates = [];
   let templateType = 'expense';
+  let templateMethod = 'card';
   let pendingInviteHouseholdName = null;
 
   const tr = (key, vars) => window.BudgetNestI18n ? window.BudgetNestI18n.t(key, vars) : key;
@@ -1208,8 +1214,14 @@
     if (isHidden) {
       document.getElementById('template-form').reset();
       setTemplateType('expense');
+      setTemplateMethod('card');
       setStatus('tpl-status', '', '');
     }
+  }
+
+  function setTemplateMethod(method) {
+    templateMethod = method;
+    document.querySelectorAll('#tpl-method-toggle .method-btn').forEach(b => b.classList.toggle('active', b.dataset.method === method));
   }
 
   function setTemplateType(type) {
@@ -1280,6 +1292,7 @@
         name,
         type: templateType,
         amount,
+        payment_method: templateMethod,
       }]);
 
     if (error) {
@@ -1307,9 +1320,9 @@
         amount: tpl.amount,
         description: tpl.name,
         transaction_date: today,
-        // Без метод на плащане транзакцията "изчезва" от баланса карта/в брой
-        // (wallet_balances брои само card/cash). По подразбиране: карта.
-        payment_method: 'card',
+        // Методът вече идва от самия шаблон (запазен при създаването му);
+        // 'card' е само резервен вариант за по-стари шаблони отпреди тази промяна.
+        payment_method: tpl.payment_method || 'card',
       }]);
 
     if (error) {
