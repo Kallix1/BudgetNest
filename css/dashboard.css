@@ -31,6 +31,39 @@ body.dashboard-body {
   box-shadow: 2px 0 10px rgba(0,0,0,0.08);
   box-sizing: border-box;
   overflow-y: auto;
+
+  /* Firefox — тънък скролбар в цветовете на темата, вместо системния */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+/* Chrome/Edge/Safari — къстъм скролбар за страничната лента.
+   Вижда се само когато съдържанието не се събира на по-нисък екран
+   (напр. лаптоп с малка височина или таблет) — тогава .navbar вече
+   скролва вертикално (overflow-y: auto по-горе), но системният
+   скролбар изглеждаше чужд на тъмнозеления фон. */
+.navbar::-webkit-scrollbar {
+  width: 6px;
+}
+.navbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.navbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 4px;
+}
+.navbar::-webkit-scrollbar-thumb:hover {
+  background: var(--nest-gold);
+}
+
+/* На по-нисък екран (напр. 13" лаптоп или таблет в landscape) страничната
+   лента лесно не се събира на височина — свиваме леко разстоянията,
+   за да остане скролването плавно и минимално, а не основен начин
+   на разглеждане на менюто. */
+@media (min-width: 901px) and (max-height: 700px) {
+  .navbar { padding: 20px 20px; }
+  .nav-left { gap: 24px; }
+  .nav-link { padding: 11px 16px; }
 }
 
 .nav-left {
