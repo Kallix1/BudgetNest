@@ -975,7 +975,8 @@
   // ===== Смяна на страницата на транзакциите чрез навигация =====
   function changeTxPage(direction) {
     const TX_PER_PAGE = 6;
-    const totalPages = Math.ceil(allTransactions.length / TX_PER_PAGE);
+    const TX_MAX_PAGES = 3; // Последните транзакции показват максимум 3 страници
+    const totalPages = Math.min(Math.ceil(allTransactions.length / TX_PER_PAGE), TX_MAX_PAGES);
     
     currentTxPage += direction;
     if (currentTxPage < 1) currentTxPage = 1;
@@ -997,7 +998,8 @@
     }
 
     const TX_PER_PAGE = 6;
-    const totalPages = Math.ceil(txs.length / TX_PER_PAGE);
+    const TX_MAX_PAGES = 3; // Последните транзакции показват максимум 3 страници (18 записа)
+    const totalPages = Math.min(Math.ceil(txs.length / TX_PER_PAGE), TX_MAX_PAGES);
     
     // Подсигуряване на валидни граници на страницата
     if (currentTxPage > totalPages) currentTxPage = totalPages;
