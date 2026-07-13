@@ -726,7 +726,8 @@
       .eq('household_id', currentHouseholdId)
       .gte('transaction_date', monthStart)
       .lte('transaction_date', monthEnd)
-      .order('transaction_date', { ascending: false });
+      .order('transaction_date', { ascending: false })
+      .order('created_at', { ascending: false });
 
     if (error) { console.error(error); return; }
 

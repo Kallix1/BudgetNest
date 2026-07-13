@@ -444,7 +444,8 @@
       .from('transactions')
       .select('*, categories(name, icon, type)')
       .eq('household_id', currentHouseholdId)
-      .order('transaction_date', { ascending: false });
+      .order('transaction_date', { ascending: false })
+      .order('created_at', { ascending: false });
 
     if (error) { console.error(error); return; }
     allTransactions = data || [];
