@@ -837,7 +837,14 @@
     const isEditing = editingTransactionId !== null;
     setStatus('modal-tx-status', isEditing ? tr('tx.status_saving') : tr('tx.status_adding'), '');
 
-    const paidBy = modalIsShared ? (document.getElementById('modal-tx-paidby').value || currentUser.id) : currentUser.id;
+    // При редакция запазваме оригиналния платил, ако транзакцията не е
+    // споделена — иначе редакция на чужда транзакция тихо я прехвърля към
+    // текущия потребител и разваля изчисленията за сетълмент.
+    const editingTx = isEditing ? allTransactions.find(t => t.id === editingTransactionId) : null;
+
+    const paidBy = modalIsShared
+      ? (document.getElementById('modal-tx-paidby').value || editingTx?.user_id || currentUser.id)
+      : (editingTx?.user_id || currentUser.id);
 
     const payload = {
       household_id: currentHouseholdId,

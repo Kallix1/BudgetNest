@@ -1301,6 +1301,17 @@
     const deletedId = editingTransactionId;
     const deletedTx = txToDelete ? JSON.parse(JSON.stringify(txToDelete)) : null;
 
+    // Запазваме дяловете преди изтриването, за да може „Отмени“ да възстанови
+    // и споделянето, а не само самата транзакция.
+    let deletedSplits = [];
+    if (txToDelete && txToDelete.is_shared) {
+      const { data: splitRows } = await supabaseClient
+        .from('transaction_splits')
+        .select('user_id, share_amount')
+        .eq('transaction_id', deletedId);
+      deletedSplits = splitRows || [];
+    }
+
     const { error } = await supabaseClient
       .from('transactions')
       .delete()
@@ -1322,8 +1333,8 @@
     try {
       const toast = document.getElementById('toast');
       if (toast && deletedTx) {
-        toast.innerHTML = 'Изтрито <button onclick="undoDeleteTransaction()" style="background:none;border:none;color:var(--nest-gold);cursor:pointer;margin-left:8px;">Отмени</button>';
-        toast.dataset.deleted = JSON.stringify({ id: deletedId, tx: deletedTx });
+        toast.innerHTML = escapeHtml(tr('dashboard.tx_deleted_toast')) + ' <button onclick="undoDeleteTransaction()" style="background:none;border:none;color:var(--nest-gold);cursor:pointer;margin-left:8px;">' + escapeHtml(tr('dashboard.undo_btn')) + '</button>';
+        toast.dataset.deleted = JSON.stringify({ id: deletedId, tx: deletedTx, splits: deletedSplits });
         toast.style.display = 'block';
         setTimeout(()=>{toast.style.display='none';}, 7000);
       }
@@ -1346,29 +1357,108 @@
         amount: tx.amount,
         description: tx.description || '',
         transaction_date: tx.transaction_date,
-        payment_method: tx.payment_method || 'card'
+        payment_method: tx.payment_method || 'card',
+        is_shared: !!tx.is_shared
       };
-      await supabaseClient.from('transactions').insert([payload]);
+      const { data: inserted, error } = await supabaseClient
+        .from('transactions')
+        .insert([payload])
+        .select('id')
+        .single();
+
+      if (!error && inserted && Array.isArray(data.splits) && data.splits.length) {
+        await supabaseClient.from('transaction_splits').insert(data.splits.map(s => ({
+          transaction_id: inserted.id,
+          household_id: payload.household_id,
+          user_id: s.user_id,
+          share_amount: s.share_amount
+        })));
+      }
       await loadDashboard();
     } catch(e) {}
+  }
+
+  // ===== Синхронизиране на дяловете при промяна на сумата =====
+  // Запазва съотношенията между отделните дялове и разпределя остатъка от
+  // закръглянето към последния член, така че сборът да е точно новата сума.
+  async function syncSharedSplits(tx, oldAmount, newAmount) {
+    oldAmount = Number(oldAmount);
+    const amount = Number(newAmount);
+    if (!oldAmount || !amount) return null;
+
+    const { data: splits, error } = await supabaseClient
+      .from('transaction_splits')
+      .select('user_id, share_amount')
+      .eq('transaction_id', tx.id);
+
+    if (error) return error;
+    if (!splits || !splits.length) return null;
+
+    const totalCents = Math.round(amount * 100);
+    let allocated = 0;
+    const rows = splits.map((s, i) => {
+      // Последният дял поема разликата от закръглянето.
+      const cents = i === splits.length - 1
+        ? totalCents - allocated
+        : Math.round((Number(s.share_amount) / oldAmount) * totalCents);
+      const safeCents = Math.max(0, cents);
+      allocated += safeCents;
+      return { user_id: s.user_id, share_amount: safeCents / 100 };
+    });
+
+    const results = await Promise.all(rows.map(row =>
+      supabaseClient
+        .from('transaction_splits')
+        .update({ share_amount: row.share_amount })
+        .eq('transaction_id', tx.id)
+        .eq('user_id', row.user_id)
+    ));
+
+    const failed = results.find(r => r.error);
+    return failed ? failed.error : null;
   }
 
   // ===== Добавяне / Обновяване =====
   async function handleAddTransaction(event) {
     event.preventDefault();
+    const isEditing = editingTransactionId !== null;
+
+    const categoryId = document.getElementById('tx-category').value;
+    const amount = parseFloat(document.getElementById('tx-amount').value);
+    const txDate = document.getElementById('tx-date').value;
+
+    // Валидация преди изпращане (както в transactions.html)
+    if (!categoryId) {
+      setStatus('tx-status', tr('tx.err_no_category'), 'error');
+      return;
+    }
+    if (isNaN(amount) || amount <= 0) {
+      setStatus('tx-status', tr('tx.err_bad_amount'), 'error');
+      return;
+    }
+    if (!txDate) {
+      setStatus('tx-status', tr('tx.err_no_date'), 'error');
+      return;
+    }
+
     const btn = document.getElementById('tx-submit');
     btn.disabled = true;
 
-    const isEditing = editingTransactionId !== null;
     setStatus('tx-status', isEditing ? tr('dashboard.saving_changes_status') : tr('dashboard.adding_status'), '');
 
+    // При редакция запазваме оригиналния платил и домакинство. Иначе редакция
+    // на чужда транзакция тихо я прехвърля към текущия потребител и разваля
+    // изчисленията за сетълмент.
+    const existingTx = isEditing ? allTransactions.find(t => t.id === editingTransactionId) : null;
+    const previousAmount = existingTx ? Number(existingTx.amount) : null;
+
     const payload = {
-      household_id: currentHouseholdId,
-      user_id: currentUser.id,
-      category_id: document.getElementById('tx-category').value,
-      amount: parseFloat(document.getElementById('tx-amount').value),
+      household_id: existingTx?.household_id || currentHouseholdId,
+      user_id: existingTx?.user_id || currentUser.id,
+      category_id: categoryId,
+      amount: Math.round(amount * 100) / 100,
       description: document.getElementById('tx-description').value.trim(),
-      transaction_date: document.getElementById('tx-date').value,
+      transaction_date: txDate,
       payment_method: quickAddMethod,
     };
 
@@ -1378,6 +1468,7 @@
     } catch(e) {}
 
     let resultError = null;
+    let splitError = null;
 
     if (isEditing) {
       const { error } = await supabaseClient
@@ -1385,6 +1476,12 @@
         .update(payload)
         .eq('id', editingTransactionId);
       resultError = error;
+
+      // Ако сумата на споделена транзакция се промени, дяловете трябва да
+      // останат пропорционални, за да не се разминава сетълментът.
+      if (!resultError && existingTx && existingTx.is_shared && previousAmount !== payload.amount) {
+        splitError = await syncSharedSplits(existingTx, previousAmount, payload.amount);
+      }
     } else {
       const { error } = await supabaseClient
         .from('transactions')
@@ -1396,6 +1493,12 @@
 
     if (resultError) {
       setStatus('tx-status', tr('common.error_prefix') + resultError.message, 'error');
+      return;
+    }
+
+    if (splitError) {
+      setStatus('tx-status', tr('common.error_prefix') + splitError.message, 'error');
+      await loadDashboard();
       return;
     }
 

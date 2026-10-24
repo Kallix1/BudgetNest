@@ -42,10 +42,38 @@ self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   const url = new URL(event.request.url);
   if (url.origin !== location.origin) return;
-  event.respondWith(
-    caches.match(event.request).then((cached) => {
+
+  // Мрежа първо: така след обновяване на сайта потребителите не остават със
+  // стар кеширан HTML/JS. При офлайн връщаме кеширано копие, а за навигация —
+  // таблото, което е предварително кеширано.
+  event.respondWith((async () => {
+    try {
+      const response = await fetch(event.request);
+      if (response && response.ok) {
+        try {
+          const cache = await caches.open(CACHE_NAME);
+          await cache.put(event.request, response.clone());
+        } catch (cacheError) {
+          // Кеширането е второстепенно — не проваляме заявката заради него.
+        }
+      }
+      return response;
+    } catch (networkError) {
+      const cached = await caches.match(event.request);
       if (cached) return cached;
-      return fetch(event.request).catch(() => cached);
-    })
-  );
+
+      if (event.request.mode === 'navigate') {
+        const fallback = await caches.match('./dashboard.html');
+        if (fallback) return fallback;
+      }
+
+      // Винаги връщаме валиден Response — иначе respondWith(null) хвърля
+      // TypeError и заявката приключва с неясна мрежова грешка.
+      return new Response('', {
+        status: 503,
+        statusText: 'Offline',
+        headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+      });
+    }
+  })());
 });
