@@ -123,3 +123,103 @@
   --heading-accent: #CFF5E0;
   --focus-ring: #3EDC92;
 }
+
+/* ============================================================
+   Хелуин — трета тема по избор (светла → тъмна → Хелуин)
+   Тъмна нощ в лилаво, тиквено оранжево и костено бяло.
+   Всички компоненти черпят от същите токени, затова темата
+   наследява цялата визия на сайта без отделни копия на стиловете.
+   ============================================================ */
+[data-theme="halloween"] {
+  --bg-void: #120B1A;
+  --bg-panel: #1E1229;
+  --bg-card: #241631;
+  --border-soft: rgba(255, 160, 80, 0.2);
+  --line-lip: #080410;
+  --surface-alt: #2B1938;
+  --input-bg: #170E21;
+  --input-border: rgba(255, 170, 90, 0.36);
+  --track-bg: #341D42;
+  --grid-line: rgba(255, 150, 70, 0.07);
+
+  --nest-green-dark: #1A0C24;
+  --nest-green-mid: #FF9240;
+  --nest-green-light: #FFB067;
+  --nest-gold: #FF8A2B;
+  --nest-gold-accent: #FFA24C;
+  --on-brand: #1A0C24;
+
+  --sprout: #FF8A2B;
+  --sprout-lip: #A94F00;
+  --on-sprout: #1A0C24;
+
+  --sun: #FFB23E;
+  --sun-soft: rgba(255, 178, 62, 0.16);
+  --sun-ink: #FFD38A;
+  --egg-pale: #FFE0B0;
+
+  --peri: #B87CFF;
+  --peri-soft: rgba(184, 124, 255, 0.18);
+
+  --mint-soft: rgba(126, 255, 176, 0.13);
+  --red-soft: rgba(255, 92, 112, 0.16);
+
+  --text-primary: #F8ECDD;
+  --text-secondary: #D3BEE4;
+  --text-dim: #A88FBC;
+
+  --color-income: #7DFFB0;
+  --color-expense: #FF7383;
+  --color-warning: #FFC15A;
+
+  --hero-bg: #2A1238;
+  --hero-ink: #FFFFFF;
+
+  --card-shadow: 0 3px 0 var(--line-lip);
+  --btn-shadow: 0 4px 0 var(--sprout-lip);
+  --heading-accent: #FFD6A0;
+  --focus-ring: #FF9E45;
+}
+
+/* Малки декоративни щрихи, които правят Хелуин различен от тъмната тема */
+[data-theme="halloween"] ::selection { background: var(--sun); color: #2A1400; }
+
+[data-theme="halloween"] .navbar {
+  color: #F1E3FF;
+  background-image:
+    radial-gradient(circle at 18% -8%, rgba(255, 145, 50, 0.2), transparent 46%),
+    linear-gradient(rgba(255, 153, 64, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 153, 64, 0.055) 1px, transparent 1px);
+  border-right-color: rgba(255, 160, 80, 0.12);
+}
+
+[data-theme="halloween"] .nav-link { color: #CDB7E0; }
+[data-theme="halloween"] .nav-link:hover { color: #FFFFFF; background: rgba(255, 150, 60, 0.14); }
+[data-theme="halloween"] .nav-link.active { color: #2A1400; }
+
+[data-theme="halloween"] .household-pill {
+  background: rgba(255, 150, 60, 0.12);
+  border-color: rgba(255, 160, 80, 0.28);
+}
+
+[data-theme="halloween"] .navbar .brand-mark::before {
+  content: "🎃";
+  display: inline-block;
+  margin-right: 8px;
+  font-size: 17px;
+  line-height: 1;
+  vertical-align: -2px;
+}
+
+[data-theme="halloween"] .bg-grid {
+  background-image:
+    radial-gradient(circle at 50% -18%, rgba(255, 140, 40, 0.13), transparent 58%),
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+}
+
+[data-theme="halloween"] .card,
+[data-theme="halloween"] .summary-card,
+[data-theme="halloween"] .overlay-card {
+  box-shadow: 0 3px 0 var(--line-lip), 0 0 28px rgba(255, 140, 40, 0.06);
+}

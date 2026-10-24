@@ -10,12 +10,13 @@
 <meta name="description" content="Табло на BudgetNest — общ преглед на приходите, разходите и баланса на домакинството.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Unbounded:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=17">
-<link rel="stylesheet" href="css/dashboard.css?v=17">
+<link rel="stylesheet" href="css/style.css?v=18">
+<link rel="stylesheet" href="css/dashboard.css?v=18">
 <link rel="stylesheet" href="css/datepicker.css?v=2">
 <script src="datepicker.js?v=3" defer></script>
 <script src="nav.js?v=10" defer></script>
 <script src="i18n.js?v=9" defer></script>
+<script src="theme.js?v=1" defer></script>
 <script src="analytics.js?v=1" defer></script>
 <script src="icons.js?v=2" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -404,6 +405,12 @@
   }
 
   applyTheme(localStorage.getItem('budgetnest-theme') || 'light');
+
+  // Theme.js сменя темата (светла → тъмна → Хелуин) и излъчва това събитие.
+  // Chart.js не се пребоядисва сам, затова прерисуваме диаграмите тук.
+  document.addEventListener('budgetnest:themechange', function () {
+    if (typeof currentHouseholdId !== 'undefined' && currentHouseholdId) loadTrend();
+  });
 
   // ===== Скриване/показване на блокове (око) =====
   const EYE_OPEN_PATH = '<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle>';
@@ -1586,7 +1593,7 @@
     .bottom-nav { display:flex !important; position:fixed; bottom:0; left:0; right:0; background:var(--bg-surface); border-top:1px solid var(--border-soft); justify-content:space-around; padding:6px 0; z-index:40; }
     .bottom-nav-item { display:flex; flex-direction:column; align-items:center; text-decoration:none; color:var(--text-secondary); font-size:11px; gap:2px; }
     .bottom-nav-item.active { color:var(--nest-gold); }
-    .navbar .nav-links { display:none !important; }
+    .navbar:not(.nav-open) .nav-links { display:none !important; }
     .nav-toggle { display:flex !important; }
   }
   .bottom-nav { display:none; }

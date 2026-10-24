@@ -701,7 +701,7 @@ body.dashboard-body {
   color: #FFFFFF !important;
   box-shadow: 0 3px 0 rgba(0, 0, 0, 0.25);
 }
-[data-theme="dark"] #tx-delete { color: #3B0A10 !important; }
+[data-theme="dark"] #tx-delete, [data-theme="halloween"] #tx-delete { color: #3B0A10 !important; }
 
 /* ============================================================
    Списък с транзакции

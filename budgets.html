@@ -8,10 +8,11 @@
 <meta name="description" content="Месечни лимити по категория в BudgetNest — следете колко ви остава.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Unbounded:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=17">
-<link rel="stylesheet" href="css/dashboard.css?v=17">
+<link rel="stylesheet" href="css/style.css?v=18">
+<link rel="stylesheet" href="css/dashboard.css?v=18">
 <script src="nav.js?v=10" defer></script>
 <script src="i18n.js?v=9" defer></script>
+<script src="theme.js?v=1" defer></script>
 <script src="analytics.js?v=1" defer></script>
 <script src="icons.js?v=2" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -31,7 +32,7 @@
   .budget-badge.ok   { background: rgba(37,74,55,0.12);  color: var(--color-income); }
   .budget-badge.near { background: rgba(221,133,0,0.15);  color: #B7791F; }
   .budget-badge.over { background: rgba(229,62,62,0.14);  color: #E53E3E; }
-  [data-theme="dark"] .budget-badge.near { color: #F6C065; }
+  [data-theme="dark"] .budget-badge.near, [data-theme="halloween"] .budget-badge.near { color: #F6C065; }
 
   .budget-warn {
     font-size: 12.5px; font-weight: 500; margin-top: 8px;
@@ -39,7 +40,7 @@
   }
   .budget-warn.near { background: rgba(221,133,0,0.1);  color: #B7791F; border: 1px solid rgba(221,133,0,0.3); }
   .budget-warn.over { background: rgba(229,62,62,0.1);  color: #E53E3E; border: 1px solid rgba(229,62,62,0.3); }
-  [data-theme="dark"] .budget-warn.near { color: #F6C065; }
+  [data-theme="dark"] .budget-warn.near, [data-theme="halloween"] .budget-warn.near { color: #F6C065; }
 
   .compare-fill.near { background: linear-gradient(90deg, #DD8500, #F6AD55) !important; }
 
@@ -49,7 +50,7 @@
   .budget-summary-pill.ok   { background: rgba(37,74,55,0.12); color: var(--color-income); }
   .budget-summary-pill.near { background: rgba(221,133,0,0.15); color: #B7791F; }
   .budget-summary-pill.over { background: rgba(229,62,62,0.14); color: #E53E3E; }
-  [data-theme="dark"] .budget-summary-pill.near { color: #F6C065; }
+  [data-theme="dark"] .budget-summary-pill.near, [data-theme="halloween"] .budget-summary-pill.near { color: #F6C065; }
 </style>
 </head>
 <body class="dashboard-body">

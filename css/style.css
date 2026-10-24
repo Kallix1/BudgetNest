@@ -3,7 +3,7 @@
    Цветове и шрифтове: виж tokens.css
    ============================================================ */
 
-@import url("tokens.css?v=17");
+@import url("tokens.css?v=18");
 
 /* ===== База ===== */
 * { box-sizing: border-box; margin: 0; padding: 0; }
