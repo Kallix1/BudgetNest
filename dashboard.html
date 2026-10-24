@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B1%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#d4af37">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title data-i18n="dashboard.page_title">Табло — BudgetNest</title>
 <meta name="description" content="Табло на BudgetNest — общ преглед на приходите, разходите и баланса на домакинството.">
@@ -18,6 +20,13 @@
 <script src="icons.js?v=2" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('./sw.js').catch(function(){});
+    });
+  }
+</script>
 
 <style>
   body.dashboard-body {
@@ -108,6 +117,10 @@
     <div class="summary-card" style="cursor:pointer;" onclick="window.location.href='wallets.html'" data-i18n-title="dashboard.view_wallet_title" title="Виж портфейла">
       <div class="summary-label" data-i18n="dashboard.summary_total">Общо</div>
       <div class="summary-value balance" id="summary-total-balance">0.00 €</div>
+    </div>
+    <div class="summary-card" id="safe-to-spend-card" style="display:none;">
+      <div class="summary-label" data-i18n="dashboard.safe_to_spend_label">Безопасно за харчене днес</div>
+      <div class="summary-value" id="safe-to-spend" style="color: var(--color-income);">0.00 €</div>
     </div>
   </div>
 
@@ -211,7 +224,7 @@
 
             <div class="field">
               <label data-i18n="dashboard.amount_label">Сума (€)</label>
-              <input type="number" id="tpl-amount" step="0.01" min="0.01" placeholder="0.00" required>
+              <input type="number" id="tpl-amount" inputmode="decimal" pattern="[0-9]+([.][0-9]+)?" step="0.01" min="0.01" placeholder="0.00" required>
             </div>
 
             <div class="field">
@@ -245,7 +258,7 @@
 
           <div class="field full">
             <label data-i18n="dashboard.amount_label">Сума (€)</label>
-            <input type="number" id="tx-amount" step="0.01" min="0.01" placeholder="0.00" required>
+            <input type="number" id="tx-amount" inputmode="decimal" pattern="[0-9]+([.][0-9]+)?" step="0.01" min="0.01" placeholder="0.00" required>
           </div>
 
           <div class="field full">
@@ -302,6 +315,21 @@
 
 </main>
 
+<!-- Mobile bottom tab bar -->
+<nav class="bottom-nav" id="bottom-nav">
+  <a href="dashboard.html" class="bottom-nav-item active"><span>🏠</span><span data-i18n="nav.dashboard">Табло</span></a>
+  <a href="transactions.html" class="bottom-nav-item"><span>🧾</span><span data-i18n="nav.transactions">Транзакции</span></a>
+  <a href="budgets.html" class="bottom-nav-item"><span>📊</span><span data-i18n="nav.budgets">Бюджети</span></a>
+  <a href="wallets.html" class="bottom-nav-item"><span>💳</span><span data-i18n="nav.wallets">Портфейл</span></a>
+  <a href="goals.html" class="bottom-nav-item"><span>🎯</span><span data-i18n="nav.goals">Цели</span></a>
+</nav>
+
+<!-- Toast -->
+<div id="toast" style="position:fixed; bottom:70px; left:50%; transform:translateX(-50%); background:rgba(20,20,20,0.9); color:#fff; padding:10px 16px; border-radius:10px; display:none; z-index:100; font-size:14px;"></div>
+
+<!-- Floating + button for mobile -->
+<button id="fab-add" onclick="openQuickAddFromFab()" style="display:none; position:fixed; bottom:90px; right:18px; width:56px; height:56px; border-radius:50%; background:linear-gradient(135deg, var(--nest-gold), #b8962e); color:#1a1a1a; border:none; box-shadow:0 8px 24px rgba(212,175,55,0.4); font-size:28px; font-weight:700; z-index:50; cursor:pointer; align-items:center; justify-content:center;">+</button>
+
 <div class="overlay" id="onboarding-overlay" style="display:none;">
   <div class="overlay-card">
     <h2 data-i18n="dashboard.onboarding_title">Създайте домакинство</h2>
@@ -348,6 +376,14 @@
   // ===== Тъмна тема =====
   const SUN_ICON_PATH = '<circle cx="12" cy="12" r="4"></circle><line x1="12" y1="2" x2="12" y2="4"></line><line x1="12" y1="20" x2="12" y2="22"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="2" y1="12" x2="4" y2="12"></line><line x1="20" y1="12" x2="22" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
   const MOON_ICON_PATH = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+  
+  // QoL: remember last choices
+  function getLastTxPrefs() {
+    try { return JSON.parse(localStorage.getItem('budgetnest-last-tx') || '{}'); } catch(e) { return {}; }
+  }
+  function saveLastTxPrefs(type, method, categoryId) {
+    try { localStorage.setItem('budgetnest-last-tx', JSON.stringify({ type, method, categoryId })); } catch(e) {}
+  }
   function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     const btn = document.getElementById('theme-toggle-btn');
@@ -521,6 +557,11 @@
         opt.textContent = c.icon + ' ' + c.name;
         select.appendChild(opt);
       });
+    // Apply last used category if present
+    const last = getLastTxPrefs();
+    if (!editingTransactionId && last.categoryId && Array.from(select.options).some(o => o.value === last.categoryId)) {
+      select.value = last.categoryId;
+    }
   }
 
   // ===== Init flow =====
@@ -533,6 +574,15 @@
     currentUser = session.user;
     updateSettleNavVisibility(currentUser.id);
     document.getElementById('tx-date').valueAsDate = new Date();
+    
+    // Apply last preferences
+    const lastPrefs = getLastTxPrefs();
+    if (lastPrefs.type) {
+      setTxType(lastPrefs.type);
+    }
+    if (lastPrefs.method) {
+      setQuickMethod(lastPrefs.method);
+    }
 
     if (ADMIN_EMAILS.map(e => e.toLowerCase()).includes((currentUser.email || '').toLowerCase())) {
       document.getElementById('admin-nav-link').style.display = 'flex';
@@ -925,6 +975,23 @@
     const expense = txs.filter(t => t.categories?.type === 'expense').reduce((s, t) => s + Number(t.amount), 0);
     document.getElementById('summary-income').textContent = eur(income);
     document.getElementById('summary-expense').textContent = eur(expense);
+    
+    // Safe to spend
+    try {
+      const now = new Date();
+      const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      const daysLeft = Math.max(1, lastDay - now.getDate() + 1);
+      const net = income - expense;
+      const safe = net / daysLeft;
+      const safeEl = document.getElementById('safe-to-spend');
+      const safeCard = document.getElementById('safe-to-spend-card');
+      if (safeEl && safeCard) {
+        safeEl.textContent = eur(safe);
+        safeCard.style.display = 'flex';
+        safeCard.style.flexDirection = 'column';
+        safeCard.style.justifyContent = 'center';
+      }
+    } catch(e) {}
   }
 
   function toggleChartView() {
@@ -1041,6 +1108,35 @@
     }).join('');
   }
 
+  function translateCompareCategory(name) {
+    const lang = getLang();
+    const map = {
+      'Храна': lang === 'en' ? 'Food' : 'Храна',
+      'Жилище': lang === 'en' ? 'Housing' : 'Жилище',
+      'Наем': lang === 'en' ? 'Rent' : 'Наем',
+      'Жилище и наем': lang === 'en' ? 'Housing & rent' : 'Жилище и наем',
+      'Транспорт': lang === 'en' ? 'Transport' : 'Транспорт',
+      'Здраве': lang === 'en' ? 'Health' : 'Здраве',
+      'Забавление': lang === 'en' ? 'Entertainment' : 'Забавление',
+      'Развлечение': lang === 'en' ? 'Entertainment' : 'Развлечение',
+      'Други': lang === 'en' ? 'Other' : 'Други',
+      'Дрехи и обувки': lang === 'en' ? 'Clothes & shoes' : 'Дрехи и обувки',
+      'Комунални услуги': lang === 'en' ? 'Utilities' : 'Комунални услуги',
+      'Образование': lang === 'en' ? 'Education' : 'Образование',
+      'Пътувания': lang === 'en' ? 'Travel' : 'Пътувания',
+      'Кафе/Храна навън': lang === 'en' ? 'Eating out' : 'Кафе/Храна навън'
+    };
+    if (map[name]) return map[name];
+    // Also try matching translated from our defaults
+    if (name === tr('dashboard.default_category_food')) return lang === 'en' ? 'Food' : name;
+    if (name === tr('dashboard.default_category_housing')) return lang === 'en' ? 'Housing' : name;
+    if (name === tr('dashboard.default_category_transport')) return lang === 'en' ? 'Transport' : name;
+    if (name === tr('dashboard.default_category_health')) return lang === 'en' ? 'Health' : name;
+    if (name === tr('dashboard.default_category_fun')) return lang === 'en' ? 'Entertainment' : name;
+    if (name === dashboardOtherLabel()) return lang === 'en' ? 'Other' : name;
+    return name;
+  }
+
   async function renderComparison(txs) {
     const { data: averages, error } = await supabaseClient.from('bg_average_expenses').select('*');
     if (error) { console.error(error); return; }
@@ -1056,7 +1152,38 @@
     container.innerHTML = '';
 
     averages.forEach(avg => {
-      const yours = byCategory[avg.category_name] || 0;
+      let translatedAvgName = translateCompareCategory(avg.category_name);
+      const langComp = getLang();
+      if ((avg.category_name && avg.category_name.toLowerCase().includes('забав')) || translatedAvgName.toLowerCase().includes('забав')) {
+        translatedAvgName = langComp === 'en' ? 'Entertainment' : 'Забавление';
+      }
+      if ((avg.category_name && (avg.category_name.toLowerCase().includes('жилищ') || avg.category_name.toLowerCase().includes('наем'))) || translatedAvgName.toLowerCase().includes('жилищ')) {
+        translatedAvgName = langComp === 'en' ? (avg.category_name.toLowerCase().includes('наем') ? 'Rent' : 'Housing') : (avg.category_name.toLowerCase().includes('наем') ? 'Наем' : 'Жилище');
+      }
+      // Try to match by translated name or original or by keys
+      let yours = byCategory[translatedAvgName] || byCategory[avg.category_name] || 0;
+      if (!yours) {
+        // try to find by matching translated default names
+        const defaults = [
+          tr('dashboard.default_category_food'),
+          tr('dashboard.default_category_housing'),
+          tr('dashboard.default_category_transport'),
+          tr('dashboard.default_category_health'),
+          tr('dashboard.default_category_fun'),
+          tr('dashboard.default_category_other')
+        ];
+        for (let i = 0; i < defaults.length; i++) {
+          if (byCategory[defaults[i]]) { yours = byCategory[defaults[i]]; break; }
+        }
+        // also check if any key contains fun/entertainment
+        if (!yours) {
+          Object.keys(byCategory).forEach(k => {
+            if (k.toLowerCase().includes('забав') || k.toLowerCase().includes('fun') || k.toLowerCase().includes('entertain')) {
+              yours = byCategory[k];
+            }
+          });
+        }
+      }
       const max = Math.max(yours, avg.avg_amount_per_household) * 1.15 || 1;
       const yourPct = Math.min((yours / max) * 100, 100);
       const avgPct = Math.min((avg.avg_amount_per_household / max) * 100, 100);
@@ -1066,7 +1193,7 @@
       row.className = 'compare-row';
       row.innerHTML = `
         <div class="compare-labels">
-          <span class="cat-name">${escapeHtml(avg.category_name)}</span>
+          <span class="cat-name">${escapeHtml(translatedAvgName)}</span>
           <span class="cat-amounts">${eur(yours)} · ${tr('dashboard.compare_avg_label')} ${eur(avg.avg_amount_per_household)}</span>
         </div>
         <div class="compare-track">
@@ -1111,8 +1238,40 @@
 
     document.getElementById('quick-add-form').reset();
     document.getElementById('tx-date').valueAsDate = new Date();
-    setTxType('expense');
-    setQuickMethod('card');
+    const lastPrefs = getLastTxPrefs();
+    if (lastPrefs.type) setTxType(lastPrefs.type); else setTxType('expense');
+    if (lastPrefs.method) setQuickMethod(lastPrefs.method); else setQuickMethod('card');
+    // Reapply last category after populate
+    setTimeout(() => {
+      const sel = document.getElementById('tx-category');
+      if (sel && lastPrefs.categoryId && Array.from(sel.options).some(o => o.value === lastPrefs.categoryId)) {
+        sel.value = lastPrefs.categoryId;
+      }
+    }, 0);
+  }
+  
+  function openQuickAddFromFab() {
+    const card = document.querySelector('.card form#quick-add-form')?.closest('.card');
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    const amt = document.getElementById('tx-amount');
+    if (amt) { amt.focus(); amt.select && amt.select(); }
+  }
+  
+  // Show FAB on mobile
+  function initFab() {
+    const fab = document.getElementById('fab-add');
+    if (!fab) return;
+    const mq = window.matchMedia('(max-width: 768px)');
+    function update() { fab.style.display = mq.matches ? 'flex' : 'none'; }
+    update();
+    mq.addEventListener ? mq.addEventListener('change', update) : mq.addListener(update);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFab);
+  } else {
+    initFab();
   }
 
   // ===== Управление на Поп-ъп Прозореца =====
@@ -1134,11 +1293,15 @@
     const btn = document.getElementById('tx-delete');
     btn.disabled = true;
     setStatus('tx-status', tr('dashboard.deleting_status'), '');
+    
+    const txToDelete = allTransactions.find(t => t.id === editingTransactionId);
+    const deletedId = editingTransactionId;
+    const deletedTx = txToDelete ? JSON.parse(JSON.stringify(txToDelete)) : null;
 
     const { error } = await supabaseClient
       .from('transactions')
       .delete()
-      .eq('id', editingTransactionId);
+      .eq('id', deletedId);
 
     btn.disabled = false;
 
@@ -1152,7 +1315,39 @@
     cancelEditTransaction();
     await loadDashboard();
     
+    // Show undo toast
+    try {
+      const toast = document.getElementById('toast');
+      if (toast && deletedTx) {
+        toast.innerHTML = 'Изтрито <button onclick="undoDeleteTransaction()" style="background:none;border:none;color:var(--nest-gold);cursor:pointer;margin-left:8px;">Отмени</button>';
+        toast.dataset.deleted = JSON.stringify({ id: deletedId, tx: deletedTx });
+        toast.style.display = 'block';
+        setTimeout(()=>{toast.style.display='none';}, 7000);
+      }
+    } catch(e) {}
+    
     setTimeout(() => setStatus('tx-status', '', ''), 2000);
+  }
+  
+  async function undoDeleteTransaction() {
+    try {
+      const toast = document.getElementById('toast');
+      if (!toast || !toast.dataset.deleted) return;
+      const data = JSON.parse(toast.dataset.deleted);
+      toast.style.display = 'none';
+      const tx = data.tx;
+      const payload = {
+        household_id: tx.household_id || currentHouseholdId,
+        user_id: tx.user_id || currentUser.id,
+        category_id: tx.category_id,
+        amount: tx.amount,
+        description: tx.description || '',
+        transaction_date: tx.transaction_date,
+        payment_method: tx.payment_method || 'card'
+      };
+      await supabaseClient.from('transactions').insert([payload]);
+      await loadDashboard();
+    } catch(e) {}
   }
 
   // ===== Добавяне / Обновяване =====
@@ -1173,6 +1368,11 @@
       transaction_date: document.getElementById('tx-date').value,
       payment_method: quickAddMethod,
     };
+
+    // Save preferences
+    try {
+      localStorage.setItem('budgetnest-last-tx', JSON.stringify({ type: currentTxType, method: quickAddMethod, categoryId: payload.category_id }));
+    } catch(e) {}
 
     let resultError = null;
 
@@ -1369,6 +1569,9 @@
       populateTemplateCategorySelect();
       renderTemplates();
       loadDashboard();
+      if (typeof renderComparison === 'function' && allTransactions) {
+        renderComparison(allTransactions);
+      }
     }
   };
 
@@ -1377,6 +1580,25 @@
     el.textContent = message;
     el.className = 'status-msg' + (type ? ' ' + type : '');
   }
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .summary-row { grid-template-columns: repeat(2, 1fr); }
+    .content-grid { grid-template-columns: 1fr; }
+    body.dashboard-body { padding-bottom: 90px; }
+    .bottom-nav { display:flex !important; position:fixed; bottom:0; left:0; right:0; background:var(--bg-surface); border-top:1px solid var(--border-soft); justify-content:space-around; padding:6px 0; z-index:40; }
+    .bottom-nav-item { display:flex; flex-direction:column; align-items:center; text-decoration:none; color:var(--text-secondary); font-size:11px; gap:2px; }
+    .bottom-nav-item.active { color:var(--nest-gold); }
+    .navbar .nav-links { display:none !important; }
+    .nav-toggle { display:flex !important; }
+  }
+  .bottom-nav { display:none; }
+</style>
+
+<script>
+  // Focus amount when opening quick add area on mobile via FAB
+  document.getElementById('fab-add')?.addEventListener('click', function(){});
 </script>
 
 <script src="chatbot.js?v=1" defer></script>

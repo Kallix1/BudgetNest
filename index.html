@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B1%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#d4af37">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title data-i18n="landing.page_title">BudgetNest — семейният бюджет на едно място</title>
 <meta name="description" data-i18n-content="landing.meta_description" content="BudgetNest е споделен семеен бюджет: следете приходи и разходи в евро, задавайте месечни лимити по категория и вижте къде отиват парите ви — заедно, в реално време.">
@@ -178,6 +180,14 @@
     }
     applyTheme(saved);
   })();
+</script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('./sw.js').catch(function(){});
+    });
+  }
 </script>
 
 <script src="chatbot.js?v=1" defer></script>

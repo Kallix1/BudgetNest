@@ -366,6 +366,12 @@ button.submit:disabled {
   .brand-stat { max-width: none; padding-right: 150px; }
   .form-side { padding: 38px 30px; }
 }
+@media (max-width: 768px){
+  .nav-toggle{display:flex;}
+  .nav-links{display:none; width:100%; flex-direction:column; gap:6px;}
+  .nav-links.open{display:flex;}
+  .nav-link{width:100%;}
+}
 
 @media (max-width: 420px) {
   body { padding: 0; align-items: flex-start; }
