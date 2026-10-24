@@ -1108,33 +1108,53 @@
     }).join('');
   }
 
-  function translateCompareCategory(name) {
-    const lang = getLang();
-    const map = {
-      'Храна': lang === 'en' ? 'Food' : 'Храна',
-      'Жилище': lang === 'en' ? 'Housing' : 'Жилище',
-      'Наем': lang === 'en' ? 'Rent' : 'Наем',
-      'Жилище и наем': lang === 'en' ? 'Housing & rent' : 'Жилище и наем',
-      'Транспорт': lang === 'en' ? 'Transport' : 'Транспорт',
-      'Здраве': lang === 'en' ? 'Health' : 'Здраве',
-      'Забавление': lang === 'en' ? 'Entertainment' : 'Забавление',
-      'Развлечение': lang === 'en' ? 'Entertainment' : 'Развлечение',
-      'Други': lang === 'en' ? 'Other' : 'Други',
-      'Дрехи и обувки': lang === 'en' ? 'Clothes & shoes' : 'Дрехи и обувки',
-      'Комунални услуги': lang === 'en' ? 'Utilities' : 'Комунални услуги',
-      'Образование': lang === 'en' ? 'Education' : 'Образование',
-      'Пътувания': lang === 'en' ? 'Travel' : 'Пътувания',
-      'Кафе/Храна навън': lang === 'en' ? 'Eating out' : 'Кафе/Храна навън'
+  // ===== Сравнение с BG средните: канонични ключове + превод =====
+  // Категориите в bg_average_expenses идват на български ("Забавления",
+  // "Жилище и наем" и т.н.), а категориите на домакинството може да са
+  // създадени на друг език. Затова свеждаме всичко до каноничен ключ и
+  // превеждаме само за показване.
+  function canonCategoryKey(name) {
+    const n = String(name || '').trim().toLowerCase();
+    if (!n) return 'other';
+    if (n.indexOf('забавл') === 0 || n.indexOf('развлеч') === 0 || n.indexOf('entertain') >= 0 || n === 'fun') return 'fun';
+    if (n.indexOf('храна') === 0 || n.indexOf('food') >= 0 || n.indexOf('grocer') >= 0) return 'food';
+    if (n.indexOf('жилищ') >= 0 && (n.indexOf('наем') >= 0 || n.indexOf('rent') >= 0)) return 'housing_rent';
+    if (n.indexOf('жилищ') >= 0 || n.indexOf('housing') >= 0) return 'housing';
+    if (n.indexOf('наем') === 0 || n.indexOf('rent') === 0) return 'rent';
+    if (n.indexOf('транспорт') >= 0 || n.indexOf('transport') >= 0) return 'transport';
+    if (n.indexOf('здрав') === 0 || n.indexOf('health') >= 0) return 'health';
+    if (n.indexOf('дрехи') === 0 || n.indexOf('cloth') >= 0) return 'clothes';
+    if (n.indexOf('комунал') === 0 || n.indexOf('utilit') >= 0) return 'utilities';
+    if (n.indexOf('образован') === 0 || n.indexOf('education') >= 0) return 'education';
+    if (n.indexOf('пътуван') === 0 || n.indexOf('travel') >= 0) return 'travel';
+    if (n.indexOf('кафе') >= 0 || n.indexOf('eating out') >= 0 || n.indexOf('dining') >= 0) return 'dining';
+    if (n.indexOf('други') === 0 || n.indexOf('other') === 0) return 'other';
+    return 'other';
+  }
+
+  function compareCategoryLabel(key, originalName) {
+    const labels = {
+      food: { bg: 'Храна', en: 'Food' },
+      housing: { bg: 'Жилище', en: 'Housing' },
+      rent: { bg: 'Наем', en: 'Rent' },
+      housing_rent: { bg: 'Жилище и наем', en: 'Housing & rent' },
+      transport: { bg: 'Транспорт', en: 'Transport' },
+      health: { bg: 'Здраве', en: 'Health' },
+      fun: { bg: 'Забавления', en: 'Entertainment' },
+      clothes: { bg: 'Дрехи и обувки', en: 'Clothes & shoes' },
+      utilities: { bg: 'Комунални услуги', en: 'Utilities' },
+      education: { bg: 'Образование', en: 'Education' },
+      travel: { bg: 'Пътувания', en: 'Travel' },
+      dining: { bg: 'Кафе/Храна навън', en: 'Eating out' },
+      other: { bg: 'Други', en: 'Other' }
     };
-    if (map[name]) return map[name];
-    // Also try matching translated from our defaults
-    if (name === tr('dashboard.default_category_food')) return lang === 'en' ? 'Food' : name;
-    if (name === tr('dashboard.default_category_housing')) return lang === 'en' ? 'Housing' : name;
-    if (name === tr('dashboard.default_category_transport')) return lang === 'en' ? 'Transport' : name;
-    if (name === tr('dashboard.default_category_health')) return lang === 'en' ? 'Health' : name;
-    if (name === tr('dashboard.default_category_fun')) return lang === 'en' ? 'Entertainment' : name;
-    if (name === dashboardOtherLabel()) return lang === 'en' ? 'Other' : name;
-    return name;
+    const lang = getLang() === 'en' ? 'en' : 'bg';
+    const entry = labels[key];
+    if (!entry) return originalName;
+    // Ако оригиналът е на текущия език, запазваме точния му вид
+    const orig = String(originalName || '');
+    if (lang === 'bg' && /[а-яА-Я]/.test(orig)) return orig;
+    return entry[lang];
   }
 
   async function renderComparison(txs) {
@@ -1145,45 +1165,21 @@
     const byCategory = {};
     expenseTxs.forEach(t => {
       const name = t.categories?.name || dashboardOtherLabel();
-      byCategory[name] = (byCategory[name] || 0) + Number(t.amount);
+      const key = canonCategoryKey(name);
+      byCategory[key] = (byCategory[key] || 0) + Number(t.amount);
     });
 
     const container = document.getElementById('compare-list');
     container.innerHTML = '';
 
     averages.forEach(avg => {
-      let translatedAvgName = translateCompareCategory(avg.category_name);
-      const langComp = getLang();
-      if ((avg.category_name && avg.category_name.toLowerCase().includes('забав')) || translatedAvgName.toLowerCase().includes('забав')) {
-        translatedAvgName = langComp === 'en' ? 'Entertainment' : 'Забавление';
-      }
-      if ((avg.category_name && (avg.category_name.toLowerCase().includes('жилищ') || avg.category_name.toLowerCase().includes('наем'))) || translatedAvgName.toLowerCase().includes('жилищ')) {
-        translatedAvgName = langComp === 'en' ? (avg.category_name.toLowerCase().includes('наем') ? 'Rent' : 'Housing') : (avg.category_name.toLowerCase().includes('наем') ? 'Наем' : 'Жилище');
-      }
-      // Try to match by translated name or original or by keys
-      let yours = byCategory[translatedAvgName] || byCategory[avg.category_name] || 0;
-      if (!yours) {
-        // try to find by matching translated default names
-        const defaults = [
-          tr('dashboard.default_category_food'),
-          tr('dashboard.default_category_housing'),
-          tr('dashboard.default_category_transport'),
-          tr('dashboard.default_category_health'),
-          tr('dashboard.default_category_fun'),
-          tr('dashboard.default_category_other')
-        ];
-        for (let i = 0; i < defaults.length; i++) {
-          if (byCategory[defaults[i]]) { yours = byCategory[defaults[i]]; break; }
-        }
-        // also check if any key contains fun/entertainment
-        if (!yours) {
-          Object.keys(byCategory).forEach(k => {
-            if (k.toLowerCase().includes('забав') || k.toLowerCase().includes('fun') || k.toLowerCase().includes('entertain')) {
-              yours = byCategory[k];
-            }
-          });
-        }
-      }
+      const key = canonCategoryKey(avg.category_name);
+      const label = compareCategoryLabel(key, avg.category_name);
+      // housing_rent обхваща и двете отделни категории
+      let yours = byCategory[key] || 0;
+      if (key === 'housing_rent') yours = (byCategory.housing || 0) + (byCategory.rent || 0);
+      if (key === 'housing') yours = byCategory.housing || 0;
+      if (key === 'rent') yours = byCategory.rent || 0;
       const max = Math.max(yours, avg.avg_amount_per_household) * 1.15 || 1;
       const yourPct = Math.min((yours / max) * 100, 100);
       const avgPct = Math.min((avg.avg_amount_per_household / max) * 100, 100);
@@ -1193,7 +1189,7 @@
       row.className = 'compare-row';
       row.innerHTML = `
         <div class="compare-labels">
-          <span class="cat-name">${escapeHtml(translatedAvgName)}</span>
+          <span class="cat-name">${escapeHtml(label)}</span>
           <span class="cat-amounts">${eur(yours)} · ${tr('dashboard.compare_avg_label')} ${eur(avg.avg_amount_per_household)}</span>
         </div>
         <div class="compare-track">
