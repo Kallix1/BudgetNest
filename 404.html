@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Страницата не е намерена — BudgetNest</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Unbounded:wght@500;600;700&display=swap" rel="stylesheet">
 <script>
   /* Прилагаме темата ПРЕДИ стиловете да се рендерират, за да няма
      "премигване". Същата логика като на index.html: първо запазеният
@@ -21,45 +21,43 @@
     document.documentElement.setAttribute('data-theme', theme);
   })();
 </script>
+<link rel="stylesheet" href="css/tokens.css?v=17">
 <style>
-  :root {
-    --bg-void:#F4F6F8; --bg-panel:#FFFFFF; --border-soft:#E2E8F0;
-    --nest-green-dark:#1A3326; --nest-green-mid:#254A37; --nest-green-light:#366A4F; --nest-gold:#2E9E44; --nest-gold-accent:#21813A;
-    --text-primary:#1A202C; --text-secondary:#4A5568; --text-dim:#718096;
-  }
-  /* Тъмната тема следва запазения избор на потребителя (budgetnest-theme),
-     точно както на всички останали страници — вижте скрипта в <head>. */
-  [data-theme="dark"] {
-    --bg-void:#0A0F14; --bg-panel:#10161C; --border-soft:rgba(255,255,255,0.08);
-    --nest-green-dark:#0A0F14; --nest-green-mid:#4FAE72; --nest-green-light:#3E7A50; --nest-gold:#43A248; --nest-gold-accent:#368A3C;
-    --text-primary:#F1F5F1; --text-secondary:#A9BDAF; --text-dim:#6E8577;
-  }
   * { box-sizing:border-box; margin:0; padding:0; }
   body {
-    font-family:'Inter',sans-serif; background:var(--bg-void); color:var(--text-primary);
+    font-family:var(--font-body); color:var(--text-primary); line-height:1.6;
+    background-color:var(--bg-void);
+    background-image:linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size:28px 28px;
     min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center;
-    text-align:center; padding:24px; line-height:1.6;
+    text-align:center; padding:24px;
   }
+  :focus-visible { outline:3px solid var(--focus-ring); outline-offset:3px; border-radius:8px; }
   .mark {
-    width:64px; height:64px; border-radius:16px; font-size:34px;
-    display:flex; align-items:center; justify-content:center; margin-bottom:24px;
-    background:linear-gradient(135deg,var(--nest-green-mid),var(--nest-green-light));
+    width:68px; height:68px; border-radius:22px; margin-bottom:26px;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--sun); box-shadow:0 5px 0 rgba(0,0,0,0.2);
+    transform:rotate(-6deg);
   }
-  .code { font-family:'Playfair Display',serif; font-weight:700; font-size:clamp(56px,12vw,90px); line-height:1; margin-bottom:8px;
-    background:linear-gradient(120deg,var(--nest-green-light),var(--nest-gold));
-    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
-  h1 { font-family:'Playfair Display',serif; font-weight:600; font-size:24px; margin-bottom:10px; }
-  p { color:var(--text-secondary); max-width:420px; margin:0 auto 28px; }
-  .actions { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
+  .mark svg { stroke:#3A2A00; }
+  .code {
+    font-family:var(--font-display); font-weight:700; font-size:clamp(64px,14vw,112px);
+    line-height:1; letter-spacing:-0.04em; margin-bottom:12px; color:var(--text-primary);
+  }
+  h1 { font-family:var(--font-display); font-weight:600; font-size:clamp(20px,3vw,26px); letter-spacing:-0.02em; margin-bottom:12px; }
+  p { color:var(--text-secondary); max-width:420px; margin:0 auto 30px; font-size:16px; }
+  .actions { display:flex; gap:14px; flex-wrap:wrap; justify-content:center; }
   .btn {
-    display:inline-flex; align-items:center; justify-content:center; font-weight:600; font-size:14px;
-    padding:12px 24px; border-radius:12px; cursor:pointer; text-decoration:none;
-    border:1px solid transparent; transition:transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+    display:inline-flex; align-items:center; justify-content:center; font-family:var(--font-body); font-weight:700; font-size:15px;
+    padding:13px 26px; border-radius:var(--r-md); cursor:pointer; text-decoration:none;
+    border:1.5px solid transparent; transition:transform 0.12s ease, box-shadow 0.12s ease, filter 0.2s ease;
   }
-  .btn-primary { background:linear-gradient(135deg,var(--nest-gold),var(--nest-gold-accent)); color:var(--nest-green-dark); box-shadow:0 4px 14px rgba(67,162,72,0.28); }
-  .btn-primary:hover { transform:translateY(-2px); }
-  .btn-ghost { background:transparent; color:var(--text-primary); border-color:var(--border-soft); }
-  .btn-ghost:hover { background:var(--bg-panel); }
+  .btn-primary { background:var(--sprout); color:var(--on-sprout); box-shadow:var(--btn-shadow); }
+  .btn-primary:hover { filter:brightness(1.05); transform:translateY(-1px); }
+  .btn-primary:active { transform:translateY(4px); box-shadow:none; }
+  .btn-ghost { background:var(--bg-panel); color:var(--text-primary); border-color:var(--input-border); box-shadow:0 3px 0 var(--line-lip); }
+  .btn-ghost:hover { border-color:var(--nest-green-mid); }
+  .btn-ghost:active { transform:translateY(3px); box-shadow:none; }
 </style>
 </head>
 <body>

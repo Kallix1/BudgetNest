@@ -16,7 +16,7 @@
 }
 
 .dnp-input-wrap input.dnp-fake::placeholder {
-  color: #94A3B8;
+  color: var(--text-dim);
 }
 
 .dnp-icon {
@@ -45,13 +45,13 @@
 .dnp-panel {
   position: fixed;
   z-index: 3000;
-  width: 300px;
+  width: 316px;
   background: var(--bg-panel);
-  border: 1px solid var(--border-soft);
-  border-radius: 16px;
-  box-shadow: var(--card-shadow), 0 12px 28px rgba(0, 0, 0, 0.12);
-  padding: 14px;
-  font-family: 'Inter', sans-serif;
+  border: 1.5px solid var(--input-border);
+  border-radius: var(--r-lg);
+  box-shadow: 0 4px 0 var(--line-lip), 0 18px 36px rgba(8, 40, 28, 0.18);
+  padding: 16px;
+  font-family: var(--font-body);
   opacity: 0;
   transform: translateY(-6px) scale(0.98);
   pointer-events: none;
@@ -79,8 +79,8 @@
 }
 
 .dnp-nav-btn {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -100,11 +100,12 @@
 }
 
 .dnp-title {
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-weight: 600;
   font-size: 14px;
   color: var(--heading-accent, var(--text-primary));
   text-transform: capitalize;
-  letter-spacing: 0.01em;
+  letter-spacing: -0.01em;
   white-space: nowrap;
 }
 
@@ -116,10 +117,10 @@
 
 .dnp-weekdays span {
   text-align: center;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
+  text-transform: none;
+  letter-spacing: 0;
   color: var(--text-dim);
   padding: 4px 0;
 }
@@ -132,22 +133,22 @@
 
 .dnp-day {
   position: relative;
-  height: 32px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
   background: transparent;
-  border-radius: 9px;
+  border-radius: 12px;
   font-size: 13px;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   color: var(--text-primary);
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
 }
 
 .dnp-day:hover:not(.dnp-day-selected):not(:disabled) {
-  background: var(--surface-alt);
+  background: var(--mint-soft);
 }
 
 .dnp-day.dnp-day-muted {
@@ -173,13 +174,14 @@
 }
 
 .dnp-day.dnp-day-selected {
-  background: var(--nest-green-mid);
-  color: #FFFFFF;
+  background: var(--sprout);
+  color: var(--on-sprout);
   font-weight: 700;
+  box-shadow: 0 3px 0 var(--sprout-lip);
 }
 
 .dnp-day.dnp-day-selected::after {
-  background: var(--nest-gold);
+  background: var(--on-sprout);
 }
 
 .dnp-day:disabled {
@@ -193,18 +195,18 @@
   justify-content: space-between;
   margin-top: 10px;
   padding-top: 10px;
-  border-top: 1px solid var(--border-soft);
+  border-top: 1.5px dashed var(--border-soft);
 }
 
 .dnp-footer button {
   border: none;
   background: transparent;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   font-size: 12.5px;
   font-weight: 600;
   cursor: pointer;
   padding: 6px 8px;
-  border-radius: 7px;
+  border-radius: 8px;
   transition: background 0.15s ease, color 0.15s ease;
 }
 

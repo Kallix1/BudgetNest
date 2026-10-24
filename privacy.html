@@ -6,56 +6,59 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title data-i18n="privacy.page_title">Поверителност — BudgetNest</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Unbounded:wght@500;600;700&display=swap" rel="stylesheet">
 <script src="i18n.js?v=9" defer></script>
 <script src="analytics.js?v=1" defer></script>
 <script src="icons.js?v=2" defer></script>
+<link rel="stylesheet" href="css/tokens.css?v=17">
 <style>
-  :root {
-    --bg-void:#F4F6F8; --bg-panel:#FFFFFF; --border-soft:#E2E8F0;
-    --nest-green-mid:#254A37; --nest-green-light:#366A4F; --nest-gold-accent:#21813A;
-    --text-primary:#1A202C; --text-secondary:#4A5568; --text-dim:#718096;
-  }
-  [data-theme="dark"] {
-    --bg-void:#0A0F14; --bg-panel:#10161C; --border-soft:rgba(255,255,255,0.06);
-    --nest-green-mid:#4FAE72; --nest-green-light:#3E7A50; --nest-gold-accent:#368A3C;
-    --text-primary:#F1F5F1; --text-secondary:#A9BDAF; --text-dim:#6E8577;
-  }
-  body { transition: background-color 0.25s ease, color 0.25s ease; }
   * { box-sizing:border-box; margin:0; padding:0; }
-  body { font-family:'Inter',sans-serif; background:var(--bg-void); color:var(--text-primary); line-height:1.7; }
-  a { color:var(--nest-green-light); }
+  body {
+    font-family:var(--font-body); color:var(--text-primary); line-height:1.7;
+    background-color:var(--bg-void);
+    background-image:linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size:28px 28px;
+    transition:background-color 0.25s ease, color 0.25s ease;
+  }
+  :focus-visible { outline:3px solid var(--focus-ring); outline-offset:3px; border-radius:8px; }
+  a { color:var(--nest-green-mid); text-underline-offset:3px; }
   header {
     display:flex; align-items:center; justify-content:space-between;
-    padding:16px 24px; border-bottom:1px solid var(--border-soft);
+    padding:14px 28px; border-bottom:1.5px solid var(--border-soft);
+    background:color-mix(in srgb, var(--bg-void) 88%, transparent); backdrop-filter:blur(10px);
   }
-  .logo { display:flex; align-items:center; gap:8px; font-weight:700; font-size:19px; text-decoration:none; color:inherit; }
-  .logo-mark { width:22px; height:22px; color:var(--nest-gold); display:flex; align-items:center; justify-content:center; } .logo-mark svg { width:100%; height:100%; }
+  .logo { display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-weight:700; font-size:18px; letter-spacing:-0.02em; text-decoration:none; color:inherit; }
+  .logo-mark { width:34px; height:34px; border-radius:11px; background:var(--sun); color:#3A2A00; box-shadow:0 3px 0 rgba(0,0,0,0.18); display:flex; align-items:center; justify-content:center; }
+  .logo-mark svg { width:20px; height:20px; }
   .header-actions { display:flex; align-items:center; gap:14px; }
   .theme-toggle {
     display:flex; align-items:center; justify-content:center;
-    width:38px; height:38px; border-radius:999px;
-    border:1px solid var(--border-soft); background:var(--bg-panel);
-    color:var(--text-secondary); cursor:pointer; font-size:17px;
-    transition:background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+    min-width:40px; height:40px; padding:0 10px; border-radius:999px;
+    border:1.5px solid var(--border-soft); background:var(--bg-panel);
+    color:var(--text-secondary); cursor:pointer; font-family:var(--font-body); font-size:13px; font-weight:700;
+    box-shadow:0 2px 0 var(--line-lip);
+    transition:color 0.2s ease, border-color 0.2s ease, transform 0.12s ease, box-shadow 0.12s ease;
     flex-shrink:0;
   }
-  .theme-toggle:hover { color:var(--nest-gold-accent); border-color:var(--nest-gold-accent); transform:translateY(-1px); }
-  .theme-toggle:active { transform:scale(0.9); }
+  .theme-toggle:hover { color:var(--nest-gold-accent); border-color:var(--nest-gold-accent); }
+  .theme-toggle:active { transform:translateY(2px); box-shadow:none; }
   .theme-toggle-icon { width:18px; height:18px; animation: theme-icon-pop 0.35s ease; }
   @keyframes theme-icon-pop {
     from { transform: rotate(-90deg) scale(0.4); opacity: 0; }
     to { transform: rotate(0deg) scale(1); opacity: 1; }
   }
-  main { max-width:760px; margin:0 auto; padding:50px 24px 80px; }
-  h1 { font-family:'Playfair Display',serif; font-weight:600; font-size:36px; margin-bottom:8px; }
-  .updated { color:var(--text-dim); font-size:14px; margin-bottom:36px; }
-  h2 { font-size:20px; margin:32px 0 10px; }
-  p, li { color:var(--text-secondary); font-size:15px; }
+  main { max-width:720px; margin:0 auto; padding:56px 24px 90px; }
+  h1 { font-family:var(--font-display); font-weight:700; font-size:clamp(28px,4.5vw,38px); letter-spacing:-0.03em; line-height:1.15; margin-bottom:10px; }
+  .updated { color:var(--text-dim); font-size:14px; margin-bottom:38px; }
+  h2 { font-family:var(--font-display); font-weight:600; font-size:18px; letter-spacing:-0.02em; margin:38px 0 10px; }
+  p, li { color:var(--text-secondary); font-size:16px; max-width:68ch; }
   ul { padding-left:22px; margin:8px 0; }
   li { margin-bottom:6px; }
-  .back { display:inline-block; margin-top:40px; color:var(--nest-green-light); font-weight:600; text-decoration:none; }
-  .note { background:var(--bg-panel); border:1px solid var(--border-soft); border-radius:12px; padding:18px 20px; margin:24px 0; font-size:14px; }
+  li::marker { color:var(--nest-gold); }
+  .back { display:inline-block; margin-top:44px; font-weight:700; text-decoration:none; padding:11px 22px; border-radius:var(--r-md); background:var(--bg-panel); border:1.5px solid var(--input-border); box-shadow:0 3px 0 var(--line-lip); color:var(--text-primary); transition:transform 0.1s ease, box-shadow 0.1s ease; }
+  .back:active { transform:translateY(3px); box-shadow:none; }
+  .note { background:var(--sun-soft); border:1.5px solid color-mix(in srgb, var(--sun) 60%, transparent); border-radius:var(--r-lg); padding:18px 22px; margin:26px 0; font-size:15px; box-shadow:0 3px 0 color-mix(in srgb, var(--sun) 45%, transparent); }
+  .note, .note p, .note li { color:var(--text-primary); }
 </style>
 </head>
 <body>

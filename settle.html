@@ -7,9 +7,9 @@
 <title data-i18n="settle.page_title">Споделено — BudgetNest</title>
 <meta name="description" content="Кой на кого дължи в домакинството — споделени разходи в BudgetNest.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=16">
-<link rel="stylesheet" href="css/dashboard.css?v=16">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Unbounded:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css?v=17">
+<link rel="stylesheet" href="css/dashboard.css?v=17">
 <script src="nav.js?v=10" defer></script>
 <script src="i18n.js?v=9" defer></script>
 <script src="analytics.js?v=1" defer></script>
@@ -38,7 +38,7 @@
     padding: 14px 16px;
   }
   .balance-pill-name { font-size: 13px; color: var(--text-secondary); margin-bottom: 4px; }
-  .balance-pill-amount { font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums; font-weight: 700; font-size: 18px; }
+  .balance-pill-amount { font-family: 'Onest', sans-serif; font-variant-numeric: tabular-nums; font-weight: 700; font-size: 18px; }
   .balance-pill-amount.owed { color: var(--color-income); }
   .balance-pill-amount.owes { color: #E53E3E; }
   .balance-pill-amount.even { color: var(--text-dim); }
@@ -54,9 +54,9 @@
   }
   .transfer-row:last-child { border-bottom: none; }
   .transfer-desc { font-size: 14px; color: var(--text-primary); }
-  .transfer-desc b { font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums; }
+  .transfer-desc b { font-family: 'Onest', sans-serif; font-variant-numeric: tabular-nums; }
   .transfer-settle-btn {
-    font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700;
+    font-family: 'Onest', sans-serif; font-size: 12px; font-weight: 700;
     border-radius: 8px; padding: 8px 12px; cursor: pointer; white-space: nowrap;
     border: 1px solid var(--nest-green-mid); background: rgba(37,74,55,0.1); color: var(--nest-green-mid);
   }
@@ -68,7 +68,7 @@
   .shared-tx-row:last-child { border-bottom: none; }
   .shared-tx-desc { color: var(--text-primary); font-weight: 500; }
   .shared-tx-meta { color: var(--text-dim); font-size: 11.5px; margin-top: 2px; }
-  .shared-tx-amount { font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+  .shared-tx-amount { font-family: 'Onest', sans-serif; font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
 
   .settlement-log-row {
     display: flex; align-items: center; justify-content: space-between; gap: 10px;
@@ -156,11 +156,11 @@
 <div class="overlay" id="app-confirm-overlay" style="display:none; z-index: 9999;">
   <div class="overlay-card" style="max-width: 420px; text-align: center; padding: 30px;">
     <div style="font-size: 40px; margin-bottom: 15px;">⚠️</div>
-    <h3 id="app-confirm-title" data-i18n="common.confirm_title" style="margin-bottom: 10px; font-family: 'Playfair Display', serif; font-size: 20px; color: var(--text-primary);">Потвърждение</h3>
+    <h3 id="app-confirm-title" data-i18n="common.confirm_title" style="margin-bottom: 10px; font-family: var(--font-display); font-size: 20px; color: var(--text-primary);">Потвърждение</h3>
     <p id="app-confirm-message" style="color: var(--text-secondary); margin-bottom: 25px; font-size: 14px; line-height: 1.5;"></p>
     <div style="display: flex; gap: 12px; justify-content: center;">
-      <button type="button" id="app-confirm-cancel-btn" data-i18n="common.cancel" style="flex: 1; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: var(--text-secondary); background: var(--surface-alt); border: 1px solid var(--border-soft); border-radius: 10px; padding: 12px; cursor: pointer;">Отказ</button>
-      <button type="button" id="app-confirm-ok-btn" data-i18n="common.confirm_ok" style="flex: 1; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: #FFFFFF; background: #EF4444; border: 1px solid #DC2626; border-radius: 10px; padding: 12px; cursor: pointer;">Да, продължи</button>
+      <button type="button" id="app-confirm-cancel-btn" data-i18n="common.cancel" style="flex: 1; font-family: 'Onest', sans-serif; font-weight: 600; font-size: 14px; color: var(--text-secondary); background: var(--surface-alt); border: 1px solid var(--border-soft); border-radius: 10px; padding: 12px; cursor: pointer;">Отказ</button>
+      <button type="button" id="app-confirm-ok-btn" data-i18n="common.confirm_ok" style="flex: 1; font-family: 'Onest', sans-serif; font-weight: 600; font-size: 14px; color: #FFFFFF; background: #EF4444; border: 1px solid #DC2626; border-radius: 10px; padding: 12px; cursor: pointer;">Да, продължи</button>
     </div>
   </div>
 </div>
@@ -177,7 +177,7 @@
       info:    { bg: '#1E3A5F', border: '#3B82F6' },
     };
     const c = palette[type] || palette.info;
-    toast.style.cssText = `background:${c.bg}; border:1px solid ${c.border}; color:#fff; padding:14px 18px; border-radius:10px; font-family:'Inter',sans-serif; font-size:13px; font-weight:500; box-shadow:0 8px 24px rgba(0,0,0,0.35); max-width:340px; line-height:1.45;`;
+    toast.style.cssText = `background:${c.bg}; border:1px solid ${c.border}; color:#fff; padding:14px 18px; border-radius:10px; font-family:var(--font-body); font-size:13px; font-weight:500; box-shadow:0 8px 24px rgba(0,0,0,0.35); max-width:340px; line-height:1.45;`;
     toast.textContent = message;
     container.appendChild(toast);
     setTimeout(() => {

@@ -16,7 +16,7 @@
 
 .emp-input-wrap.emp-open input.emp-trigger {
   border-color: var(--nest-green-mid);
-  box-shadow: 0 0 0 3px rgba(37, 74, 55, 0.1);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--sprout) 30%, transparent);
 }
 
 /* ===== Панел ===== */
@@ -28,10 +28,10 @@
   display: flex;
   flex-direction: column;
   background: var(--bg-panel);
-  border: 1px solid var(--border-soft);
-  border-radius: 16px;
-  box-shadow: var(--card-shadow), 0 12px 28px rgba(0, 0, 0, 0.12);
-  font-family: 'Inter', sans-serif;
+  border: 1.5px solid var(--input-border);
+  border-radius: var(--r-lg);
+  box-shadow: 0 4px 0 var(--line-lip), 0 18px 36px rgba(8, 40, 28, 0.18);
+  font-family: var(--font-body);
   opacity: 0;
   transform: translateY(-6px) scale(0.98);
   pointer-events: none;
@@ -52,13 +52,13 @@
 
 .emp-search-row input {
   width: 100%;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   font-size: 13.5px;
   color: var(--text-primary);
   background: var(--surface-alt);
-  border: 1px solid var(--input-border);
-  border-radius: 9px;
-  padding: 9px 12px;
+  border: 1.5px solid var(--input-border);
+  border-radius: var(--r-sm);
+  padding: 10px 12px;
   outline: none;
   transition: border-color 0.2s ease;
 }
@@ -68,7 +68,7 @@
 }
 
 .emp-search-row input::placeholder {
-  color: #94A3B8;
+  color: var(--text-dim);
 }
 
 .emp-scroll {
@@ -81,11 +81,11 @@
 .emp-scroll::-webkit-scrollbar-thumb { background: var(--border-soft); border-radius: 4px; }
 
 .emp-group-label {
-  font-size: 11px;
+  font-size: 12.5px;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: var(--text-dim);
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--text-secondary);
   padding: 10px 2px 6px;
 }
 
@@ -103,20 +103,20 @@
   justify-content: center;
   border: none;
   background: transparent;
-  border-radius: 9px;
+  border-radius: 12px;
   font-size: 19px;
   cursor: pointer;
   transition: background 0.15s ease, transform 0.1s ease;
 }
 
 .emp-emoji-btn:hover {
-  background: var(--surface-alt);
+  background: var(--mint-soft);
   transform: scale(1.12);
 }
 
 .emp-emoji-btn.emp-selected {
-  background: var(--nest-green-mid);
-  box-shadow: 0 0 0 2px var(--nest-gold-accent) inset;
+  background: var(--sun-soft);
+  box-shadow: 0 0 0 2px var(--sun) inset;
 }
 
 .emp-empty {

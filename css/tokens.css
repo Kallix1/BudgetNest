@@ -1,0 +1,125 @@
+/* ============================================================
+   BudgetNest — дизайн токени (единственото място за цветове и шрифтове)
+
+   Идея: ученическа тетрадка на квадратчета + слънчоглед + кълн.
+   Цветовете носят информация и се повтарят навсякъде:
+     карта = индиго · в брой = слънчоглед · приход = зелено · разход = червено
+
+   Старите имена (--nest-gold и т.н.) са запазени нарочно, защото се
+   ползват в inline стиловете на страниците. --nest-gold е ЗЕЛЕН акцент,
+   не златен — името е останало от по-ранна версия.
+   ============================================================ */
+
+:root {
+  /* ----- Шрифтове (и двата имат кирилица) ----- */
+  --font-display: 'Unbounded', 'Onest', system-ui, sans-serif;
+  --font-body: 'Onest', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* ----- Повърхности ----- */
+  --bg-void: #F3F7EF;          /* хартията зад картите */
+  --bg-panel: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --border-soft: #DCE6D6;
+  --line-lip: #C6D6BF;         /* дебелият "ръб" под картите и бутоните */
+  --surface-alt: #F6FAF3;
+  --input-bg: #FFFFFF;
+  --input-border: #BFD0B9;
+  --track-bg: #E4EDDF;
+  --grid-line: rgba(20, 103, 74, 0.075);   /* квадратчетата на тетрадката */
+
+  /* ----- Марка ----- */
+  --nest-green-dark: #0C3B2B;  /* дълбок смърч: страничната лента */
+  --nest-green-mid: #14674A;   /* основен зелен за текст и активни състояния */
+  --nest-green-light: #2F9A6B;
+  --nest-gold: #27A86C;        /* ярък зелен акцент (икони) */
+  --nest-gold-accent: #13804F; /* зелен за връзки/акценти върху светло */
+  --on-brand: #FFFFFF;         /* текст върху --nest-green-mid */
+
+  --sprout: #3BD68C;           /* основният бутон */
+  --sprout-lip: #1FA566;
+  --on-sprout: #0C3B2B;
+
+  --sun: #FFC22E;              /* слънчоглед: в брой, активно меню, празник */
+  --sun-soft: #FFF1BF;
+  --sun-ink: #6B4700;
+  --egg-pale: #FFF1BF;          /* яйцата са еднакви и в двете теми */
+
+  --peri: #4650D0;             /* индиго: картата */
+  --peri-soft: #E6E8FF;
+
+  --mint-soft: #DDF6E8;        /* приход */
+  --red-soft: #FFE6E8;         /* разход */
+
+  /* ----- Текст ----- */
+  --text-primary: #112D22;
+  --text-secondary: #46605A;
+  --text-dim: #566F63;
+
+  /* ----- Системни ----- */
+  --color-income: #14674A;
+  --color-expense: #C42A3A;
+  --color-warning: #A86500;    /* умишлено различен от слънчогледа: жълтото е декор, а не тревога */
+
+  --hero-bg: #0C3B2B;
+  --hero-ink: #FFFFFF;
+
+  --card-shadow: 0 3px 0 var(--line-lip);
+  --btn-shadow: 0 4px 0 var(--sprout-lip);
+  --heading-accent: #0C3B2B;
+  --focus-ring: #14674A;
+
+  /* ----- Форми и радиуси (различни по йерархия, не един за всичко) ----- */
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+}
+
+[data-theme="dark"] {
+  --bg-void: #0D1914;
+  --bg-panel: #13241C;
+  --bg-card: #13241C;
+  --border-soft: rgba(190, 235, 210, 0.12);
+  --line-lip: #07100C;
+  --surface-alt: #182C23;
+  --input-bg: #0F1D17;
+  --input-border: rgba(190, 235, 210, 0.22);
+  --track-bg: #1B3128;
+  --grid-line: rgba(190, 235, 210, 0.035);
+
+  --nest-green-dark: #08110D;
+  --nest-green-mid: #4FD197;
+  --nest-green-light: #37B07C;
+  --nest-gold: #3EDC92;
+  --nest-gold-accent: #3EDC92;
+  --on-brand: #06231A;
+
+  --sprout: #3EDC92;
+  --sprout-lip: #17935B;
+  --on-sprout: #06231A;
+
+  --sun: #FFCB4D;
+  --sun-soft: rgba(255, 203, 77, 0.16);
+  --sun-ink: #FFD870;
+
+  --peri: #9DA5FF;
+  --peri-soft: rgba(157, 165, 255, 0.16);
+
+  --mint-soft: rgba(62, 220, 146, 0.14);
+  --red-soft: rgba(255, 128, 137, 0.14);
+
+  --text-primary: #EAF6EE;
+  --text-secondary: #A9C4B6;
+  --text-dim: #86A294;
+
+  --color-income: #5EE0A0;
+  --color-expense: #FF8089;
+  --color-warning: #FFCB4D;
+
+  --hero-bg: #0F4A35;
+  --hero-ink: #FFFFFF;
+
+  --btn-shadow: 0 4px 0 var(--sprout-lip);
+  --heading-accent: #CFF5E0;
+  --focus-ring: #3EDC92;
+}

@@ -1,138 +1,19 @@
-/* ============================================
-   БЮДЖЕТ ТРАКЕР — Светла корпоративна тема (BudgetNest)
-   ============================================ */
+/* ============================================================
+   BudgetNest — основни стилове: база, вход/регистрация, форми, бутони
+   Цветове и шрифтове: виж tokens.css
+   ============================================================ */
 
-:root {
-  --bg-void: #F4F6F8;
-  --bg-panel: #FFFFFF;
-  --bg-card: #FFFFFF;
-  --border-soft: #E2E8F0;
+@import url("tokens.css?v=17");
 
-  /* Допълнителни повърхности (за инпути, hover фонове, ленти) */
-  --surface-alt: #F8FAFC;
-  --input-bg: #FFFFFF;
-  --input-border: #CBD5E1;
-  --track-bg: #EDF2F7;
-
-  /* Фирмени цветове от логото BudgetNest */
-  --nest-green-dark: #1A3326;   /* Дълбоко горско зелено */
-  --nest-green-mid: #254A37;    /* Основно зелено */
-  --nest-green-light: #366A4F;  /* Светло зелено */
-  --nest-gold: #2E9E44;         /* Зелен акцент (преди: златно) */
-  --nest-gold-accent: #21813A;  /* Тъмно зелено за бутони */
-
-  /* Текст */
-  --text-primary: #1A202C;
-  --text-secondary: #4A5568;
-  --text-dim: #718096;
-
-  /* Системни цветове */
-  --color-income: #254A37;
-  --color-expense: #E53E3E;
-  --color-warning: #C5A028;  /* Кехлибарено предупреждение (напр. "наближавате лимита") — умишлено НЕ е обвързано с брандовия акцент */
-
-  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
-  --btn-shadow: 0 4px 10px rgba(67, 162, 72, 0.2);
-
-  /* Акцентен цвят за заглавия на карти — четим и в двете теми */
-  --heading-accent: #1A3326;
-}
-
-/* ===== Тъмна тема ===== */
-[data-theme="dark"] {
-  --bg-void: #0A0F14;
-  --bg-panel: #10161C;
-  --bg-card: #10161C;
-  --border-soft: rgba(255, 255, 255, 0.06);
-
-  --surface-alt: #151B21;
-  --input-bg: #10161C;
-  --input-border: #232B32;
-  --track-bg: #151B21;
-
-  --nest-green-dark: #0A0F14;
-  --nest-green-mid: #4FAE72;
-  --nest-green-light: #3E7A50;
-  --nest-gold: #43A248;
-  --nest-gold-accent: #368A3C;
-
-  --text-primary: #F1F5F1;
-  --text-secondary: #A9BDAF;
-  --text-dim: #6E8577;
-
-  --color-income: #6FCF97;
-  --color-expense: #FF8A8A;
-  --color-warning: #D4AF37;
-
-  --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
-  --btn-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
-
-  --heading-accent: #8FCDA8;
-}
-
-body { transition: background-color 0.25s ease, color 0.25s ease; }
-.page, .card, .summary-card, .overlay-card, .form-side, .brand-side, .navbar,
-.field input, .field select, button.submit {
-  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
-}
-
-/* Контраст на brand текста в тъмна тема — светлите цветове от gradienta
-   на светлата тема (тъмнозелено -> злато) стават почти невидими на тъмен фон */
-[data-theme="dark"] .brand-mark {
-  color: var(--text-secondary);
-}
-
-[data-theme="dark"] .brand-headline {
-  background: linear-gradient(120deg, var(--text-primary) 0%, var(--nest-green-light) 55%, var(--nest-gold) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-}
-
-/* ===== Бутон за тъмна тема ===== */
-.theme-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  align-self: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 999px;
-  border: 1px solid var(--border-soft);
-  background: var(--bg-panel);
-  color: var(--text-secondary);
-  cursor: pointer;
-  font-size: 17px;
-  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
-  flex-shrink: 0;
-}
-
-.theme-toggle:hover {
-  color: var(--nest-gold-accent);
-  border-color: var(--nest-gold-accent);
-  transform: translateY(-1px);
-}
-
-.theme-toggle:active {
-  transform: scale(0.9);
-}
-
-.theme-toggle-icon {
-  width: 18px;
-  height: 18px;
-  animation: theme-icon-pop 0.35s ease;
-}
-
-@keyframes theme-icon-pop {
-  from { transform: rotate(-90deg) scale(0.4); opacity: 0; }
-  to { transform: rotate(0deg) scale(1); opacity: 1; }
-}
-
+/* ===== База ===== */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body { height: 100%; }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
   background: var(--bg-void);
   color: var(--text-primary);
   min-height: 100vh;
@@ -142,76 +23,156 @@ body {
   padding: 24px;
   position: relative;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
-/* Изчистен фон без неонови петна */
-.bg-glow {
-  display: none;
-}
+::selection { background: var(--sun); color: #3A2A00; }
 
-/* Деликатна сива мрежа за фин акцент */
+/* Тетрадката: квадратчета върху цялата страница */
 .bg-grid {
   position: fixed;
   inset: 0;
   z-index: 0;
-  background-image:
-    linear-gradient(rgba(0, 0, 0, 0.015) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 0, 0, 0.015) 1px, transparent 1px);
-  background-size: 44px 44px;
   pointer-events: none;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+.bg-glow { display: none; }
+
+/* Видим фокус с клавиатура — навсякъде */
+:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: 6px;
 }
 
-/* ===== Страница Вход / Регистрация ===== */
+/* Плавна смяна на тема само за повърхностите, не за всичко */
+.page, .card, .summary-card, .overlay-card, .form-side, .brand-side, .navbar,
+.field input, .field select, button.submit {
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Шрифтове, записани inline в HTML (напр. в динамично генерирани редове) */
+[style*="Playfair"] { font-family: var(--font-display) !important; }
+[style*="'Inter'"]  { font-family: var(--font-body) !important; }
+
+/* ===== Бутон за тема / език ===== */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1.5px solid var(--border-soft);
+  background: var(--bg-panel);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 2px 0 var(--line-lip);
+  transition: color 0.2s ease, border-color 0.2s ease, transform 0.12s ease, box-shadow 0.12s ease;
+  flex-shrink: 0;
+}
+.theme-toggle:hover { color: var(--nest-gold-accent); border-color: var(--nest-gold-accent); }
+.theme-toggle:active { transform: translateY(2px); box-shadow: 0 0 0 var(--line-lip); }
+
+.theme-toggle-icon {
+  width: 18px;
+  height: 18px;
+  animation: theme-icon-pop 0.35s ease;
+}
+@keyframes theme-icon-pop {
+  from { transform: rotate(-90deg) scale(0.4); opacity: 0; }
+  to   { transform: rotate(0deg) scale(1); opacity: 1; }
+}
+
+/* ============================================================
+   Вход / регистрация
+   Лявата половина е "корицата на тетрадката": дълбоко зелено,
+   слънце и три яйца в гнездо. Десният панел е хартията с формата.
+   ============================================================ */
 .page {
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: 960px;
+  max-width: 980px;
   display: grid;
   grid-template-columns: 1.05fr 1fr;
   background: var(--bg-panel);
-  border: 1px solid var(--border-soft);
-  border-radius: 20px;
+  border: 1.5px solid var(--border-soft);
+  border-radius: var(--r-xl);
   overflow: hidden;
-  min-height: 580px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.06);
-  animation: fadeUp 0.6s ease both;
+  min-height: 600px;
+  box-shadow: 0 6px 0 var(--line-lip);
+  animation: fadeUp 0.55s cubic-bezier(.2,.8,.2,1) both;
 }
 
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(18px); }
+  from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Ляво брандирано каре */
 .brand-side {
-  padding: 56px 46px;
+  padding: 52px 46px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   position: relative;
-  background:
-    radial-gradient(circle at 20% 15%, rgba(37,74,55,0.04), transparent 55%),
-    radial-gradient(circle at 85% 85%, rgba(67,162,72,0.06), transparent 55%),
-    var(--bg-panel);
-  border-right: 1px solid var(--border-soft);
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--hero-bg);
+  color: var(--hero-ink);
+}
+
+/* Слънцето */
+.brand-side::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: -90px;
+  right: -70px;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: var(--sun);
+  box-shadow: 0 0 0 26px rgba(255, 255, 255, 0.07), 0 0 0 56px rgba(255, 255, 255, 0.04);
+}
+
+/* Три яйца: един елемент, клонирани с box-shadow (сянката следва радиуса) */
+.brand-side::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  right: 42px;
+  bottom: 4px;
+  width: 58px;
+  height: 74px;
+  border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+  background: var(--egg-pale);
+  box-shadow:
+    -72px 14px 0 -4px var(--sprout),
+    -140px 26px 0 -9px #FFFFFF;
+  transform: rotate(8deg);
 }
 
 .brand-mark {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  font-family: var(--font-display);
   font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: none;
-  color: var(--nest-green-dark);
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--hero-ink);
 }
-
-.brand-mark::before {
-  display: none;
-  content: none;
-}
+.brand-mark::before { display: none; content: none; }
 
 .brand-badge {
   display: inline-flex;
@@ -219,48 +180,43 @@ body {
   justify-content: center;
   width: 20px;
   height: 20px;
-  color: var(--nest-gold);
+  color: var(--sun);
   flex-shrink: 0;
 }
 .brand-badge svg { width: 100%; height: 100%; }
 
 .brand-headline {
-  font-family: 'Playfair Display', serif;
-  font-size: 40px;
+  font-family: var(--font-display);
+  font-size: clamp(30px, 3.6vw, 40px);
   font-weight: 700;
-  line-height: 1.2;
-  margin-top: 30px;
-  background: linear-gradient(120deg, var(--nest-green-dark) 0%, var(--nest-green-mid) 60%, var(--nest-gold-accent) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  margin-top: 34px;
+  color: #FFFFFF;
+  max-width: 11ch;
 }
 
 .brand-sub {
-  margin-top: 18px;
-  font-size: 15px;
-  line-height: 1.65;
-  color: var(--text-secondary);
-  max-width: 32ch;
+  margin-top: 20px;
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.82);
+  max-width: 30ch;
 }
 
 .brand-stat {
-  font-family: 'Inter', sans-serif;
-  font-size: 13px;
-  color: var(--text-secondary);
-  border-top: 1px solid var(--border-soft);
+  font-size: 13.5px;
+  color: rgba(255, 255, 255, 0.82);
   padding-top: 20px;
-  line-height: 1.7;
+  line-height: 1.6;
+  max-width: 22ch;
+  position: relative;
 }
+.brand-stat b { color: var(--sun); font-weight: 700; }
 
-.brand-stat b {
-  color: var(--nest-green-mid);
-  font-weight: 600;
-}
-
-/* Дясно каре с формите */
+/* ----- Формата ----- */
 .form-side {
-  padding: 56px 48px;
+  padding: 52px 48px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -270,163 +226,157 @@ body {
 .tabs {
   display: flex;
   gap: 6px;
-  margin-bottom: 34px;
+  margin-bottom: 32px;
   background: var(--surface-alt);
-  border: 1px solid var(--border-soft);
-  border-radius: 12px;
+  border: 1.5px solid var(--border-soft);
+  border-radius: var(--r-md);
   padding: 5px;
 }
 
 .tab {
   flex: 1;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   font-weight: 600;
-  font-size: 14px;
+  font-size: 14.5px;
   color: var(--text-secondary);
   background: none;
   border: none;
   cursor: pointer;
-  padding: 10px 0;
-  border-radius: 8px;
-  transition: color 0.2s ease, background 0.2s ease;
+  padding: 11px 0;
+  border-radius: var(--r-sm);
+  transition: color 0.2s ease, background 0.2s ease, box-shadow 0.15s ease;
 }
-
+.tab:hover:not(.active) { color: var(--text-primary); background: var(--bg-panel); }
 .tab.active {
-  color: #FFFFFF;
-  background: var(--nest-green-mid);
+  color: var(--on-sprout);
+  background: var(--sprout);
+  box-shadow: 0 3px 0 var(--sprout-lip);
 }
 
-.form-side form {
-  display: none;
-  flex-direction: column;
-  gap: 24px;
-}
+.form-side form { display: none; flex-direction: column; gap: 22px; }
+.form-side form.active { display: flex; animation: fadeUp 0.35s ease both; }
 
-.form-side form.active {
-  display: flex;
-  animation: fadeUp 0.35s ease both;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
+/* ============================================================
+   Полета
+   ============================================================ */
+.field { display: flex; flex-direction: column; gap: 7px; }
 
 .field label {
-  font-size: 12px;
+  font-size: 13.5px;
   font-weight: 600;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--text-secondary);
 }
 
-.field input {
-  font-family: 'Inter', sans-serif;
+.field input,
+.field select,
+.field textarea {
+  font-family: var(--font-body);
   font-size: 15px;
   color: var(--text-primary);
   background: var(--input-bg);
-  border: 1px solid var(--input-border);
-  border-radius: 10px;
-  padding: 13px 14px;
+  border: 1.5px solid var(--input-border);
+  border-radius: var(--r-md);
+  padding: 13px 15px;
   outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.25s ease;
 }
 
-.field input:focus {
+.field select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 42px;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2346605A' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 18px;
+}
+
+.field input:hover,
+.field select:hover,
+.field textarea:hover { border-color: var(--nest-green-light); }
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
   border-color: var(--nest-green-mid);
-  box-shadow: 0 0 0 3px rgba(37, 74, 55, 0.1);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--sprout) 30%, transparent);
 }
 
-.field input::placeholder {
-  color: #94A3B8;
-}
+.field input::placeholder,
+.field textarea::placeholder { color: var(--text-dim); opacity: 0.75; }
 
-.row-inline {
-  display: flex;
-  justify-content: flex-end;
-  font-size: 13px;
-}
+input[type="checkbox"], input[type="radio"] { accent-color: var(--nest-gold-accent); }
 
+.row-inline { display: flex; justify-content: flex-end; font-size: 13.5px; }
 .row-inline a {
   color: var(--nest-green-mid);
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.2s ease;
-}
-
-.row-inline a:hover {
-  color: var(--heading-accent);
   text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--nest-green-mid) 35%, transparent);
+  text-underline-offset: 3px;
+  font-weight: 600;
+  transition: text-decoration-color 0.2s ease;
 }
+.row-inline a:hover { text-decoration-color: currentColor; }
 
+/* ============================================================
+   Бутони — дебел "ръб", който се натиска надолу
+   ============================================================ */
 button.submit {
   margin-top: 6px;
   position: relative;
-  font-family: 'Inter', sans-serif;
-  font-weight: 600;
-  font-size: 15px;
-  color: var(--nest-green-dark);
-  background: linear-gradient(120deg, #8CDB8F, var(--nest-gold));
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  border-radius: 10px;
-  padding: 15px 20px;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 15.5px;
+  color: var(--on-sprout);
+  background: var(--sprout);
+  border: none;
+  border-radius: var(--r-md);
+  padding: 15px 22px;
   cursor: pointer;
-  overflow: hidden;
-  transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
   box-shadow: var(--btn-shadow);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.2s ease;
 }
-
-button.submit:hover {
-  transform: translateY(-1px);
-  background: linear-gradient(120deg, #8CDB8F, var(--nest-gold-accent));
-  box-shadow: 0 6px 14px rgba(67, 162, 72, 0.35);
-}
-
-button.submit:active {
-  transform: translateY(0);
-}
-
+button.submit:hover { filter: brightness(1.05); transform: translateY(-1px); box-shadow: 0 5px 0 var(--sprout-lip); }
+button.submit:active { transform: translateY(4px); box-shadow: 0 0 0 var(--sprout-lip); }
 button.submit:disabled {
   opacity: 0.55;
   cursor: not-allowed;
-  transform: none;
+  transform: translateY(4px);
   box-shadow: none;
+  filter: grayscale(0.4);
 }
 
-.status-msg {
-  font-size: 13px;
-  min-height: 18px;
-  line-height: 1.5;
-}
+.status-msg { font-size: 13.5px; min-height: 18px; line-height: 1.5; }
+.status-msg.error   { color: var(--color-expense); font-weight: 600; }
+.status-msg.success { color: var(--nest-green-mid); font-weight: 600; }
 
-.status-msg.error   { color: #DC2626; font-weight: 500; }
-.status-msg.success { color: var(--nest-green-mid); font-weight: 500; }
+.fine-print { margin-top: 24px; font-size: 12.5px; color: var(--text-dim); line-height: 1.6; }
 
-.fine-print {
-  margin-top: 26px;
-  font-size: 12px;
-  color: var(--text-dim);
-  line-height: 1.6;
-}
-
+/* ===== Малки екрани ===== */
 @media (max-width: 720px) {
-  .page { grid-template-columns: 1fr; }
-  .brand-side {
-    padding: 40px 32px;
-    border-right: none;
-    border-bottom: 1px solid var(--border-soft);
-  }
-  .brand-headline { font-size: 30px; }
-  .form-side { padding: 40px 32px; }
+  .page { grid-template-columns: 1fr; min-height: 0; }
+  .brand-side { padding: 38px 30px 74px; }
+  .brand-side::before { width: 190px; height: 190px; top: -84px; right: -60px; }
+  .brand-headline { font-size: 30px; max-width: none; margin-top: 24px; }
+  .brand-sub { max-width: none; }
+  .brand-stat { max-width: none; padding-right: 150px; }
+  .form-side { padding: 38px 30px; }
 }
 
 @media (max-width: 420px) {
   body { padding: 0; align-items: flex-start; }
-  .page { border-radius: 0; min-height: 100vh; }
-  .brand-side { padding: 32px 22px; }
-  .form-side { padding: 32px 22px; }
+  .page { border-radius: 0; border-left: 0; border-right: 0; min-height: 100vh; }
+  .brand-side { padding: 30px 22px 70px; }
+  .form-side { padding: 30px 22px; }
   .brand-headline { font-size: 26px; }
-  .brand-stat { font-size: 12px; }
-  .theme-toggle { top: 16px !important; right: 16px !important; }
+  .brand-stat { font-size: 12.5px; }
+  .theme-toggle { top: 14px !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
