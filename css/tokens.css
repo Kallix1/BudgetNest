@@ -41,7 +41,7 @@
   --sun: #FFC22E;              /* слънчоглед: в брой, активно меню, празник */
   --sun-soft: #FFF1BF;
   --sun-ink: #6B4700;
-  --egg-pale: #FFF1BF;          /* яйцата са еднакви и в двете теми */
+  --coin-pale: #FFF1BF;         /* светлата монета е еднаква и в двете теми */
 
   --peri: #4650D0;             /* индиго: картата */
   --peri-soft: #E6E8FF;
@@ -246,7 +246,7 @@
   --sun: #FFB23E;
   --sun-soft: rgba(255, 178, 62, 0.16);
   --sun-ink: #FFD38A;
-  --egg-pale: #FFE0B0;
+  --coin-pale: #FFE0B0;
 
   --peri: #B87CFF;
   --peri-soft: rgba(184, 124, 255, 0.18);
