@@ -224,10 +224,19 @@ section { padding: 84px 28px; }
   box-shadow: 0 8px 0 rgba(0, 0, 0, 0.28);
 }
 .cta-band::before {
-  content: ""; position: absolute; z-index: -1; right: 70px; bottom: -26px;
-  width: 78px; height: 98px; border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
-  background: var(--sun); transform: rotate(8deg);
-  box-shadow: -96px 18px 0 -5px var(--sprout), -186px 32px 0 -12px var(--egg-pale);
+  content: "€"; position: absolute; z-index: -1; right: 76px; bottom: 30px;
+  width: 84px; height: 84px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-size: 37px; font-weight: 700; line-height: 1;
+  color: rgba(0, 0, 0, 0.42);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+  background:
+    radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.55), transparent 56%),
+    linear-gradient(145deg, var(--coin-pale), var(--sun) 58%, color-mix(in srgb, var(--sun) 70%, #000000));
+  box-shadow:
+    inset 0 0 0 3px rgba(255, 255, 255, 0.22),
+    inset 0 0 0 4px rgba(0, 0, 0, 0.08),
+    0 8px 20px rgba(0, 0, 0, 0.2);
 }
 .cta-band::after {
   content: ""; position: absolute; z-index: -1; top: -110px; right: -90px;
