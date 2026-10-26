@@ -856,7 +856,21 @@
 
     cardEl.textContent = eur(card);
     cashEl.textContent = eur(cash);
-    if (totalEl) totalEl.textContent = eur(card + cash);
+    const total = card + cash;
+    if (totalEl) totalEl.textContent = eur(total);
+
+    // Safe to spend today = total money / days left in the month
+    const now = new Date();
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    const daysLeft = Math.max(1, lastDay - now.getDate() + 1);
+    const safeEl = document.getElementById('safe-to-spend');
+    const safeCard = document.getElementById('safe-to-spend-card');
+    if (safeEl && safeCard) {
+      safeEl.textContent = eur(total / daysLeft);
+      safeCard.style.display = 'flex';
+      safeCard.style.flexDirection = 'column';
+      safeCard.style.justifyContent = 'center';
+    }
   }
 
   // ===== Банер: категории близо до / над лимита този месец =====
@@ -1012,23 +1026,6 @@
     const expense = txs.filter(t => t.categories?.type === 'expense').reduce((s, t) => s + Number(t.amount), 0);
     document.getElementById('summary-income').textContent = eur(income);
     document.getElementById('summary-expense').textContent = eur(expense);
-    
-    // Safe to spend
-    try {
-      const now = new Date();
-      const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-      const daysLeft = Math.max(1, lastDay - now.getDate() + 1);
-      const net = income - expense;
-      const safe = net / daysLeft;
-      const safeEl = document.getElementById('safe-to-spend');
-      const safeCard = document.getElementById('safe-to-spend-card');
-      if (safeEl && safeCard) {
-        safeEl.textContent = eur(safe);
-        safeCard.style.display = 'flex';
-        safeCard.style.flexDirection = 'column';
-        safeCard.style.justifyContent = 'center';
-      }
-    } catch(e) {}
   }
 
   function toggleChartView() {
