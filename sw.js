@@ -1,4 +1,4 @@
-const CACHE_NAME = 'budgetnest-v2';
+const CACHE_NAME = 'budgetnest-v3';
 const ASSETS = [
   './',
   './dashboard.html',

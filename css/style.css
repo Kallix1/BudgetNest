@@ -3,7 +3,7 @@
    Цветове и шрифтове: виж tokens.css
    ============================================================ */
 
-@import url("tokens.css?v=18");
+@import url("tokens.css?v=21");
 
 /* ===== База ===== */
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -14,7 +14,7 @@ body {
   font-family: var(--font-body);
   font-size: 15px;
   line-height: 1.5;
-  background: var(--bg-void);
+  background-color: var(--sky-base);
   color: var(--text-primary);
   min-height: 100vh;
   display: flex;
@@ -29,16 +29,16 @@ body {
 
 ::selection { background: var(--sun); color: #3A2A00; }
 
-/* Тетрадката: квадратчета върху цялата страница */
+/* Фонът на цялата страница: виж --sky-* в tokens.css (различен за всяка тема) */
 .bg-grid {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background-image:
-    linear-gradient(var(--grid-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-  background-size: 28px 28px;
+  background-color: var(--sky-base);
+  background-image: var(--sky-image);
+  background-size: var(--sky-size);
+  background-repeat: var(--sky-repeat);
 }
 .bg-glow { display: none; }
 
