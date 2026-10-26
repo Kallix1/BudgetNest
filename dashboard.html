@@ -19,12 +19,13 @@
 <script src="theme.js?v=1" defer></script>
 <script src="analytics.js?v=1" defer></script>
 <script src="icons.js?v=2" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script src="boot.js?v=1"></script>
+<script src="vendor/supabase-js-2.117.3.min.js"></script>
+<script src="vendor/chart-4.6.1.umd.min.js"></script>
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
-      navigator.serviceWorker.register('./sw.js?v=3').catch(function(){});
+      navigator.serviceWorker.register('./sw.js?v=4').catch(function(){});
     });
   }
 </script>
@@ -572,33 +573,57 @@
   }
 
   // ===== Init flow =====
+  // Ако auth заявката „заклещи“ (стар кеширан Supabase в даден браузър,
+  // повредена сесия и т.н.), главната част на таблото оставаше скрита завинаги.
+  // Затова всяка критична стъпка има таймаут, а грешките отиват в boot guard-а,
+  // който показва екран за презареждане вместо празна страница.
+  function withTimeout(promise, ms, message) {
+    return Promise.race([
+      promise,
+      new Promise((_, reject) => setTimeout(() => reject(new Error(message)), ms))
+    ]);
+  }
+
+  function reportBootError(err, source) {
+    console.error('Dashboard init failed:', source || 'init', err);
+    if (window.BudgetNestBoot) window.BudgetNestBoot.fail(err, source || 'dashboard-init');
+  }
+
   (async function init() {
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    if (!session) {
-      window.location.href = 'login.html';
-      return;
-    }
-    currentUser = session.user;
-    updateSettleNavVisibility(currentUser.id);
-    document.getElementById('tx-date').valueAsDate = new Date();
-    
-    // Apply last preferences
-    const lastPrefs = getLastTxPrefs();
-    if (lastPrefs.type) {
-      setTxType(lastPrefs.type);
-    }
-    if (lastPrefs.method) {
-      setQuickMethod(lastPrefs.method);
-    }
+    try {
+      const { data: { session } } = await withTimeout(
+        supabaseClient.auth.getSession(),
+        10000,
+        'auth.getSession() timed out'
+      );
+      if (!session) {
+        window.location.href = 'login.html';
+        return;
+      }
+      currentUser = session.user;
+      updateSettleNavVisibility(currentUser.id);
+      document.getElementById('tx-date').valueAsDate = new Date();
 
-    if (ADMIN_EMAILS.map(e => e.toLowerCase()).includes((currentUser.email || '').toLowerCase())) {
-      document.getElementById('admin-nav-link').style.display = 'flex';
+      // Apply last preferences
+      const lastPrefs = getLastTxPrefs();
+      if (lastPrefs.type) {
+        setTxType(lastPrefs.type);
+      }
+      if (lastPrefs.method) {
+        setQuickMethod(lastPrefs.method);
+      }
+
+      if (ADMIN_EMAILS.map(e => e.toLowerCase()).includes((currentUser.email || '').toLowerCase())) {
+        document.getElementById('admin-nav-link').style.display = 'flex';
+      }
+
+      const hasPendingInvite = await checkPendingInvite();
+      if (hasPendingInvite) return; // изчакваме потребителят да приеме/откаже поканата
+
+      await continueInit();
+    } catch (err) {
+      reportBootError(err, 'dashboard-init');
     }
-
-    const hasPendingInvite = await checkPendingInvite();
-    if (hasPendingInvite) return; // изчакваме потребителят да приеме/откаже поканата
-
-    await continueInit();
   })();
 
   // ===== Проверка за чакаща покана за домакинство =====
@@ -685,7 +710,7 @@
       .limit(1);
 
     if (error) {
-      console.error(error);
+      reportBootError(error, 'continueInit');
       return;
     }
 
@@ -695,8 +720,13 @@
     }
 
     currentHouseholdId = memberships[0].household_id;
-    document.getElementById('household-name').textContent = memberships[0].households.name;
+    // households може да е null, ако връзката е прекъсната от RLS или
+    // домакинството е изтрито — не позволяваме това да счупи целия init.
+    const household = memberships[0].households;
+    document.getElementById('household-name').textContent =
+      (household && household.name) || tr('dashboard.invite_default_household');
     document.getElementById('dashboard-main').style.display = 'block';
+    if (window.BudgetNestBoot) window.BudgetNestBoot.markReady();
 
     const { data: memberRows, error: memberError } = await supabaseClient
       .from('household_members')

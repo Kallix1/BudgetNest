@@ -1,4 +1,4 @@
-const CACHE_NAME = 'budgetnest-v3';
+const CACHE_NAME = 'budgetnest-v4';
 const ASSETS = [
   './',
   './dashboard.html',
@@ -14,12 +14,15 @@ const ASSETS = [
   './css/style.css',
   './css/dashboard.css',
   './css/datepicker.css',
+  './boot.js',
   './nav.js',
   './theme.js',
   './i18n.js',
   './analytics.js',
   './icons.js',
-  './datepicker.js'
+  './datepicker.js',
+  './vendor/supabase-js-2.117.3.min.js',
+  './vendor/chart-4.6.1.umd.min.js'
 ];
 
 self.addEventListener('install', (event) => {
