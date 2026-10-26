@@ -1,0 +1,23 @@
+﻿<!doctype html>
+<html lang="bg">
+<head>
+<meta charset="utf-8">
+<title>Mobile viewport preview</title>
+<style>
+  html, body { margin: 0; padding: 0; background: #d8d4cc; }
+  body { width: 390px; }
+  iframe { width: 390px; height: 844px; border: 0; display: block; background: #F6F4EF; }
+</style>
+</head>
+<body>
+<iframe id="mobile-frame" src="__dashboard-preview.html" title="Mobile dashboard preview"></iframe>
+<script>
+  const frame = document.getElementById('mobile-frame');
+  function applyScroll() {
+    const y = Number(new URLSearchParams(location.search).get('y') || 0);
+    try { frame.contentWindow.scrollTo(0, y); } catch (e) {}
+  }
+  frame.addEventListener('load', () => { applyScroll(); setTimeout(applyScroll, 250); });
+</script>
+</body>
+</html>

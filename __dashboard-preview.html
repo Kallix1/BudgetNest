@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B1%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#10291E">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="dashboard.page_title">Табло — BudgetNest</title>
+<meta name="description" content="Табло на BudgetNest — общ преглед на приходите, разходите и баланса на домакинството.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Unbounded:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css?v=20">
+<link rel="stylesheet" href="css/dashboard.css?v=20">
+<link rel="stylesheet" href="css/dashboard-home.css?v=6">
+<link rel="stylesheet" href="css/datepicker.css?v=2">
+<script src="datepicker.js?v=3" defer></script>
+<script src="nav.js?v=10" defer></script>
+<script src="i18n.js?v=10" defer></script>
+<script src="theme.js?v=1" defer></script>
+<script src="analytics.js?v=1" defer></script>
+<script src="icons.js?v=2" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('./sw.js').catch(function(){});
+    });
+  }
+</script>
+
+</head>
+<body class="dashboard-body dashboard-home">
+
+<nav class="navbar">
+  <div class="nav-left">
+    <div class="nav-left-header">
+      <a href="dashboard.html" class="brand-mark" id="brand-mark-link" style="text-decoration:none; cursor:pointer;">BudgetNest</a>
+      <button class="nav-toggle" type="button" aria-label="Меню" aria-expanded="false" aria-controls="nav-links">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="nav-links" id="nav-links">
+      <a href="dashboard.html" class="nav-link active"><span class="nav-icon" id="nav-icon-dashboard"></span><span data-i18n="nav.dashboard">Табло</span></a>
+      <a href="transactions.html" class="nav-link"><span class="nav-icon" id="nav-icon-transactions"></span><span data-i18n="nav.transactions">Транзакции</span></a>
+      <a href="budgets.html" class="nav-link"><span class="nav-icon" id="nav-icon-budgets"></span><span data-i18n="nav.budgets">Бюджети</span></a>
+      <a href="wallets.html" class="nav-link"><span class="nav-icon" id="nav-icon-wallet"></span><span data-i18n="nav.wallets">Портфейл</span></a>
+      <a href="goals.html" class="nav-link"><span class="nav-icon" id="nav-icon-goals"></span><span data-i18n="nav.goals">Цели</span></a>
+      <a href="recurring.html" class="nav-link"><span class="nav-icon" id="nav-icon-recurring"></span><span data-i18n="nav.recurring">Периодични</span></a>
+      <a href="settle.html" class="nav-link" id="settle-nav-link" style="display:none;"><span class="nav-icon" id="nav-icon-settle"></span><span data-i18n="nav.settle">Споделено</span></a>
+      <a href="reviews.html" class="nav-link"><span class="nav-icon" id="nav-icon-reviews"></span><span data-i18n="nav.reviews">Отзиви</span></a>
+      <a href="settings.html" class="nav-link"><span class="nav-icon" id="nav-icon-settings"></span><span data-i18n="nav.settings">Настройки</span></a>
+      <a href="admin.html" class="nav-link" id="admin-nav-link" style="display:none;"><span class="nav-icon" id="nav-icon-admin"></span><span data-i18n="nav.admin">Админ</span></a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <span class="household-pill" id="household-name">…</span>
+    <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" data-i18n-title="nav.theme_toggle_title" title="Смяна на тема"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-toggle-icon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button>
+    <button class="theme-toggle" id="lang-toggle-btn" onclick="toggleLang()" data-i18n-title="nav.lang_toggle_title" title="Смяна на език">EN</button>
+    <button class="btn-ghost" onclick="handleSignOut()" data-i18n="nav.signout">Изход</button>
+  </div>
+</nav>
+
+<main class="dashboard-main" id="dashboard-main">
+
+  <header class="dash-header">
+    <div class="dash-header-copy">
+      <span class="dash-eyebrow" data-i18n="dashboard.overview_eyebrow">Финансов преглед</span>
+      <h1 class="dash-title" data-i18n="dashboard.overview_title">Месецът ти в една картина</h1>
+      <p class="dash-subtitle">
+        <span id="chart-month-label">—</span>
+        <span class="dash-dot" aria-hidden="true"></span>
+        <span data-i18n="dashboard.overview_subtitle">Ясен поглед върху парите — без изненади.</span>
+      </p>
+    </div>
+    <div class="dash-header-actions">
+      <span class="dash-period">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="2"></rect><path d="M3.5 9.5h17M8 3.5v3M16 3.5v3"></path></svg>
+        <span data-i18n="dashboard.this_month">този месец</span>
+      </span>
+      <button type="button" class="dash-btn dash-btn-primary" onclick="openQuickAddFromFab()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+        <span data-i18n="dashboard.add_transaction_cta">Добави транзакция</span>
+      </button>
+    </div>
+  </header>
+
+  <section class="health-panel" aria-label="Финансово здраве">
+    <div class="health-main">
+      <div class="health-net">
+        <div class="health-net-top">
+          <span class="dash-kicker" data-i18n="dashboard.net_flow">Нетен паричен поток</span>
+          <span class="health-badge is-neutral" id="net-badge">—</span>
+        </div>
+        <div class="health-net-value" id="summary-net">—</div>
+        <p class="health-net-caption" id="net-caption" data-i18n="dashboard.net_caption">Приходи минус разходи за този месец</p>
+        <div class="health-ratio">
+          <div class="health-ratio-head">
+            <span data-i18n="dashboard.expense_ratio">Разходи спрямо приходи</span>
+            <span class="health-ratio-value" id="expense-ratio-value">—</span>
+          </div>
+          <div class="health-ratio-track" id="expense-ratio-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Разходи спрямо приходи">
+            <span id="expense-ratio-fill"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="health-metrics">
+        <div class="health-metric is-income">
+          <span class="health-metric-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"></path><path d="m6 11 6-6 6 6"></path></svg>
+          </span>
+          <span class="health-metric-label" data-i18n="dashboard.summary_income_short">Приходи</span>
+          <strong class="health-metric-value" id="summary-income">—</strong>
+          <span class="health-metric-note" data-i18n="dashboard.this_month">този месец</span>
+        </div>
+        <div class="health-metric is-expense">
+          <span class="health-metric-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"></path><path d="m6 13 6 6 6-6"></path></svg>
+          </span>
+          <span class="health-metric-label" data-i18n="dashboard.summary_expense_short">Разходи</span>
+          <strong class="health-metric-value" id="summary-expense">—</strong>
+          <span class="health-metric-note" data-i18n="dashboard.this_month">този месец</span>
+        </div>
+        <div class="health-metric is-safe" id="safe-to-spend-card" style="display:none;">
+          <span class="health-metric-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v6c0 4.6 3.2 7.9 7.5 9 4.3-1.1 7.5-4.4 7.5-9V6L12 3Z"></path><path d="m9.2 12 1.9 1.9 3.7-3.9"></path></svg>
+          </span>
+          <span class="health-metric-label" data-i18n="dashboard.safe_to_spend_short">За харчене днес</span>
+          <strong class="health-metric-value" id="safe-to-spend">—</strong>
+          <span class="health-metric-note" data-i18n="dashboard.per_day_left">на ден до края на месеца</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="health-accounts" aria-label="Сметки">
+      <a href="wallets.html" class="health-account" data-i18n-title="dashboard.view_wallet_title" title="Виж портфейла">
+        <span class="health-account-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.2"></rect><path d="M2.5 9.5h19"></path><path d="M6 14.5h4"></path></svg>
+        </span>
+        <span class="health-account-copy">
+          <span class="health-account-label" data-i18n="dashboard.summary_card">В картата</span>
+          <strong class="health-account-value" id="summary-card-balance">—</strong>
+        </span>
+        <svg class="health-account-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+      </a>
+      <a href="wallets.html" class="health-account" data-i18n-title="dashboard.view_wallet_title" title="Виж портфейла">
+        <span class="health-account-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6.5" width="20" height="11" rx="1.6"></rect><circle cx="12" cy="12" r="2.6"></circle><path d="M5.5 6.5v0M18.5 17.5v0"></path></svg>
+        </span>
+        <span class="health-account-copy">
+          <span class="health-account-label" data-i18n="dashboard.summary_cash">В брой</span>
+          <strong class="health-account-value" id="summary-cash-balance">—</strong>
+        </span>
+        <svg class="health-account-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+      </a>
+      <a href="wallets.html" class="health-account" data-i18n-title="dashboard.view_wallet_title" title="Виж портфейла">
+        <span class="health-account-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h13A1.5 1.5 0 0 1 19 7.5V9H4.5"></path><path d="M3 7.5V18a1.5 1.5 0 0 0 1.5 1.5h15A1.5 1.5 0 0 0 21 18v-7A1.5 1.5 0 0 0 19.5 9.5H16a2 2 0 1 0 0 4"></path></svg>
+        </span>
+        <span class="health-account-copy">
+          <span class="health-account-label" data-i18n="dashboard.summary_total">Общо</span>
+          <strong class="health-account-value" id="summary-total-balance">—</strong>
+        </span>
+        <svg class="health-account-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+      </a>
+    </div>
+  </section>
+
+  <div id="budget-alert-banner" style="display:none;"></div>
+
+    <div class="dash-grid">
+    <div class="dash-col dash-col-primary">
+      <section class="card card-chart" id="card-chart" aria-labelledby="chart-card-title">
+            <header class="card-head">
+              <div class="card-head-copy">
+                <h2 class="card-title" id="chart-card-title" data-i18n="dashboard.chart_expense_title">Разходи по категория</h2>
+                <p class="card-sub" id="chart-view-label" data-i18n="dashboard.chart_sub_expense">Къде отиват парите този месец</p>
+              </div>
+              <div class="chart-switch" role="group" aria-label="Тип диаграма">
+                <button type="button" class="chart-seg-btn active" data-chart-view="expense" onclick="setChartView('expense')" data-i18n="dashboard.chart_view_expense">Разходи</button>
+                <button type="button" class="chart-seg-btn" data-chart-view="income" onclick="setChartView('income')" data-i18n="dashboard.chart_view_income">Приходи</button>
+              </div>
+            </header>
+            <div class="chart-layout" id="chart-wrap">
+              <div class="chart-donut">
+                <canvas id="expense-chart" role="img" aria-label="Разходи по категория"></canvas>
+                <div class="donut-center">
+                  <span class="donut-center-label" id="chart-total-label" data-i18n="dashboard.chart_total_expense">Общо разходи</span>
+                  <strong class="donut-center-value" id="chart-total">—</strong>
+                </div>
+              </div>
+              <div class="legend" id="chart-legend"></div>
+            </div>
+            <div class="empty-state" id="chart-empty" data-i18n="dashboard.chart_empty_expense" style="display:none;">Все още няма данни за този месец.</div>
+          </section>
+
+      <section class="card recent-card" id="card-recent" data-card-key="recent" aria-labelledby="recent-title">
+            <header class="card-head">
+              <div class="card-head-copy">
+                <h2 class="card-title" id="recent-title" data-i18n="dashboard.recent_tx_title">Последни транзакции</h2>
+                <p class="card-sub" data-i18n="dashboard.recent_sub">Най-новите движения в бюджета</p>
+              </div>
+              <div class="card-head-actions">
+                <a href="transactions.html" class="text-link" data-i18n="dashboard.view_all">Всички</a>
+                <button type="button" class="card-visibility-toggle" onclick="toggleCardVisibility('recent')" aria-label="Скрий/покажи блока" data-i18n-title="dashboard.toggle_visibility_title" title="Скрий/покажи блока">
+                  <svg id="eye-icon-recent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+                </button>
+              </div>
+            </header>
+            <div class="card-collapsible-body" id="card-recent-body">
+              <div class="tx-list" id="tx-list">
+                <div class="skeleton-row"><span class="skeleton skeleton-circle"></span><span class="skeleton-lines"><span class="skeleton skeleton-line medium"></span><span class="skeleton skeleton-line short"></span></span><span class="skeleton skeleton-amount"></span></div>
+                <div class="skeleton-row"><span class="skeleton skeleton-circle"></span><span class="skeleton-lines"><span class="skeleton skeleton-line medium"></span><span class="skeleton skeleton-line short"></span></span><span class="skeleton skeleton-amount"></span></div>
+                <div class="skeleton-row"><span class="skeleton skeleton-circle"></span><span class="skeleton-lines"><span class="skeleton skeleton-line medium"></span><span class="skeleton skeleton-line short"></span></span><span class="skeleton skeleton-amount"></span></div>
+              </div>
+
+              <div class="tx-nav" id="tx-nav" style="display:none;">
+                <button type="button" class="tx-page-btn" onclick="changeTxPage(-1)" aria-label="Предишна страница">←</button>
+                <span class="tx-page-label" id="tx-page-label" data-i18n="dashboard.page_label">Страница 1 от 1</span>
+                <button type="button" class="tx-page-btn" onclick="changeTxPage(1)" aria-label="Следваща страница">→</button>
+              </div>
+            </div>
+          </section>
+
+      <section class="card trend-card dash-accordion" id="card-trend" data-card-key="trend" data-mobile-accordion aria-labelledby="trend-title">
+            <header class="card-head">
+              <div class="card-head-copy">
+                <h2 class="card-title" id="trend-title" data-i18n="dashboard.trend_title">Тенденция по месеци</h2>
+                <p class="card-sub" data-i18n="dashboard.trend_hint">приходи и разходи, последните 6 месеца</p>
+              </div>
+              <div class="card-head-actions">
+                <button type="button" class="accordion-toggle" aria-expanded="false" aria-controls="card-trend-body" aria-label="Покажи секцията">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                </button>
+                <button type="button" class="card-visibility-toggle" onclick="toggleCardVisibility('trend')" aria-label="Скрий/покажи блока" data-i18n-title="dashboard.toggle_visibility_title" title="Скрий/покажи блока">
+                  <svg id="eye-icon-trend" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+                </button>
+              </div>
+            </header>
+            <div class="card-collapsible-body accordion-body" id="card-trend-body">
+              <div class="trend-wrap" id="trend-wrap">
+                <canvas id="trend-chart" role="img" aria-label="Тенденция по месеци"></canvas>
+              </div>
+              <div class="empty-state" id="trend-empty" data-i18n="dashboard.trend_empty" style="display:none;">Нужни са данни поне от два месеца, за да се покаже тенденция.</div>
+            </div>
+          </section>
+    </div>
+    <div class="dash-col dash-col-secondary">
+      <section class="card quick-card" id="quick-add-card" aria-labelledby="form-title">
+            <header class="card-head">
+              <div class="card-head-copy">
+                <h2 class="card-title" id="form-title" data-i18n="dashboard.form_title_quick">Бърза транзакция</h2>
+                <p class="card-sub" data-i18n="dashboard.quick_sub">Запиши разход или приход за секунди</p>
+              </div>
+              <span class="quick-card-mark" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-2 8 9-12h-7l2-8Z"></path></svg>
+              </span>
+            </header>
+
+            <form id="quick-add-form" class="quick-add-grid" onsubmit="handleAddTransaction(event)">
+              <div class="type-toggle" id="tx-type-toggle" role="group" aria-label="Тип транзакция">
+                <button type="button" class="type-btn active" data-type="expense" aria-pressed="true" onclick="setTxType('expense')" data-i18n="dashboard.type_expense">Разход</button>
+                <button type="button" class="type-btn" data-type="income" aria-pressed="false" onclick="setTxType('income')" data-i18n="dashboard.type_income">Приход</button>
+              </div>
+
+              <div class="method-toggle" id="tx-method-toggle" role="group" aria-label="Начин на плащане">
+                <button type="button" class="method-btn active" data-method="card" aria-pressed="true" onclick="setQuickMethod('card')"><span class="method-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.2"></rect><path d="M2.5 9.5h19"></path><path d="M6 14.5h4"></path></svg></span><span data-i18n="dashboard.method_card">Карта</span></button>
+                <button type="button" class="method-btn" data-method="cash" aria-pressed="false" onclick="setQuickMethod('cash')"><span class="method-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6.5" width="20" height="11" rx="1.6"></rect><circle cx="12" cy="12" r="2.6"></circle><path d="M5.5 6.5v0M18.5 17.5v0"></path></svg></span><span data-i18n="dashboard.method_cash">В брой</span></button>
+              </div>
+
+              <div class="field full amount-field">
+                <label for="tx-amount" data-i18n="dashboard.amount_label">Сума (€)</label>
+                <div class="amount-input-wrap">
+                  <span class="amount-currency" aria-hidden="true">€</span>
+                  <input type="number" id="tx-amount" inputmode="decimal" pattern="[0-9]+([.][0-9]+)?" step="0.01" min="0.01" placeholder="0.00" autocomplete="off" required>
+                </div>
+              </div>
+
+              <div class="field full">
+                <label for="tx-category" data-i18n="dashboard.category_label">Категория</label>
+                <select id="tx-category" required></select>
+              </div>
+
+              <div class="field full">
+                <label for="tx-description" data-i18n="dashboard.description_label">Описание</label>
+                <input type="text" id="tx-description" data-i18n-placeholder="dashboard.description_placeholder_expense" placeholder="напр. Пазар от Kaufland" autocomplete="off">
+              </div>
+
+              <div class="field full">
+                <label for="tx-date" data-i18n="dashboard.date_label">Дата</label>
+                <input type="date" id="tx-date" required>
+              </div>
+
+              <div class="field full">
+                <div class="status-msg" id="tx-status" role="status" aria-live="polite"></div>
+                <button type="submit" class="submit" id="tx-submit" data-i18n="dashboard.add_btn">Добави</button>
+                <div class="form-secondary-actions">
+                  <button type="button" id="tx-cancel" class="btn-secondary" style="display:none;" onclick="cancelEditTransaction()" data-i18n="common.cancel">Отказ</button>
+                  <button type="button" id="tx-delete" class="btn-danger" style="display:none;" onclick="openDeleteModal()" data-i18n="common.delete">Изтрий</button>
+                </div>
+              </div>
+            </form>
+          </section>
+
+      <section class="card templates-card dash-accordion" id="card-templates" data-card-key="templates" data-mobile-accordion aria-labelledby="templates-title">
+            <header class="card-head">
+              <div class="card-head-copy">
+                <h2 class="card-title" id="templates-title" data-i18n="dashboard.templates_title">Бързи шаблони</h2>
+                <p class="card-sub" data-i18n="dashboard.templates_hint">едно докосване = записана транзакция</p>
+              </div>
+              <div class="card-head-actions">
+                <button type="button" class="accordion-toggle" aria-expanded="false" aria-controls="card-templates-body" aria-label="Покажи секцията">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                </button>
+                <button type="button" class="card-visibility-toggle" onclick="toggleCardVisibility('templates')" aria-label="Скрий/покажи блока" data-i18n-title="dashboard.toggle_visibility_title" title="Скрий/покажи блока">
+                  <svg id="eye-icon-templates" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+                </button>
+              </div>
+            </header>
+            <div class="card-collapsible-body accordion-body" id="card-templates-body">
+              <div class="template-chips" id="template-chips">
+                <span class="hint" data-i18n="dashboard.templates_loading" style="font-size:13px;">Зареждане…</span>
+              </div>
+              <button type="button" class="template-add-btn" id="template-add-toggle" onclick="toggleTemplateForm()" data-i18n="dashboard.template_add_btn">+ Нов шаблон</button>
+
+              <form id="template-form" class="quick-add-grid template-form" style="display:none;" onsubmit="handleSaveTemplate(event)">
+                <div class="type-toggle">
+                  <button type="button" class="type-btn active" data-type="expense" aria-pressed="true" onclick="setTemplateType('expense')" data-i18n="dashboard.type_expense">Разход</button>
+                  <button type="button" class="type-btn" data-type="income" aria-pressed="false" onclick="setTemplateType('income')" data-i18n="dashboard.type_income">Приход</button>
+                </div>
+
+                <div class="method-toggle" id="tpl-method-toggle">
+                  <button type="button" class="method-btn active" data-method="card" aria-pressed="true" onclick="setTemplateMethod('card')"><span class="method-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.2"></rect><path d="M2.5 9.5h19"></path><path d="M6 14.5h4"></path></svg></span><span data-i18n="dashboard.method_card">Карта</span></button>
+                  <button type="button" class="method-btn" data-method="cash" aria-pressed="false" onclick="setTemplateMethod('cash')"><span class="method-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6.5" width="20" height="11" rx="1.6"></rect><circle cx="12" cy="12" r="2.6"></circle><path d="M5.5 6.5v0M18.5 17.5v0"></path></svg></span><span data-i18n="dashboard.method_cash">В брой</span></button>
+                </div>
+
+                <div class="field full">
+                  <label for="tpl-name" data-i18n="dashboard.template_name_label">Име на шаблона</label>
+                  <input type="text" id="tpl-name" data-i18n-placeholder="dashboard.template_name_placeholder" placeholder="напр. Цигари" required>
+                </div>
+
+                <div class="field">
+                  <label for="tpl-amount" data-i18n="dashboard.amount_label">Сума (€)</label>
+                  <input type="number" id="tpl-amount" inputmode="decimal" pattern="[0-9]+([.][0-9]+)?" step="0.01" min="0.01" placeholder="0.00" required>
+                </div>
+
+                <div class="field">
+                  <label for="tpl-category" data-i18n="dashboard.category_label">Категория</label>
+                  <select id="tpl-category" required></select>
+                </div>
+
+                <div class="field full">
+                  <div class="status-msg" id="tpl-status" role="status" aria-live="polite"></div>
+                  <div class="form-secondary-actions">
+                    <button type="submit" class="submit" data-i18n="dashboard.save_template_btn">Запази шаблон</button>
+                    <button type="button" class="btn-secondary" onclick="toggleTemplateForm()" data-i18n="common.cancel">Отказ</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </section>
+
+      <section class="card compare-card dash-accordion" id="card-compare" data-card-key="compare" data-mobile-accordion aria-labelledby="compare-title">
+            <header class="card-head">
+              <div class="card-head-copy">
+                <h2 class="card-title" id="compare-title" data-i18n="dashboard.compare_title">Ти срещу средното в България</h2>
+                <p class="card-sub" data-i18n="dashboard.compare_hint">в евро, на домакинство</p>
+              </div>
+              <div class="card-head-actions">
+                <button type="button" class="accordion-toggle" aria-expanded="false" aria-controls="card-compare-body" aria-label="Покажи секцията">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                </button>
+                <button type="button" class="card-visibility-toggle" onclick="toggleCardVisibility('compare')" aria-label="Скрий/покажи блока" data-i18n-title="dashboard.toggle_visibility_title" title="Скрий/покажи блока">
+                  <svg id="eye-icon-compare" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+                </button>
+              </div>
+            </header>
+            <div class="card-collapsible-body accordion-body" id="card-compare-body">
+              <div class="compare-legend">
+                <span><i class="legend-swatch" aria-hidden="true"></i><span data-i18n="dashboard.compare_you_label">Ти</span></span>
+                <span><i class="legend-swatch is-average" aria-hidden="true"></i><span data-i18n="dashboard.compare_avg_label">БГ средно</span></span>
+              </div>
+              <div id="compare-list"></div>
+            </div>
+          </section>
+    </div>
+  </div>
+
+</main>
+
+
+<!-- Mobile bottom tab bar -->
+<nav class="bottom-nav" id="bottom-nav" aria-label="Основна навигация">
+  <a href="dashboard.html" class="bottom-nav-item active" aria-current="page"><span aria-hidden="true">🏠</span><span data-i18n="nav.dashboard">Табло</span></a>
+  <a href="transactions.html" class="bottom-nav-item"><span aria-hidden="true">🧾</span><span data-i18n="nav.transactions">Транзакции</span></a>
+  <a href="budgets.html" class="bottom-nav-item"><span aria-hidden="true">📊</span><span data-i18n="nav.budgets">Бюджети</span></a>
+  <a href="wallets.html" class="bottom-nav-item"><span aria-hidden="true">💳</span><span data-i18n="nav.wallets">Портфейл</span></a>
+  <a href="goals.html" class="bottom-nav-item"><span aria-hidden="true">🎯</span><span data-i18n="nav.goals">Цели</span></a>
+</nav>
+
+<!-- Toast -->
+<div id="toast" role="status" aria-live="polite"></div>
+
+<!-- Floating + button for mobile -->
+<button type="button" id="fab-add" onclick="openQuickAddFromFab()" aria-label="Добави транзакция" data-i18n-title="dashboard.add_transaction_cta" title="Добави транзакция">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+</button>
+
+<div class="overlay" id="onboarding-overlay" style="display:none;">
+  <div class="overlay-card onboarding-card" role="dialog" aria-modal="true" aria-labelledby="onboarding-title">
+    <h2 id="onboarding-title" data-i18n="dashboard.onboarding_title">Създайте домакинство</h2>
+    <p data-i18n="dashboard.onboarding_text">Домакинството е споделеното пространство за бюджета ви. Поканете членове на семейството по-късно от Настройки.</p>
+    <form id="household-form" onsubmit="handleCreateHousehold(event)">
+      <div class="field onboarding-field">
+        <label for="household-input" data-i18n="dashboard.household_name_label">Име на домакинството</label>
+        <input type="text" id="household-input" data-i18n-placeholder="dashboard.household_placeholder" placeholder="напр. Семейство Иванови" required>
+      </div>
+      <div class="status-msg" id="household-status"></div>
+      <button type="submit" class="submit" id="household-submit" data-i18n="dashboard.create_btn">Създай</button>
+    </form>
+  </div>
+</div>
+
+<div class="overlay" id="delete-modal-overlay" style="display:none;">
+  <div class="overlay-card confirm-card" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title" style="max-width: 420px;">
+    <div class="confirm-icon is-danger" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4.5A1.5 1.5 0 0 1 9.5 3h5A1.5 1.5 0 0 1 16 4.5V6"></path><path d="M19 6v13a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 19V6"></path><path d="M10 11v5M14 11v5"></path></svg>
+    </div>
+    <h3 id="delete-modal-title" data-i18n="dashboard.delete_tx_title">Изтриване на транзакция</h3>
+    <p data-i18n="dashboard.delete_tx_text">Сигурни ли сте, че искате окончателно да изтриете тази транзакция? Това действие е необратимо.</p>
+    <div class="modal-actions">
+      <button type="button" class="btn-secondary" onclick="closeDeleteModal()" data-i18n="common.cancel">Отказ</button>
+      <button type="button" class="btn-danger" onclick="confirmDeleteTransaction()" data-i18n="dashboard.delete_confirm_btn">Да, изтрий</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="invite-modal-overlay" style="display:none;">
+  <div class="overlay-card confirm-card" role="dialog" aria-modal="true" aria-labelledby="invite-modal-title" style="max-width: 420px;">
+    <div class="confirm-icon is-success" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 11.5 12 4l8.5 7.5"></path><path d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9"></path><path d="M9.5 20v-6h5v6"></path></svg>
+    </div>
+    <h3 id="invite-modal-title" data-i18n="dashboard.invite_title">Покана за домакинство</h3>
+    <p id="invite-modal-text">
+      Поканени сте да се присъедините към <b id="invite-household-name">домакинство</b>. Искате ли да приемете поканата?
+    </p>
+    <div class="modal-actions">
+      <button type="button" id="invite-decline-btn" class="btn-secondary" onclick="declineInvite()" data-i18n="dashboard.invite_decline">Откажи</button>
+      <button type="button" id="invite-accept-btn" class="btn-success" onclick="acceptInvite()" data-i18n="dashboard.invite_accept">Приеми</button>
+    </div>
+    <div class="status-msg" id="invite-modal-status" style="margin-top:12px;"></div>
+  </div>
+</div>
+
+
+<script>
+(function () {
+  const fmt = (n) => (Number(n) || 0).toLocaleString('bg-BG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '\u00A0€';
+  const t = (k, vars) => (window.BudgetNestI18n ? window.BudgetNestI18n.t(k, vars) : k);
+
+  document.addEventListener('DOMContentLoaded', function () {
+    document.documentElement.setAttribute('data-theme', 'light');
+    document.documentElement.style.height = 'auto';
+    document.body.style.height = 'auto';
+    document.body.style.overflow = 'visible';
+    document.getElementById('dashboard-main').style.overflow = 'visible';
+    const income = 4200;
+    const expense = 2875.4;
+    const net = income - expense;
+    const daysLeft = 11;
+    const safe = net / daysLeft;
+
+    document.getElementById('chart-month-label').textContent = 'Октомври 2026';
+    document.getElementById('summary-income').textContent = fmt(income);
+    document.getElementById('summary-expense').textContent = fmt(expense);
+    document.getElementById('summary-card-balance').textContent = fmt(1840.25);
+    document.getElementById('summary-cash-balance').textContent = fmt(320);
+    document.getElementById('summary-total-balance').textContent = fmt(2160.25);
+
+    const netEl = document.getElementById('summary-net');
+    netEl.textContent = fmt(net);
+    netEl.classList.add('is-positive');
+
+    const badge = document.getElementById('net-badge');
+    badge.className = 'health-badge is-positive';
+    badge.textContent = t('dashboard.net_positive');
+
+    document.getElementById('net-caption').textContent = t('dashboard.net_caption_positive');
+
+    document.getElementById('expense-ratio-value').textContent = t('dashboard.expense_ratio_value', { percent: 68 });
+    const fill = document.getElementById('expense-ratio-fill');
+    fill.style.width = '68%';
+    document.getElementById('expense-ratio-track').setAttribute('aria-valuenow', '68');
+
+    const safeCard = document.getElementById('safe-to-spend-card');
+    safeCard.style.display = 'flex';
+    document.getElementById('safe-to-spend').textContent = fmt(safe);
+
+    const banner = document.getElementById('budget-alert-banner');
+    banner.style.display = 'block';
+    banner.innerHTML = '<div class="budget-alert near"><span class="alert-icon">🔔</span><div class="alert-body"><div class="alert-title">2 категории са близо лимита</div><div class="alert-text">Наближавате зададените месечни лимити.</div></div><a class="alert-link" href="budgets.html">Виж бюджетите →</a></div>';
+
+    const styles = getComputedStyle(document.body);
+    const palette = [];
+    for (let i = 1; i <= 7; i++) palette.push(styles.getPropertyValue('--db-chart-' + i).trim());
+    const surface = styles.getPropertyValue('--db-surface').trim();
+    const textColor = styles.getPropertyValue('--db-text').trim();
+    const numeric = styles.getPropertyValue('--db-font-numeric').trim();
+
+    const labels = ['Храна', 'Жилище и наем', 'Транспорт', 'Забавления', 'Здраве', 'Друго'];
+    const values = [820.4, 1150, 320.5, 210.5, 180, 194];
+    const total = values.reduce((a, b) => a + b, 0);
+
+    document.getElementById('chart-total').textContent = fmt(total);
+    document.getElementById('chart-total-label').textContent = t('dashboard.chart_total_expense');
+
+    new Chart(document.getElementById('expense-chart'), {
+      type: 'doughnut',
+      data: {
+        labels,
+        datasets: [{
+          data: values,
+          backgroundColor: labels.map((_, i) => palette[i % palette.length]),
+          borderColor: surface,
+          borderWidth: 2,
+          hoverOffset: 5,
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '70%',
+        plugins: { legend: { display: false } },
+      },
+    });
+
+    const legend = document.getElementById('chart-legend');
+    legend.innerHTML = labels.map((name, i) => `
+      <button type="button" class="legend-item">
+        <span class="legend-dot" style="background:${palette[i % palette.length]}"></span>
+        <span class="legend-name">${name}</span>
+        <span class="legend-amount">${fmt(values[i])}</span>
+      </button>`).join('');
+
+    const rows = [
+      ['🛒', 'Пазар от Kaufland', '2026-10-24', 84.6, 'expense', 'card'],
+      ['💶', 'Заплата', '2026-10-23', 3200, 'income', 'card'],
+      ['🚗', 'Гориво', '2026-10-22', 62.3, 'expense', 'cash'],
+      ['🎬', 'Кино', '2026-10-21', 24, 'expense', 'card'],
+      ['💊', 'Аптека', '2026-10-20', 38.9, 'expense', 'card'],
+      ['➕', 'Хонорар', '2026-10-19', 1000, 'income', 'card'],
+    ];
+    document.getElementById('tx-list').innerHTML = rows.map(([icon, desc, date, amount, type, method]) => `
+      <div class="tx-row" role="button" tabindex="0">
+        <div class="tx-icon">${window.BudgetNestIcons ? window.BudgetNestIcons.renderCatIcon(icon, 22) : icon}</div>
+        <div class="tx-info">
+          <div class="tx-desc">${desc}</div>
+          <div class="tx-meta">${window.BudgetNestIcons ? window.BudgetNestIcons.renderCatIcon(method === 'cash' ? '💵' : '💳', 14) : ''} <span>${date}</span> <span class="tx-edit-hint">✏️ Промени</span><span class="tx-actor">· Иван</span></div>
+        </div>
+        <div class="tx-amount ${type}">${type === 'income' ? '+' : '−'} ${fmt(amount)}</div>
+      </div>`).join('');
+
+    document.getElementById('template-chips').innerHTML = [
+      ['☕', 'Кафе', 3.5, 'expense'],
+      ['🛒', 'Седмичен пазар', 95, 'expense'],
+      ['🚌', 'Карта за градски', 35, 'expense'],
+      ['💶', 'Хонорар', 800, 'income'],
+    ].map(([icon, name, amount, type]) => `
+      <span class="template-chip">
+        <span>${window.BudgetNestIcons ? window.BudgetNestIcons.renderCatIcon(icon, 18) : icon}</span>
+        <span>${name}</span>
+        <span class="tpl-amount">${type === 'income' ? '+' : '−'} ${fmt(amount)}</span>
+        <span class="tpl-remove">×</span>
+      </span>`).join('');
+
+    new Chart(document.getElementById('trend-chart'), {
+      type: 'bar',
+      data: {
+        labels: ['май 26', 'юни 26', 'юли 26', 'авг 26', 'сеп 26', 'окт 26'],
+        datasets: [
+          { label: 'Приходи', data: [3900, 4020, 3980, 4100, 4150, 4200], backgroundColor: styles.getPropertyValue('--db-green').trim(), borderRadius: 4, maxBarThickness: 18 },
+          { label: 'Разходи', data: [2600, 3100, 2750, 2980, 2650, 2875], backgroundColor: styles.getPropertyValue('--db-rose').trim(), borderRadius: 4, maxBarThickness: 18 },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'top', align: 'end', labels: { color: styles.getPropertyValue('--db-text-secondary').trim(), usePointStyle: true, pointStyle: 'rectRounded', boxWidth: 8, boxHeight: 8, padding: 16, font: { family: 'Onest', size: 12, weight: '600' } } },
+        },
+        scales: {
+          x: { grid: { display: false }, border: { display: false }, ticks: { color: styles.getPropertyValue('--db-text-secondary').trim(), font: { family: 'Onest', size: 12 } } },
+          y: { beginAtZero: true, grid: { color: styles.getPropertyValue('--db-border').trim(), drawTicks: false }, border: { display: false }, ticks: { color: styles.getPropertyValue('--db-text-secondary').trim(), padding: 8, font: { family: numeric, size: 10.5 }, callback: (v) => v.toLocaleString('bg-BG') + '\u00A0€' } },
+        },
+      },
+    });
+
+    document.getElementById('compare-list').innerHTML = [
+      ['Храна', 820.4, 690],
+      ['Жилище и наем', 1150, 980],
+      ['Транспорт', 320.5, 410],
+      ['Забавления', 210.5, 240],
+    ].map(([name, yours, avg]) => {
+      const max = Math.max(yours, avg) * 1.15;
+      return `<div class="compare-row">
+        <div class="compare-labels"><span class="cat-name">${name}</span><span class="cat-amounts">${fmt(yours)} · БГ средно ${fmt(avg)}</span></div>
+        <div class="compare-track"><div class="compare-fill ${yours > avg ? 'over' : ''}" style="width:${Math.min(yours / max * 100, 100)}%"></div><div class="compare-marker" style="left:${Math.min(avg / max * 100, 100)}%"></div></div>
+      </div>`;
+    }).join('');
+
+    document.querySelectorAll('[data-mobile-accordion]').forEach(card => {
+      const btn = card.querySelector('.accordion-toggle');
+      if (!btn) return;
+      btn.addEventListener('click', () => {
+        const open = !card.classList.contains('is-open');
+        card.classList.toggle('is-open', open);
+        btn.setAttribute('aria-expanded', String(open));
+      });
+    });
+
+    document.querySelectorAll('.chart-seg-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.chart-seg-btn').forEach(b => b.classList.toggle('active', b === btn));
+      });
+    });
+
+    if (document.getElementById('fab-add')) {
+      document.getElementById('fab-add').style.display = window.matchMedia('(max-width: 900px)').matches ? 'flex' : 'none';
+    }
+    if (window.BudgetNestIcons) window.BudgetNestIcons.iconify(document.body);
+  });
+})();
+</script>
+
+
+<script>
+  // Keep the support chat launcher clear of the mobile add button and tab bar.
+  (function positionSupportLauncher() {
+    var host = null;
+
+    function applyOffset() {
+      host = host || document.getElementById('fab-root');
+      if (!host || !host.shadowRoot) return false;
+      var root = host.shadowRoot;
+      if (root.getElementById('bn-chat-offset')) return true;
+
+      var style = document.createElement('style');
+      style.id = 'bn-chat-offset';
+      style.textContent =
+        '@media (max-width: 900px) {' +
+        '.bpFabWrapper{right:16px !important;bottom:calc(154px + env(safe-area-inset-bottom, 0px)) !important;width:48px !important;height:48px !important;}' +
+        '.bpFab{width:48px !important;height:48px !important;}' +
+        '.bpMessagePreview.bpFABMessagePreview{right:16px !important;bottom:calc(214px + env(safe-area-inset-bottom, 0px)) !important;}' +
+        '}';
+      root.appendChild(style);
+      return true;
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      if (applyOffset()) return;
+      var observer = new MutationObserver(function () {
+        if (applyOffset()) observer.disconnect();
+      });
+      observer.observe(document.documentElement, { childList: true, subtree: true });
+      window.setTimeout(function () {
+        applyOffset();
+        observer.disconnect();
+      }, 12000);
+    });
+  })();
+</script>
+
+<script src="chatbot.js?v=1" defer></script>
+</body>
+</html>
