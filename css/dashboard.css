@@ -29,8 +29,11 @@ body.dashboard-body {
   justify-content: space-between;
   padding: 32px 20px 24px;
   color: #E4F3EA;
-  background-color: var(--navbar-bg);
-  background-image: var(--navbar-image);
+  background-color: var(--nest-green-dark);
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 28px 28px;
   border-right: 1px solid rgba(255, 255, 255, 0.06);
   box-sizing: border-box;
   overflow-y: auto;
