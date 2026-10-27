@@ -250,6 +250,8 @@ body.dashboard-body {
 .summary-value.balance { color: var(--text-primary); }
 .summary-value.card-balance { color: var(--peri); }
 .summary-value.cash-balance { color: var(--sun-ink); }
+.summary-value.safe-daily { color: var(--color-income); }
+.summary-value.safe-weekly { color: var(--color-income); }
 
 /* Всяка плочка има цвят по значение */
 .summary-card:has(.summary-value.income) {
@@ -279,14 +281,17 @@ body.dashboard-body {
 .summary-row:has(.summary-value.balance) {
   grid-template-columns: 1fr 1fr 1.12fr;
   grid-template-areas:
-    "inc  exp  total"
-    "card cash total";
+    "inc   exp    total"
+    "card  cash   total"
+    "daily weekly total";
 }
 .summary-card:has(.summary-value.income)       { grid-area: inc; }
 .summary-card:has(.summary-value.expense)      { grid-area: exp; }
 .summary-card:has(.summary-value.card-balance) { grid-area: card; }
 .summary-card:has(.summary-value.cash-balance) { grid-area: cash; }
 .summary-card:has(.summary-value.balance)      { grid-area: total; }
+.summary-card:has(.summary-value.safe-daily)   { grid-area: daily; }
+.summary-card:has(.summary-value.safe-weekly)  { grid-area: weekly; }
 
 /* Висока плочка: общата сума, с яйца в гнездото */
 .summary-card:has(.summary-value.balance) {
@@ -907,9 +912,10 @@ body.dashboard-body {
   .summary-row:has(.summary-value.balance) {
     grid-template-columns: 1fr 1fr;
     grid-template-areas:
-      "total total"
-      "inc   exp"
-      "card  cash";
+      "total  total"
+      "inc    exp"
+      "card   cash"
+      "daily  weekly";
   }
   .summary-card:has(.summary-value.balance) { min-height: 150px; }
 
@@ -1111,6 +1117,41 @@ table.admin-table tbody tr:hover td { background: var(--surface-alt); }
 .admin-page-btn.admin-page-active { background: var(--nest-green-mid); border-color: var(--nest-green-mid); color: var(--on-brand); box-shadow: none; transform: translateY(2px); }
 .admin-page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .admin-page-ellipsis { color: var(--text-dim); font-size: 13px; padding: 0 4px; }
+
+/* ============================================================
+   Мобилна долна навигация (споделена за всички страници)
+   Маркъпът се инжектира от nav.js, за да е еднакъв навсякъде.
+   ============================================================ */
+.bottom-nav { display: none; }
+
+@media (max-width: 768px) {
+  /* Оставя място, за да не се скрива съдържанието под лентата */
+  body.dashboard-body { padding-bottom: 90px; }
+
+  .bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border-soft);
+    justify-content: space-around;
+    padding: 6px 0;
+    z-index: 40;
+  }
+  .bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-size: 11px;
+    gap: 2px;
+    padding: 4px 8px;
+  }
+  .bottom-nav-item.active { color: var(--nest-gold); }
+}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }

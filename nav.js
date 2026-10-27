@@ -65,4 +65,58 @@
   // все още вика toggleNav() от inline onclick, да не гърми с грешка.
   // Реалната работа я върши слушателят по-горе.
   window.toggleNav = function () {};
+
+  // ============================================================
+  // Мобилна долна навигация
+  // Инжектира се оттук, за да я има на всяка страница, която зарежда
+  // nav.js, без да се дублира еднакъв markup в 10+ HTML файла.
+  // Активният таб се определя по името на текущия файл.
+  // ============================================================
+  var BOTTOM_NAV_ITEMS = [
+    { href: 'dashboard.html', icon: '🏠', i18n: 'nav.dashboard', label: 'Табло' },
+    { href: 'transactions.html', icon: '🧾', i18n: 'nav.transactions', label: 'Транзакции' },
+    { href: 'budgets.html', icon: '📊', i18n: 'nav.budgets', label: 'Бюджети' },
+    { href: 'wallets.html', icon: '💳', i18n: 'nav.wallets', label: 'Портфейл' },
+    { href: 'goals.html', icon: '🎯', i18n: 'nav.goals', label: 'Цели' }
+  ];
+
+  function currentPageFile() {
+    var file = window.location.pathname.split('/').pop();
+    return (file || 'dashboard.html').toLowerCase();
+  }
+
+  function buildBottomNav() {
+    if (!document.body) return;
+    // Ако страницата някъде вече има долна навигация, не добавяме втора.
+    if (document.querySelector('.bottom-nav')) return;
+
+    var current = currentPageFile();
+    var nav = document.createElement('nav');
+    nav.className = 'bottom-nav';
+    nav.id = 'bottom-nav';
+    nav.setAttribute('aria-label', 'Мобилна навигация');
+
+    BOTTOM_NAV_ITEMS.forEach(function (item) {
+      var link = document.createElement('a');
+      link.href = item.href;
+      link.className = 'bottom-nav-item' + (item.href === current ? ' active' : '');
+      if (item.href === current) link.setAttribute('aria-current', 'page');
+
+      var icon = document.createElement('span');
+      icon.setAttribute('aria-hidden', 'true');
+      icon.textContent = item.icon;
+
+      var label = document.createElement('span');
+      label.setAttribute('data-i18n', item.i18n);
+      label.textContent = item.label;
+
+      link.appendChild(icon);
+      link.appendChild(label);
+      nav.appendChild(link);
+    });
+
+    document.body.appendChild(nav);
+  }
+
+  buildBottomNav();
 })();
