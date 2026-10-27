@@ -3,7 +3,7 @@
    Цветове и шрифтове: виж tokens.css
    ============================================================ */
 
-@import url("tokens.css?v=21");
+@import url("tokens.css?v=23");
 
 /* ===== База ===== */
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -96,7 +96,7 @@ body {
 /* ============================================================
    Вход / регистрация
    Лявата половина е "корицата на тетрадката": дълбоко зелено,
-   слънце и три яйца в гнездо. Десният панел е хартията с формата.
+   слънце и три монети. Десният панел е хартията с формата.
    ============================================================ */
 .page {
   position: relative;
@@ -145,21 +145,19 @@ body {
   box-shadow: 0 0 0 26px rgba(255, 255, 255, 0.07), 0 0 0 56px rgba(255, 255, 255, 0.04);
 }
 
-/* Три яйца: един елемент, клонирани с box-shadow (сянката следва радиуса) */
+/* Три монети (пръстени) на корицата */
 .brand-side::after {
   content: "";
   position: absolute;
   z-index: -1;
-  right: 42px;
-  bottom: 4px;
-  width: 58px;
-  height: 74px;
-  border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
-  background: var(--egg-pale);
-  box-shadow:
-    -72px 14px 0 -4px var(--sprout),
-    -140px 26px 0 -9px #FFFFFF;
-  transform: rotate(8deg);
+  right: 34px;
+  bottom: 6px;
+  width: 224px;
+  height: 104px;
+  background:
+    radial-gradient(circle at 184px 32px, transparent 0 24px, var(--sun) 25px 30px, transparent 31px),
+    radial-gradient(circle at 112px 56px, transparent 0 20px, var(--sprout) 21px 26px, transparent 27px),
+    radial-gradient(circle at 40px 78px, transparent 0 16px, #FFFFFF 17px 21px, transparent 22px);
 }
 
 .brand-mark {

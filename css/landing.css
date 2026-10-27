@@ -223,11 +223,14 @@ section { padding: 84px 28px; }
   position: relative; overflow: hidden; isolation: isolate;
   box-shadow: 0 8px 0 rgba(0, 0, 0, 0.28);
 }
+/* Три монети (пръстени) в долния десен ъгъл на финалния призив */
 .cta-band::before {
-  content: ""; position: absolute; z-index: -1; right: 70px; bottom: -26px;
-  width: 78px; height: 98px; border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
-  background: var(--sun); transform: rotate(8deg);
-  box-shadow: -96px 18px 0 -5px var(--sprout), -186px 32px 0 -12px var(--egg-pale);
+  content: ""; position: absolute; z-index: -1; right: 56px; bottom: 0;
+  width: 224px; height: 104px;
+  background:
+    radial-gradient(circle at 184px 32px, transparent 0 24px, var(--sun) 25px 30px, transparent 31px),
+    radial-gradient(circle at 112px 56px, transparent 0 20px, var(--sprout) 21px 26px, transparent 27px),
+    radial-gradient(circle at 40px 78px, transparent 0 16px, var(--coin-pale) 17px 21px, transparent 22px);
 }
 .cta-band::after {
   content: ""; position: absolute; z-index: -1; top: -110px; right: -90px;

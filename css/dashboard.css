@@ -118,13 +118,14 @@ body.dashboard-body {
 .household-pill::before {
   content: "";
   position: absolute;
-  left: 14px;
+  left: 13px;
   top: 50%;
-  width: 10px;
+  width: 12px;
   height: 12px;
   margin-top: -6px;
-  border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
-  background: var(--sun);
+  border-radius: 50%;
+  /* Малка монета (пръстен) в лентата */
+  background: radial-gradient(circle at 50% 50%, transparent 0 3px, var(--sun) 3.4px 5.6px, transparent 6px);
 }
 
 /* Малките бутони в лентата са прозрачни върху зеленото */
@@ -293,7 +294,7 @@ body.dashboard-body {
 .summary-card:has(.summary-value.safe-daily)   { grid-area: daily; }
 .summary-card:has(.summary-value.safe-weekly)  { grid-area: weekly; }
 
-/* Висока плочка: общата сума, с яйца в гнездото */
+/* Висока плочка: общата сума, с монети в гнездото */
 .summary-card:has(.summary-value.balance) {
   background: var(--hero-bg);
   border-color: transparent;
@@ -311,20 +312,19 @@ body.dashboard-body {
   font-size: clamp(28px, 3.3vw, 40px);
   font-weight: 700;
 }
+/* Три монети (пръстени) в горния десен ъгъл на общата плочка */
 .summary-card:has(.summary-value.balance)::before {
   content: "";
   position: absolute;
   z-index: -1;
-  top: 26px;
-  right: 34px;
-  width: 54px;
-  height: 68px;
-  border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
-  background: var(--sun);
-  transform: rotate(10deg);
-  box-shadow:
-    -64px 14px 0 -3px var(--sprout),
-    -124px 30px 0 -9px var(--egg-pale);
+  top: 18px;
+  right: 18px;
+  width: 172px;
+  height: 84px;
+  background:
+    radial-gradient(circle at 142px 28px, transparent 0 19px, var(--sun) 20px 24px, transparent 25px),
+    radial-gradient(circle at 82px 44px, transparent 0 16px, var(--sprout) 17px 21px, transparent 22px),
+    radial-gradient(circle at 26px 60px, transparent 0 13px, var(--coin-pale) 14px 17px, transparent 18px);
 }
 .summary-card:has(.summary-value.balance)::after {
   content: "";
