@@ -16,7 +16,7 @@ body {
   transition: background-color 0.25s ease, color 0.25s ease;
 }
 a { text-decoration: none; color: inherit; }
-::selection { background: var(--sun); color: #3A2A00; }
+::selection { background: var(--sun); color: var(--on-sun); }
 :focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 3px; border-radius: 8px; }
 
 /* ===== Горна лента ===== */
@@ -31,9 +31,10 @@ header {
 .logo { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 700; font-size: 18px; letter-spacing: -0.02em; }
 .logo-mark {
   width: 34px; height: 34px; border-radius: 11px;
-  background: var(--sun); color: #3A2A00;
+  background: linear-gradient(135deg, var(--sun-2), var(--sun));
+  color: var(--on-sun);
   display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.18);
+  box-shadow: var(--lift-shadow);
   flex-shrink: 0;
 }
 .logo-mark svg { width: 20px; height: 20px; }
@@ -112,7 +113,7 @@ header {
 .hero::before {
   content: ""; position: absolute; z-index: -1;
   top: 40px; right: -20px; width: 300px; height: 300px; border-radius: 50%;
-  background: var(--sun);
+  background: radial-gradient(circle at 34% 30%, var(--sun-2), var(--sun) 58%, color-mix(in srgb, var(--sun) 70%, var(--sprout)) 100%);
   box-shadow: 0 0 0 30px color-mix(in srgb, var(--sun) 22%, transparent), 0 0 0 64px color-mix(in srgb, var(--sun) 10%, transparent);
   opacity: 0.95;
 }
@@ -125,7 +126,7 @@ header {
   border: 1.5px solid var(--input-border);
   border-radius: var(--r-xl);
   overflow: hidden;
-  box-shadow: 0 8px 0 var(--line-lip), 0 30px 60px rgba(8, 40, 28, 0.12);
+  box-shadow: 0 8px 0 var(--line-lip), var(--popover-shadow);
   transform: rotate(-1.2deg);
 }
 /* Спиралата на тетрадката вместо трите точки */
@@ -153,10 +154,10 @@ header {
 .bar-name { font-size: 14px; font-weight: 600; color: var(--text-secondary); width: 110px; flex-shrink: 0; display: flex; align-items: center; gap: 8px; }
 .bar-name svg { width: 16px; height: 16px; flex-shrink: 0; }
 .bar-track { flex: 1; height: 14px; background: var(--track-bg); border-radius: 999px; overflow: hidden; }
-.bar-fill { height: 100%; border-radius: 999px; background: var(--sprout); box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.12); }
-.bar-row:nth-child(2) .bar-fill { background: var(--peri); }
-.bar-row:nth-child(3) .bar-fill { background: var(--sun); }
-.bar-row:nth-child(4) .bar-fill { background: var(--color-expense); }
+.bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--sprout), var(--sprout-2)); box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.12); }
+.bar-row:nth-child(2) .bar-fill { background: linear-gradient(90deg, var(--peri), color-mix(in srgb, var(--peri) 55%, var(--chart-4))); }
+.bar-row:nth-child(3) .bar-fill { background: linear-gradient(90deg, var(--sun), var(--sun-2)); }
+.bar-row:nth-child(4) .bar-fill { background: linear-gradient(90deg, var(--color-expense), color-mix(in srgb, var(--color-expense) 60%, var(--sun))); }
 
 /* ===== Функции ===== */
 section { padding: 84px 28px; }
@@ -180,12 +181,12 @@ section { padding: 84px 28px; }
 .feature:nth-child(3) { background: var(--peri-soft); border-color: transparent; box-shadow: 0 4px 0 color-mix(in srgb, var(--peri) 28%, transparent); }
 .feature:nth-child(5) { background: var(--red-soft);  border-color: transparent; box-shadow: 0 4px 0 color-mix(in srgb, var(--color-expense) 25%, transparent); }
 .feature:nth-child(6) {
-  grid-column: span 6; background: var(--hero-bg); border-color: transparent; color: #FFFFFF;
-  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3);
+  grid-column: span 6; background: var(--hero-bg); border-color: transparent; color: var(--hero-ink);
+  box-shadow: 0 4px 0 color-mix(in srgb, var(--line-lip) 55%, black);
   display: grid; grid-template-columns: auto 1fr; column-gap: 20px; align-items: center;
 }
-.feature:nth-child(6) .feature-icon { grid-row: span 2; margin: 0; background: var(--sun); color: #3A2A00; }
-.feature:nth-child(6) p { color: rgba(255, 255, 255, 0.82); }
+.feature:nth-child(6) .feature-icon { grid-row: span 2; margin: 0; background: linear-gradient(135deg, var(--sun-2), var(--sun)); color: var(--on-sun); }
+.feature:nth-child(6) p { color: var(--hero-muted); }
 
 .feature-icon {
   width: 50px; height: 50px; border-radius: 16px;
@@ -205,8 +206,8 @@ section { padding: 84px 28px; }
   width: 52px; height: 52px; border-radius: 50%; margin: 0 0 18px;
   display: flex; align-items: center; justify-content: center;
   font-family: var(--font-display); font-weight: 700; font-size: 20px;
-  color: #3A2A00; background: var(--sun);
-  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.18);
+  color: var(--on-sun); background: linear-gradient(135deg, var(--sun-2), var(--sun));
+  box-shadow: var(--lift-shadow);
 }
 .step:not(:last-child)::after {
   content: ""; position: absolute; top: 25px; left: 68px; right: -14px;
@@ -218,10 +219,10 @@ section { padding: 84px 28px; }
 /* ===== Финален призив ===== */
 .cta-band {
   max-width: 940px; margin: 0 auto; text-align: left;
-  background: var(--hero-bg); color: #FFFFFF;
+  background: var(--hero-bg); color: var(--hero-ink);
   border-radius: var(--r-xl); padding: 60px 48px;
   position: relative; overflow: hidden; isolation: isolate;
-  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.28);
+  box-shadow: 0 8px 0 color-mix(in srgb, var(--line-lip) 55%, black);
 }
 /* Три монети (пръстени) в долния десен ъгъл на финалния призив */
 .cta-band::before {
@@ -235,10 +236,10 @@ section { padding: 84px 28px; }
 .cta-band::after {
   content: ""; position: absolute; z-index: -1; top: -110px; right: -90px;
   width: 280px; height: 280px; border-radius: 50%;
-  border: 30px solid rgba(255, 255, 255, 0.06);
+  border: 30px solid var(--hero-line);
 }
 .cta-band h2 { font-family: var(--font-display); font-weight: 700; font-size: clamp(24px, 3.6vw, 36px); letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 14px; max-width: 16ch; }
-.cta-band p { color: rgba(255, 255, 255, 0.85); margin-bottom: 30px; max-width: 460px; font-size: 17px; }
+.cta-band p { color: var(--hero-muted); margin-bottom: 30px; max-width: 460px; font-size: 17px; }
 
 /* ===== Долна лента ===== */
 footer {

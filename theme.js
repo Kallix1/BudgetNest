@@ -37,6 +37,13 @@
     halloween: SUN_ICON_PATH
   };
 
+  // Цветът на адресната лента в браузъра следва средата на градиента.
+  var THEME_COLORS = {
+    light: '#E8F4D7',
+    dark: '#0A2A2A',
+    halloween: '#2F1033'
+  };
+
   var TITLES = {
     bg: {
       light: 'Смяна на тема (следваща: тъмна)',
@@ -79,6 +86,11 @@
   function applyTheme(theme, persist) {
     theme = normalize(theme);
     document.documentElement.setAttribute('data-theme', theme);
+    // Нативните контроли (select, скролбар, date picker) да следват темата.
+    document.documentElement.style.colorScheme = theme === 'light' ? 'light' : 'dark';
+
+    var themeMeta = document.querySelector('meta[name="theme-color"]');
+    if (themeMeta) themeMeta.setAttribute('content', THEME_COLORS[theme]);
 
     if (persist !== false) {
       try { localStorage.setItem(STORAGE_KEY, theme); } catch (e) { /* ignore */ }

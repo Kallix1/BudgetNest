@@ -28,19 +28,19 @@ body.dashboard-body {
   flex-direction: column;
   justify-content: space-between;
   padding: 32px 20px 24px;
-  color: #E4F3EA;
+  color: var(--nav-ink);
   background-color: var(--navbar-bg);
   background-image: var(--navbar-image);
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  border-right: 1px solid var(--hero-line);
   box-sizing: border-box;
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  scrollbar-color: color-mix(in srgb, var(--nav-ink) 20%, transparent) transparent;
   scrollbar-gutter: stable;
 }
 .navbar::-webkit-scrollbar { width: 6px; }
 .navbar::-webkit-scrollbar-track { background: transparent; }
-.navbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.18); border-radius: 4px; }
+.navbar::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--nav-ink) 18%, transparent); border-radius: 4px; }
 .navbar::-webkit-scrollbar-thumb:hover { background: var(--sun); }
 .navbar :focus-visible { outline-color: var(--sun); }
 
@@ -53,7 +53,7 @@ body.dashboard-body {
 .nav-left { display: flex; flex-direction: column; align-items: flex-start; gap: 34px; width: 100%; }
 
 .brand-mark {
-  color: #FFFFFF !important;
+  color: var(--nav-ink) !important;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 19px;
@@ -69,7 +69,7 @@ body.dashboard-body {
   align-items: center;
   font-size: 15px;
   font-weight: 600;
-  color: #BFD8CB;
+  color: var(--nav-ink-dim);
   text-decoration: none;
   padding: 12px 16px;
   border-radius: var(--r-md);
@@ -84,17 +84,17 @@ body.dashboard-body {
 
 .nav-link::before { content: none; }
 
-.nav-link:hover { color: #FFFFFF; background: rgba(255, 255, 255, 0.09); }
+.nav-link:hover { color: var(--nav-ink); background: var(--nav-hover-bg); }
 .nav-link:active { transform: translateY(2px); }
 
 /* Активната страница е слънчогледов "стикер" */
 .nav-link.active {
-  color: #3A2A00;
-  background: var(--sun);
-  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.32);
+  color: var(--nav-active-ink);
+  background: linear-gradient(135deg, var(--sun), var(--sun-2));
+  box-shadow: 0 3px 0 color-mix(in srgb, var(--line-lip) 60%, black);
 }
-.nav-link.active:hover { color: #3A2A00; background: var(--sun); }
-.nav-link.active:active { transform: translateY(3px); box-shadow: 0 0 0 rgba(0, 0, 0, 0.32); }
+.nav-link.active:hover { color: var(--nav-active-ink); background: linear-gradient(135deg, var(--sun), var(--sun-2)); }
+.nav-link.active:active { transform: translateY(3px); box-shadow: 0 0 0 color-mix(in srgb, var(--line-lip) 60%, black); }
 
 .nav-right { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; padding-top: 18px; }
 .nav-right .household-pill, .nav-right .btn-ghost { grid-column: 1 / -1; }
@@ -104,9 +104,9 @@ body.dashboard-body {
   font-family: var(--font-body);
   font-size: 14px;
   font-weight: 600;
-  color: #FFFFFF !important;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1.5px solid rgba(255, 255, 255, 0.16);
+  color: var(--nav-ink) !important;
+  background: var(--nav-pill-bg);
+  border: 1.5px solid var(--nav-pill-border);
   border-radius: 999px;
   padding: 9px 16px 9px 34px;
   text-align: left;
@@ -130,9 +130,9 @@ body.dashboard-body {
 
 /* Малките бутони в лентата са прозрачни върху зеленото */
 .navbar .theme-toggle {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.2);
-  color: #E4F3EA;
+  background: var(--nav-pill-bg);
+  border-color: var(--nav-pill-border);
+  color: var(--nav-ink);
   box-shadow: none;
 }
 .navbar .theme-toggle:hover { color: var(--sun); border-color: var(--sun); }
@@ -143,7 +143,7 @@ body.dashboard-body {
   font-size: 13.5px;
   font-weight: 600;
   color: var(--text-secondary);
-  background: var(--bg-panel);
+  background-color: var(--bg-panel);
   border: 1.5px solid var(--input-border);
   border-radius: var(--r-sm);
   padding: 9px 16px;
@@ -155,12 +155,13 @@ body.dashboard-body {
 .btn-ghost:active { transform: translateY(2px); box-shadow: 0 0 0 var(--line-lip); }
 
 .navbar .btn-ghost {
-  color: #E4F3EA;
+  color: var(--nav-ink);
   background: transparent;
-  border-color: rgba(255, 255, 255, 0.25);
+  border-color: var(--nav-pill-border);
   box-shadow: none;
+  background-image: none;
 }
-.navbar .btn-ghost:hover { color: #FFFFFF; background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.5); }
+.navbar .btn-ghost:hover { color: var(--nav-ink); background: var(--nav-hover-bg); border-color: color-mix(in srgb, var(--nav-ink) 48%, transparent); }
 
 /* ============================================================
    Основно съдържание
@@ -208,7 +209,7 @@ body.dashboard-body {
 }
 
 .summary-card {
-  background: var(--bg-card);
+  background-color: var(--bg-card);
   border: 1.5px solid var(--border-soft);
   border-radius: var(--r-lg);
   padding: 22px 22px 24px;
@@ -306,7 +307,7 @@ body.dashboard-body {
   min-height: 190px;
   isolation: isolate;
 }
-.summary-card:has(.summary-value.balance) .summary-label { color: rgba(255, 255, 255, 0.78); font-size: 15px; }
+.summary-card:has(.summary-value.balance) .summary-label { color: var(--hero-muted); font-size: 15px; }
 .summary-card:has(.summary-value.balance) .summary-value.balance {
   color: var(--hero-ink);
   font-size: clamp(28px, 3.3vw, 40px);
@@ -335,7 +336,7 @@ body.dashboard-body {
   width: 190px;
   height: 190px;
   border-radius: 50%;
-  border: 22px solid rgba(255, 255, 255, 0.06);
+  border: 22px solid var(--hero-line);
 }
 
 /* ============================================================
@@ -349,7 +350,7 @@ body.dashboard-body {
 }
 
 .wallet-card {
-  background: var(--bg-card);
+  background-color: var(--bg-card);
   border: 1.5px solid var(--border-soft);
   border-radius: var(--r-lg);
   padding: 24px;
@@ -435,7 +436,7 @@ body.dashboard-body {
 }
 
 .card {
-  background: var(--bg-card);
+  background-color: var(--bg-card);
   border: 1.5px solid var(--border-soft);
   border-radius: var(--r-lg);
   padding: 26px;
@@ -572,8 +573,8 @@ body.dashboard-body {
   100% { background-position: calc(200px + 100%) 0; }
 }
 .skeleton {
-  background: var(--surface-alt);
-  background-image: linear-gradient(90deg, var(--surface-alt) 0px, var(--border-soft) 60px, var(--surface-alt) 120px);
+  background-color: var(--track-bg);
+  background-image: linear-gradient(90deg, var(--track-bg) 0px, var(--border-soft) 60px, var(--track-bg) 120px);
   background-size: 200px 100%;
   background-repeat: no-repeat;
   border-radius: 8px;
@@ -632,7 +633,7 @@ body.dashboard-body {
   position: absolute;
   left: 0; top: 0; bottom: 0;
   border-radius: 999px;
-  background: var(--sprout);
+  background: linear-gradient(90deg, var(--sprout), var(--sprout-2));
   box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.12);
   transition: width 0.6s cubic-bezier(.2, .8, .2, 1);
 }
@@ -670,7 +671,7 @@ body.dashboard-body {
   padding: 12px;
   border-radius: var(--r-md);
   border: 1.5px solid var(--input-border);
-  background: var(--bg-panel);
+  background-color: var(--bg-panel);
   color: var(--text-secondary);
   font-family: var(--font-body);
   font-size: 14px;
@@ -700,10 +701,9 @@ body.dashboard-body {
 #tx-delete {
   background: var(--color-expense) !important;
   border: none !important;
-  color: #FFFFFF !important;
-  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.25);
+  color: var(--on-expense) !important;
+  box-shadow: 0 3px 0 color-mix(in srgb, var(--color-expense) 40%, black);
 }
-[data-theme="dark"] #tx-delete, [data-theme="halloween"] #tx-delete { color: #3B0A10 !important; }
 
 /* ============================================================
    Списък с транзакции
@@ -845,7 +845,7 @@ body.dashboard-body {
   position: fixed;
   inset: 0;
   z-index: 30;
-  background: rgba(8, 40, 28, 0.55);
+  background: var(--overlay-bg);
   backdrop-filter: blur(5px);
   display: flex;
   align-items: center;
@@ -854,7 +854,7 @@ body.dashboard-body {
 }
 
 .overlay-card {
-  background: var(--bg-card);
+  background-color: var(--bg-card);
   border: 1.5px solid var(--border-soft);
   border-radius: var(--r-xl);
   padding: 40px;
@@ -900,8 +900,8 @@ body.dashboard-body {
   justify-content: space-between;
   box-sizing: border-box;
 }
-.nav-toggle:hover { background: rgba(255, 255, 255, 0.1); }
-.nav-toggle span { display: block; height: 2.5px; width: 100%; background: #FFFFFF; border-radius: 2px; transition: transform 0.25s ease, opacity 0.2s ease; }
+.nav-toggle:hover { background: var(--nav-hover-bg); }
+.nav-toggle span { display: block; height: 2.5px; width: 100%; background: var(--nav-ink); border-radius: 2px; transition: transform 0.25s ease, opacity 0.2s ease; }
 .navbar.nav-open .nav-toggle span:nth-child(1) { transform: translateY(8.5px) rotate(45deg); }
 .navbar.nav-open .nav-toggle span:nth-child(2) { opacity: 0; }
 .navbar.nav-open .nav-toggle span:nth-child(3) { transform: translateY(-8.5px) rotate(-45deg); }
@@ -933,6 +933,11 @@ body.dashboard-body {
     border-right: none;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     overflow: visible;
+    /* Хоризонталната лента е ниска, затова целият диагонален градиент
+       би показал само светлия си край. Показваме първата му половина —
+       същата дълбока гора като страничната лента. */
+    background-size: 200% 100%;
+    background-repeat: no-repeat;
   }
 
   .nav-toggle { display: flex; }
@@ -1013,7 +1018,7 @@ body.dashboard-body {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--bg-panel);
+  background-color: var(--bg-panel);
   border: 1.5px solid var(--input-border);
   border-radius: 999px;
   padding: 9px 14px 9px 14px;
@@ -1030,7 +1035,7 @@ body.dashboard-body {
 
 .template-chip .tpl-amount { font-variant-numeric: tabular-nums; color: var(--text-dim); font-weight: 600; }
 .template-chip .tpl-remove { margin-left: 2px; color: var(--text-dim); font-size: 15px; line-height: 1; padding: 2px 4px; border-radius: 50%; }
-.template-chip .tpl-remove:hover { color: #FFFFFF; background: var(--color-expense); }
+.template-chip .tpl-remove:hover { color: var(--on-expense); background: var(--color-expense); }
 
 .template-add-btn {
   display: flex;
@@ -1103,7 +1108,7 @@ table.admin-table tbody tr:hover td { background: var(--surface-alt); }
   align-items: center;
   justify-content: center;
   border: 1.5px solid var(--input-border);
-  background: var(--bg-panel);
+  background-color: var(--bg-panel);
   color: var(--text-secondary);
   border-radius: var(--r-sm);
   font-family: var(--font-body);
@@ -1150,7 +1155,9 @@ table.admin-table tbody tr:hover td { background: var(--surface-alt); }
     gap: 2px;
     padding: 4px 8px;
   }
-  .bottom-nav-item.active { color: var(--nest-gold); }
+  /* --nest-green-mid е достатъчно тъмно в светлата тема за 11px текст,
+     а в тъмната и Хелуин е ярко; --nest-gold беше твърде светло зелено. */
+  .bottom-nav-item.active { color: var(--nest-green-mid); }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -8,14 +8,14 @@
 <meta name="description" content="Автоматични повтарящи се приходи и разходи в BudgetNest.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Unbounded:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=23">
-<link rel="stylesheet" href="css/dashboard.css?v=24">
+<link rel="stylesheet" href="css/style.css?v=25">
+<link rel="stylesheet" href="css/dashboard.css?v=26">
 <script src="nav.js?v=11" defer></script>
 <script src="i18n.js?v=10" defer></script>
-<script src="theme.js?v=1" defer></script>
+<script src="theme.js?v=2" defer></script>
 <script src="analytics.js?v=1" defer></script>
 <script src="icons.js?v=2" defer></script>
-<script src="boot.js?v=1"></script>
+<script src="boot.js?v=2"></script>
 <script src="vendor/supabase-js-2.117.3.min.js"></script>
 
 <style>
@@ -50,18 +50,18 @@
   .recur-side { display: flex; align-items: center; gap: 12px; flex: 0 0 auto; margin-left: auto; }
   .recur-amount { font-family: 'Onest', sans-serif; font-variant-numeric: tabular-nums; font-weight: 600; font-size: 15px; white-space: nowrap; }
   .recur-amount.income { color: var(--color-income); }
-  .recur-amount.expense { color: #DC2626; }
+  .recur-amount.expense { color: var(--color-expense); }
   .recur-actions { display: flex; gap: 8px; align-items: center; }
   .recur-pause-btn, .recur-delete-btn {
     font-family: 'Onest', sans-serif; font-size: 12px; font-weight: 600;
     border-radius: 8px; padding: 7px 12px; cursor: pointer; white-space: nowrap;
     border: 1px solid var(--border-soft); background: var(--surface-alt); color: var(--text-secondary);
   }
-  .recur-delete-btn { color: #E53E3E; border-color: rgba(229,62,62,0.3); }
+  .recur-delete-btn { color: var(--color-expense); border-color: color-mix(in srgb, var(--color-expense) 30%, transparent); }
   .recur-row.paused { opacity: 0.55; }
   .recur-badge {
     font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px;
-    background: rgba(221,133,0,0.15); color: #B7791F; margin-left: 8px;
+    background: var(--sun-soft); color: var(--color-warning); margin-left: 8px;
   }
 </style>
 </head>
@@ -198,12 +198,12 @@
     const container = document.getElementById('app-toast-container');
     const toast = document.createElement('div');
     const palette = {
-      error:   { bg: '#7F1D1D', border: '#EF4444' },
-      success: { bg: '#14532D', border: '#22C55E' },
-      info:    { bg: '#1E3A5F', border: '#3B82F6' },
+      error:   { bg: 'var(--toast-error-bg)', border: 'var(--toast-error-border)' },
+      success: { bg: 'var(--toast-success-bg)', border: 'var(--toast-success-border)' },
+      info:    { bg: 'var(--toast-info-bg)', border: 'var(--toast-info-border)' },
     };
     const c = palette[type] || palette.info;
-    toast.style.cssText = `background:${c.bg}; border:1px solid ${c.border}; color:#fff; padding:14px 18px; border-radius:10px; font-family:var(--font-body); font-size:13px; font-weight:500; box-shadow:0 8px 24px rgba(0,0,0,0.35); max-width:340px; line-height:1.45;`;
+    toast.style.cssText = `background:${c.bg}; border:1px solid ${c.border}; color:var(--toast-text); padding:14px 18px; border-radius:10px; font-family:var(--font-body); font-size:13px; font-weight:500; box-shadow:0 8px 24px rgba(0,0,0,0.35); max-width:340px; line-height:1.45;`;
     toast.textContent = message;
     container.appendChild(toast);
     setTimeout(() => {
@@ -280,7 +280,7 @@
     const el = document.getElementById(id);
     if (!el) return;
     el.textContent = message;
-    el.style.color = type === 'error' ? '#E53E3E' : (type === 'success' ? 'var(--color-income)' : 'var(--text-secondary)');
+    el.style.color = type === 'error' ? 'var(--color-expense)' : (type === 'success' ? 'var(--color-income)' : 'var(--text-secondary)');
   }
 
   function setRecurType(type) {

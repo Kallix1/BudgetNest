@@ -3,12 +3,12 @@
    Цветове и шрифтове: виж tokens.css
    ============================================================ */
 
-@import url("tokens.css?v=23");
+@import url("tokens.css?v=25");
 
 /* ===== База ===== */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-html, body { height: 100%; }
+html { height: 100%; }
 
 body {
   font-family: var(--font-body);
@@ -16,6 +16,8 @@ body {
   line-height: 1.5;
   background-color: var(--sky-base);
   color: var(--text-primary);
+  /* Без фиксирана височина: при дълга форма (регистрация) тялото расте
+     и flex центрирането не избутва горния ръб на картата извън екрана. */
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -27,7 +29,7 @@ body {
   transition: background-color 0.25s ease, color 0.25s ease;
 }
 
-::selection { background: var(--sun); color: #3A2A00; }
+::selection { background: var(--sun); color: var(--on-sun); }
 
 /* Фонът на цялата страница: виж --sky-* в tokens.css (различен за всяка тема) */
 .bg-grid {
@@ -70,7 +72,7 @@ body {
   padding: 0 10px;
   border-radius: 999px;
   border: 1.5px solid var(--border-soft);
-  background: var(--bg-panel);
+  background-color: var(--bg-panel);
   color: var(--text-secondary);
   cursor: pointer;
   font-family: var(--font-body);
@@ -105,7 +107,7 @@ body {
   max-width: 980px;
   display: grid;
   grid-template-columns: 1.05fr 1fr;
-  background: var(--bg-panel);
+  background-color: var(--bg-panel);
   border: 1.5px solid var(--border-soft);
   border-radius: var(--r-xl);
   overflow: hidden;
@@ -141,8 +143,8 @@ body {
   width: 260px;
   height: 260px;
   border-radius: 50%;
-  background: var(--sun);
-  box-shadow: 0 0 0 26px rgba(255, 255, 255, 0.07), 0 0 0 56px rgba(255, 255, 255, 0.04);
+  background: radial-gradient(circle at 34% 30%, var(--sun-2), var(--sun) 62%, var(--sprout) 130%);
+  box-shadow: 0 0 0 26px var(--hero-line), 0 0 0 56px color-mix(in srgb, var(--hero-ink) 5%, transparent);
 }
 
 /* Три монети (пръстени) на корицата */
@@ -157,7 +159,7 @@ body {
   background:
     radial-gradient(circle at 184px 32px, transparent 0 24px, var(--sun) 25px 30px, transparent 31px),
     radial-gradient(circle at 112px 56px, transparent 0 20px, var(--sprout) 21px 26px, transparent 27px),
-    radial-gradient(circle at 40px 78px, transparent 0 16px, #FFFFFF 17px 21px, transparent 22px);
+    radial-gradient(circle at 40px 78px, transparent 0 16px, var(--coin-pale) 17px 21px, transparent 22px);
 }
 
 .brand-mark {
@@ -190,7 +192,7 @@ body {
   line-height: 1.12;
   letter-spacing: -0.02em;
   margin-top: 34px;
-  color: #FFFFFF;
+  color: var(--hero-ink);
   max-width: 11ch;
 }
 
@@ -198,13 +200,13 @@ body {
   margin-top: 20px;
   font-size: 15.5px;
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.82);
+  color: var(--hero-muted);
   max-width: 30ch;
 }
 
 .brand-stat {
   font-size: 13.5px;
-  color: rgba(255, 255, 255, 0.82);
+  color: var(--hero-muted);
   padding-top: 20px;
   line-height: 1.6;
   max-width: 22ch;
@@ -218,7 +220,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background: var(--bg-panel);
+  background-color: var(--bg-panel);
 }
 
 .tabs {
@@ -247,7 +249,7 @@ body {
 .tab:hover:not(.active) { color: var(--text-primary); background: var(--bg-panel); }
 .tab.active {
   color: var(--on-sprout);
-  background: var(--sprout);
+  background: linear-gradient(135deg, var(--sprout), var(--sprout-2));
   box-shadow: 0 3px 0 var(--sprout-lip);
 }
 
@@ -287,7 +289,7 @@ body {
   -webkit-appearance: none;
   padding-right: 42px;
   cursor: pointer;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2346605A' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-image: var(--select-arrow);
   background-repeat: no-repeat;
   background-position: right 14px center;
   background-size: 18px;
@@ -330,7 +332,7 @@ button.submit {
   font-weight: 700;
   font-size: 15.5px;
   color: var(--on-sprout);
-  background: var(--sprout);
+  background: linear-gradient(135deg, var(--sprout), var(--sprout-2));
   border: none;
   border-radius: var(--r-md);
   padding: 15px 22px;

@@ -8,10 +8,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Unbounded:wght@500;600;700&display=swap" rel="stylesheet">
 <script src="i18n.js?v=10" defer></script>
-<script src="theme.js?v=1" defer></script>
+<script src="theme.js?v=2" defer></script>
 <script src="analytics.js?v=1" defer></script>
 <script src="icons.js?v=2" defer></script>
-<link rel="stylesheet" href="css/tokens.css?v=23">
+<link rel="stylesheet" href="css/tokens.css?v=25">
 <style>
   * { box-sizing:border-box; margin:0; padding:0; }
   body {
@@ -26,7 +26,7 @@
     background:color-mix(in srgb, var(--bg-void) 88%, transparent); backdrop-filter:blur(10px);
   }
   .logo { display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-weight:700; font-size:18px; letter-spacing:-0.02em; text-decoration:none; color:inherit; }
-  .logo-mark { width:34px; height:34px; border-radius:11px; background:var(--sun); color:#3A2A00; box-shadow:0 3px 0 rgba(0,0,0,0.18); display:flex; align-items:center; justify-content:center; }
+  .logo-mark { width:34px; height:34px; border-radius:11px; background:linear-gradient(135deg, var(--sun-2), var(--sun)); color:var(--on-sun); box-shadow:var(--lift-shadow); display:flex; align-items:center; justify-content:center; }
   .logo-mark svg { width:20px; height:20px; }
   .header-actions { display:flex; align-items:center; gap:14px; }
   .theme-toggle {
