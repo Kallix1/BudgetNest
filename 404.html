@@ -13,7 +13,19 @@
      избор на потребителя, иначе — настройката на системата. */
   (function () {
     var theme = null;
-    try { theme = localStorage.getItem('budgetnest-theme'); } catch (e) {}
+    try {
+      var raw = localStorage.getItem('budgetnest-theme-schedule');
+      if (raw) {
+        var schedule = JSON.parse(raw);
+        if (schedule && schedule.enabled) {
+          var hour = new Date().getHours();
+          theme = (hour >= 7 && hour < 18) ? schedule.day : schedule.night;
+        }
+      }
+    } catch (e) {}
+    if (!theme) {
+      try { theme = localStorage.getItem('budgetnest-theme'); } catch (e) {}
+    }
     if (!theme) {
       var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
       theme = prefersDark ? 'dark' : 'light';

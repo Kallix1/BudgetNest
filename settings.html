@@ -12,8 +12,8 @@
 <link rel="stylesheet" href="css/emojipicker.css?v=3">
 <script src="emojipicker.js?v=2" defer></script>
 <script src="nav.js?v=11" defer></script>
-<script src="i18n.js?v=10" defer></script>
-<script src="theme.js?v=3" defer></script>
+<script src="i18n.js?v=11" defer></script>
+<script src="theme.js?v=4" defer></script>
 <script src="analytics.js?v=1" defer></script>
 <script src="icons.js?v=2" defer></script>
 <script src="boot.js?v=2"></script>
@@ -111,6 +111,92 @@
     background: none; border: none; cursor: pointer; text-decoration: underline;
     margin-left: 14px;
   }
+
+  /* ===== Тема: ръчен избор или автоматична смяна по часовник ===== */
+  .theme-setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 2px 0 18px;
+  }
+  .theme-setting-copy { min-width: 0; }
+  .theme-setting-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .theme-setting-desc {
+    display: block;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-top: 4px;
+  }
+  .theme-switch {
+    position: relative;
+    width: 48px;
+    height: 28px;
+    flex: 0 0 auto;
+  }
+  .theme-switch input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 1;
+  }
+  .theme-switch-track {
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    background: var(--surface-alt);
+    border: 1.5px solid var(--border-soft);
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+  }
+  .theme-switch-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 19px;
+    height: 19px;
+    border-radius: 50%;
+    background: var(--text-dim);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+  }
+  .theme-switch input:checked + .theme-switch-track {
+    background: var(--sprout);
+    border-color: var(--sprout);
+  }
+  .theme-switch input:checked + .theme-switch-track .theme-switch-thumb {
+    transform: translateX(20px);
+    background: var(--on-sprout);
+  }
+  .theme-switch input:focus-visible + .theme-switch-track {
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--sprout) 30%, transparent);
+  }
+  .theme-fields {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-soft);
+  }
+  .theme-fields .field { flex: 1 1 210px; }
+  .theme-fields .field label { font-size: 12px; }
+  .theme-status {
+    margin-top: 14px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--text-dim);
+  }
+  @media (max-width: 560px) {
+    .theme-setting-row { align-items: flex-start; }
+  }
 </style>
 </head>
 <body class="dashboard-body">
@@ -151,6 +237,59 @@
 
   <div class="page-header">
     <h1 data-i18n="settings.h1">Настройки</h1>
+  </div>
+
+  <div class="card">
+    <div class="card-title" data-i18n="settings.theme_title">Тема</div>
+    <p data-i18n="settings.theme_hint" style="font-size:13px; color:var(--text-secondary); margin-bottom:16px; line-height:1.5;">
+      Изберете една тема или оставете темата да се сменя автоматично според часа на устройството.
+    </p>
+
+    <label class="theme-setting-row" for="theme-schedule-toggle">
+      <span class="theme-setting-copy">
+        <span class="theme-setting-label" id="theme-schedule-toggle-label" data-i18n="settings.theme_schedule_label">Автоматична смяна на темата</span>
+        <span class="theme-setting-desc" data-i18n="settings.theme_schedule_desc">Дневна тема от 07:00 до 18:00, нощна — от 18:00 до 07:00.</span>
+      </span>
+      <span class="theme-switch">
+        <input type="checkbox" id="theme-schedule-toggle" role="switch" aria-labelledby="theme-schedule-toggle-label">
+        <span class="theme-switch-track" aria-hidden="true"><span class="theme-switch-thumb"></span></span>
+      </span>
+    </label>
+
+    <div id="theme-schedule-fields" class="theme-fields" style="display:none;">
+      <div class="field">
+        <label for="theme-day-select" data-i18n="settings.theme_day_label">Дневна тема (07:00 – 18:00)</label>
+        <select id="theme-day-select">
+          <option value="light" data-i18n="settings.theme_light">Светла</option>
+          <option value="dark" data-i18n="settings.theme_dark">Тъмна</option>
+          <option value="halloween" data-i18n="settings.theme_halloween">Хелуин</option>
+          <option value="lagoon" data-i18n="settings.theme_lagoon">Лагуна</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="theme-night-select" data-i18n="settings.theme_night_label">Нощна тема (18:00 – 07:00)</label>
+        <select id="theme-night-select">
+          <option value="light" data-i18n="settings.theme_light">Светла</option>
+          <option value="dark" data-i18n="settings.theme_dark">Тъмна</option>
+          <option value="halloween" data-i18n="settings.theme_halloween">Хелуин</option>
+          <option value="lagoon" data-i18n="settings.theme_lagoon">Лагуна</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="theme-single-fields" class="theme-fields">
+      <div class="field">
+        <label for="theme-single-select" data-i18n="settings.theme_single_label">Тема на сайта</label>
+        <select id="theme-single-select">
+          <option value="light" data-i18n="settings.theme_light">Светла</option>
+          <option value="dark" data-i18n="settings.theme_dark">Тъмна</option>
+          <option value="halloween" data-i18n="settings.theme_halloween">Хелуин</option>
+          <option value="lagoon" data-i18n="settings.theme_lagoon">Лагуна</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="theme-status" id="theme-status" role="status" aria-live="polite"></div>
   </div>
 
   <div class="card">
@@ -306,7 +445,17 @@
     const current = document.documentElement.getAttribute('data-theme') || 'light';
     applyTheme(current === 'dark' ? 'light' : 'dark');
   }
-  applyTheme(localStorage.getItem('budgetnest-theme') || 'light');
+  (function () {
+    var theme = localStorage.getItem('budgetnest-theme') || 'light';
+    try {
+      var schedule = JSON.parse(localStorage.getItem('budgetnest-theme-schedule') || 'null');
+      if (schedule && schedule.enabled) {
+        var hour = new Date().getHours();
+        theme = (hour >= 7 && hour < 18) ? schedule.day : schedule.night;
+      }
+    } catch (e) {}
+    document.documentElement.setAttribute('data-theme', theme || 'light');
+  })();
 
   // ===== Supabase конфигурация =====
   const SUPABASE_URL = 'https://fvorpmajvrsxrwtscmwk.supabase.co';
@@ -356,6 +505,82 @@
     const el = document.getElementById(elId);
     el.textContent = message;
     el.className = 'status-msg' + (type ? ' ' + type : '');
+  }
+
+  // ===== Тема: ръчен избор или автоматична смяна по часовник =====
+  function themeApi() {
+    return window.BudgetNestTheme || null;
+  }
+
+  function themeName(theme) {
+    return tr('settings.theme_' + theme);
+  }
+
+  function renderThemeSettings() {
+    const api = themeApi();
+    if (!api || typeof api.getSchedule !== 'function') return;
+
+    const schedule = api.getSchedule();
+    const enabled = !!schedule.enabled;
+    const activeTheme = api.get();
+    const period = api.currentPeriod();
+
+    const toggle = document.getElementById('theme-schedule-toggle');
+    const daySelect = document.getElementById('theme-day-select');
+    const nightSelect = document.getElementById('theme-night-select');
+    const singleSelect = document.getElementById('theme-single-select');
+    const status = document.getElementById('theme-status');
+    if (!toggle || !daySelect || !nightSelect || !singleSelect || !status) return;
+
+    toggle.checked = enabled;
+    daySelect.value = schedule.day;
+    nightSelect.value = schedule.night;
+    singleSelect.value = activeTheme;
+
+    document.getElementById('theme-schedule-fields').style.display = enabled ? 'flex' : 'none';
+    document.getElementById('theme-single-fields').style.display = enabled ? 'none' : 'flex';
+
+    const nextStatus = enabled
+      ? tr(period === 'day' ? 'settings.theme_now_day' : 'settings.theme_now_night', {
+          theme: themeName(activeTheme)
+        })
+      : tr('settings.theme_off_hint', { theme: themeName(activeTheme) });
+
+    // Пишем само при реална промяна, за да не се пре-обявява status
+    // регионът на всеки 30 секунди.
+    if (status.textContent !== nextStatus) status.textContent = nextStatus;
+  }
+
+  function initThemeSettings() {
+    const api = themeApi();
+    if (!api || typeof api.getSchedule !== 'function') return;
+
+    document.getElementById('theme-schedule-toggle').addEventListener('change', (e) => {
+      api.setSchedule({ enabled: e.target.checked });
+    });
+    document.getElementById('theme-day-select').addEventListener('change', (e) => {
+      api.setSchedule({ day: e.target.value });
+    });
+    document.getElementById('theme-night-select').addEventListener('change', (e) => {
+      api.setSchedule({ night: e.target.value });
+    });
+    document.getElementById('theme-single-select').addEventListener('change', (e) => {
+      api.setManualTheme(e.target.value);
+    });
+
+    // Синхронизира UI, ако темата се смени от бутона в навигацията
+    // или автоматично при преминаване към дневния/нощния период.
+    document.addEventListener('budgetnest:themechange', renderThemeSettings);
+    document.addEventListener('budgetnest:schedulechange', renderThemeSettings);
+
+    renderThemeSettings();
+    setInterval(renderThemeSettings, 30000);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initThemeSettings);
+  } else {
+    initThemeSettings();
   }
 
   // ===== Init flow =====
@@ -712,6 +937,7 @@
 
   // ===== Смяна на език: презареждаме динамично рендерираните части =====
   window.onLanguageChange = function () {
+    renderThemeSettings();
     if (!currentHouseholdId) return;
     renderMembers();
     renderPendingInvites();

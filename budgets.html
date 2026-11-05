@@ -11,8 +11,8 @@
 <link rel="stylesheet" href="css/style.css?v=26">
 <link rel="stylesheet" href="css/dashboard.css?v=26">
 <script src="nav.js?v=11" defer></script>
-<script src="i18n.js?v=10" defer></script>
-<script src="theme.js?v=3" defer></script>
+<script src="i18n.js?v=11" defer></script>
+<script src="theme.js?v=4" defer></script>
 <script src="analytics.js?v=1" defer></script>
 <script src="icons.js?v=2" defer></script>
 <script src="boot.js?v=2"></script>
@@ -147,7 +147,17 @@
     const current = document.documentElement.getAttribute('data-theme') || 'light';
     applyTheme(current === 'dark' ? 'light' : 'dark');
   }
-  applyTheme(localStorage.getItem('budgetnest-theme') || 'light');
+  (function () {
+    var theme = localStorage.getItem('budgetnest-theme') || 'light';
+    try {
+      var schedule = JSON.parse(localStorage.getItem('budgetnest-theme-schedule') || 'null');
+      if (schedule && schedule.enabled) {
+        var hour = new Date().getHours();
+        theme = (hour >= 7 && hour < 18) ? schedule.day : schedule.night;
+      }
+    } catch (e) {}
+    document.documentElement.setAttribute('data-theme', theme || 'light');
+  })();
 
   // ===== Supabase конфигурация =====
   const SUPABASE_URL = 'https://fvorpmajvrsxrwtscmwk.supabase.co';
