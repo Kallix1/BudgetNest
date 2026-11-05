@@ -1,8 +1,8 @@
 /* ============================================================
    BudgetNest — превключвател на тема
 
-   Един бутон обикаля три теми:
-     светла → тъмна → Хелуин → светла
+   Един бутон обикаля четири теми:
+     светла → тъмна → Хелуин → Лагуна → светла
 
    Изборът се пази в localStorage под същия ключ, който страниците
    вече използват ('budgetnest-theme'), така че старите избори
@@ -18,7 +18,8 @@
   'use strict';
 
   var STORAGE_KEY = 'budgetnest-theme';
-  var THEMES = ['light', 'dark', 'halloween'];
+  var THEMES = ['light', 'dark', 'halloween', 'lagoon'];
+  var DARK_THEMES = ['dark', 'halloween'];
   var DEFAULT_THEME = 'light';
 
   var SUN_ICON_PATH = '<circle cx="12" cy="12" r="4"></circle><line x1="12" y1="2" x2="12" y2="4"></line><line x1="12" y1="20" x2="12" y2="22"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="2" y1="12" x2="4" y2="12"></line><line x1="20" y1="12" x2="22" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
@@ -29,31 +30,38 @@
     '<path d="M12 6.2V4.3"></path>' +
     '<path d="M9.2 11.6h1.4"></path><path d="M13.4 11.6h1.4"></path>' +
     '<path d="M9.5 15.1l2.5 2.3 2.5-2.3"></path>';
+  // Капка: следващата тема след Хелуин е Лагуна.
+  var DROPLET_ICON_PATH =
+    '<path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C5 11.1 4 13 4 15a7 7 0 0 0 7 7z"></path>';
 
   // Иконата показва СЛЕДВАЩАТА тема (както досега слънце/луна).
   var ICON_BY_CURRENT_THEME = {
     light: MOON_ICON_PATH,
     dark: PUMPKIN_ICON_PATH,
-    halloween: SUN_ICON_PATH
+    halloween: DROPLET_ICON_PATH,
+    lagoon: SUN_ICON_PATH
   };
 
   // Цветът на адресната лента в браузъра следва средата на градиента.
   var THEME_COLORS = {
     light: '#E8F4D7',
     dark: '#0A2A2A',
-    halloween: '#2F1033'
+    halloween: '#2F1033',
+    lagoon: '#D9F5FA'
   };
 
   var TITLES = {
     bg: {
       light: 'Смяна на тема (следваща: тъмна)',
       dark: 'Смяна на тема (следваща: Хелуин)',
-      halloween: 'Смяна на тема (следваща: светла)'
+      halloween: 'Смяна на тема (следваща: Лагуна)',
+      lagoon: 'Смяна на тема (следваща: светла)'
     },
     en: {
       light: 'Toggle theme (next: dark)',
       dark: 'Toggle theme (next: Halloween)',
-      halloween: 'Toggle theme (next: light)'
+      halloween: 'Toggle theme (next: Lagoon)',
+      lagoon: 'Toggle theme (next: light)'
     }
   };
 
@@ -87,7 +95,7 @@
     theme = normalize(theme);
     document.documentElement.setAttribute('data-theme', theme);
     // Нативните контроли (select, скролбар, date picker) да следват темата.
-    document.documentElement.style.colorScheme = theme === 'light' ? 'light' : 'dark';
+    document.documentElement.style.colorScheme = DARK_THEMES.indexOf(theme) === -1 ? 'light' : 'dark';
 
     var themeMeta = document.querySelector('meta[name="theme-color"]');
     if (themeMeta) themeMeta.setAttribute('content', THEME_COLORS[theme]);

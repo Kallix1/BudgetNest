@@ -1,7 +1,7 @@
 /* ============================================================
    BudgetNest — дизайн токени (единственото място за цветове и шрифтове)
 
-   Трите теми са построени върху по един "подписен" градиент, избран
+   Четирите теми са построени върху по един "подписен" градиент, избран
    като в cssgradient.io: 4–5 стопа по диагонал + меки радиални светлини.
    Всичко останало — панели, текст, бутони, диаграми — е изведено от
    същия градиент, за да не е темата само фон.
@@ -9,10 +9,11 @@
      светла   → слънчева градина: сметана → жълто-зелено → мента → аква
      тъмна    → горска нощ: нощен индиго → бор → аврора → дълбоко зелено
      Хелуин   → тиквена вечер: мастилено лилаво → слива → вино → тиква
+     Лагуна   → лагуна и бонбон: облачно бяло → лагуна → бонбонено розово
 
    Старите имена (--nest-gold и т.н.) са запазени нарочно, защото се
    ползват в inline стиловете на страниците. --nest-gold е ЗЕЛЕН акцент
-   в светлата тема — името е останало от по-ранна версия.
+   в светлата тема и РОЗОВ в Лагуна — името е останало от по-ранна версия.
    ============================================================ */
 
 :root {
@@ -381,6 +382,125 @@
     var(--gradient-brand);
 
   --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23E2CAE9' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+/* ============================================================
+   ЛАГУНА — лагуна и бонбон
+   Три цвята: лагуна #7BDFF2 · облачно бяло #FCFFFF · бонбон #F2B5D4
+   Светла тема: облачно бяло е основата, лагуната е основният акцент,
+   а бонбоненото розово — вторият (в брой, активно меню, избор).
+   ============================================================ */
+[data-theme="lagoon"] {
+  color-scheme: light;
+
+  --gradient-page: linear-gradient(135deg, #FCFFFF 0%, #F2FCFE 24%, #DDF5FA 50%, #EAF7FC 76%, #FCEAF4 100%);
+  --gradient-brand: linear-gradient(150deg, #083A46 0%, #0B4D5C 34%, #0E6577 66%, #147A8E 88%, #1B92A6 100%);
+
+  --bg-void: #EAF7FB;
+  --bg-panel: rgba(252, 255, 255, 0.90);
+  --bg-card: rgba(252, 255, 255, 0.93);
+  --bg-surface: rgba(252, 255, 255, 0.96);
+  --border-soft: rgba(14, 113, 131, 0.17);
+  --line-lip: #BFE3EA;
+  --surface-alt: rgba(214, 245, 250, 0.72);
+  --input-bg: rgba(252, 255, 255, 0.96);
+  --input-border: #9FD8E3;
+  --track-bg: #D9F0F6;
+  --panel-sheen: linear-gradient(155deg, rgba(255, 255, 255, 0.60) 0%, rgba(255, 255, 255, 0) 44%, rgba(242, 181, 212, 0.18) 100%);
+  --popover-shadow: 0 18px 36px rgba(10, 63, 75, 0.18);
+  --overlay-bg: rgba(7, 45, 54, 0.52);
+
+  --nest-green-dark: #0A3540;
+  --nest-green-mid: #0E6B7D;
+  --nest-green-light: #1E93A8;
+  --nest-gold: #D77BAE;
+  --nest-gold-accent: #B9558C;
+  --on-brand: #FCFFFF;
+
+  --sprout: #7BDFF2;
+  --sprout-2: #A9ECF7;
+  --sprout-lip: #2E9AAF;
+  --on-sprout: #062B33;
+
+  --sun: #F2B5D4;
+  --sun-2: #F8CFE5;
+  --sun-soft: linear-gradient(150deg, rgba(242, 181, 212, 0.34), rgba(252, 255, 255, 0.55));
+  --sun-ink: #8A3E68;
+  --on-sun: #3C142A;
+  --coin-pale: #FCE2EF;
+
+  --peri: #0E6B7D;
+  --peri-soft: linear-gradient(150deg, rgba(14, 113, 131, 0.16), rgba(214, 245, 250, 0.34));
+
+  --mint-soft: linear-gradient(150deg, rgba(123, 223, 242, 0.22), rgba(214, 245, 250, 0.38));
+  --red-soft: linear-gradient(150deg, rgba(193, 59, 76, 0.13), rgba(255, 212, 216, 0.32));
+
+  --text-primary: #12343D;
+  --text-secondary: #3A606B;
+  --text-dim: #52757E;
+
+  --color-income: #0E7A5F;
+  --color-expense: #C0394B;
+  --color-warning: #8A5600;
+  --on-expense: #FFFFFF;
+
+  --hero-ink: #FCFFFF;
+  --hero-muted: rgba(252, 255, 255, 0.80);
+  --hero-line: rgba(255, 255, 255, 0.10);
+
+  --nav-ink: #FCFFFF;
+  --nav-ink-dim: #C6E9F0;
+  --nav-hover-bg: rgba(255, 255, 255, 0.12);
+  --nav-active-ink: #3C142A;
+  --nav-pill-bg: rgba(255, 255, 255, 0.12);
+  --nav-pill-border: rgba(255, 255, 255, 0.22);
+
+  --card-shadow: 0 3px 0 var(--line-lip), 0 10px 24px rgba(10, 84, 99, 0.06);
+  --btn-shadow: 0 4px 0 var(--sprout-lip);
+  --lift-shadow: 0 3px 0 rgba(14, 100, 115, 0.18);
+  --heading-accent: #0B4A57;
+  --focus-ring: #0E6B7D;
+
+  --chart-1: #0E6B7D;
+  --chart-2: #1E93A8;
+  --chart-3: #7BDFF2;
+  --chart-4: #D77BAE;
+  --chart-5: #F2B5D4;
+  --chart-6: #B9558C;
+  --chart-7: #6E9BA6;
+  --chart-border: #FCFFFF;
+
+  --toast-text: #FCFFFF;
+  --toast-error-bg: #8E2436;
+  --toast-error-border: #D14A5C;
+  --toast-success-bg: #0E5A4D;
+  --toast-success-border: #2FA48F;
+  --toast-info-bg: #0E4E5C;
+  --toast-info-border: #7BDFF2;
+
+  --sky-base: #E6F7FB;
+  --sky-image:
+    radial-gradient(46% 40% at 88% 2%, rgba(242, 181, 212, 0.40), rgba(242, 181, 212, 0.12) 46%, transparent 72%),
+    radial-gradient(40% 38% at 2% 100%, rgba(123, 223, 242, 0.45), transparent 72%),
+    radial-gradient(52% 42% at 48% 116%, rgba(123, 223, 242, 0.22), transparent 74%),
+    radial-gradient(30% 26% at 6% 2%, rgba(252, 255, 255, 0.75), transparent 74%),
+    var(--gradient-page);
+  --sky-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+  --sky-repeat: no-repeat;
+  --grain-image:
+    radial-gradient(circle at 20% 30%, rgba(123, 223, 242, 0.45) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 70% 68%, rgba(242, 181, 212, 0.42) 0 0.9px, transparent 1.5px),
+    radial-gradient(circle at 44% 12%, rgba(14, 113, 131, 0.20) 0 0.8px, transparent 1.4px);
+  --grain-size: 240px 240px;
+  --grain-opacity: 0.55;
+
+  --navbar-bg: #0A3F4B;
+  --navbar-image:
+    radial-gradient(circle at 16% -6%, rgba(242, 181, 212, 0.26), transparent 46%),
+    radial-gradient(circle at 92% 108%, rgba(123, 223, 242, 0.28), transparent 58%),
+    var(--gradient-brand);
+
+  --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233A606B' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
 }
 
 /* Фонът идва от --sky-* (различен за всяка тема). .bg-grid го рисува
