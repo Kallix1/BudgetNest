@@ -1,0 +1,1814 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B1%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#E8F4D7">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="reports.page_title">Отчети — BudgetNest</title>
+<meta name="description" content="Месечен отчет на домакинството в BudgetNest — приходи, разходи, бюджети, търговци и тенденции.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Unbounded:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css?v=26">
+<link rel="stylesheet" href="css/dashboard.css?v=26">
+<script src="nav.js?v=11" defer></script>
+<script src="i18n.js?v=12" defer></script>
+<script src="theme.js?v=4" defer></script>
+<script src="analytics.js?v=1" defer></script>
+<script src="icons.js?v=3" defer></script>
+<script src="boot.js?v=2"></script>
+<script src="vendor/supabase-js-2.117.3.min.js"></script>
+<script src="vendor/chart-4.6.1.umd.min.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('./sw.js?v=8').catch(function(){});
+    });
+  }
+</script>
+
+<style>
+  body.dashboard-body {
+    display: flex !important;
+    align-items: stretch !important;
+    min-height: 100vh !important;
+    margin: 0;
+    background: var(--bg-void);
+  }
+
+  /* ===== Header / toolbar ===== */
+  .report-subtitle {
+    margin-top: 6px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    max-width: 560px;
+  }
+  .report-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: flex-end; }
+  .report-actions .btn-primary-sm { padding: 11px 18px; font-size: 13.5px; }
+  .report-actions .btn-ghost { padding: 10px 16px; font-size: 13px; }
+
+  .report-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+  }
+  .month-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 4px;
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-soft);
+    border-radius: 999px;
+    box-shadow: var(--card-shadow);
+  }
+  .month-nav button {
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: var(--font-body);
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+  }
+  .month-nav button:hover:not(:disabled) { background: var(--surface-alt); color: var(--text-primary); }
+  .month-nav button:active:not(:disabled) { transform: translateY(1px); }
+  .month-nav button:disabled { opacity: 0.35; cursor: not-allowed; }
+  .month-nav input[type="month"] {
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 700;
+    padding: 6px 8px;
+    outline: none;
+    min-width: 132px;
+  }
+  .report-toolbar .btn-ghost { padding: 10px 16px; font-size: 13px; }
+  .report-toolbar .btn-ghost:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  /* ===== KPI tiles ===== */
+  .report-kpis {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+    max-width: 1200px;
+    margin: 0 auto 22px;
+  }
+  .report-kpi {
+    position: relative;
+    overflow: hidden;
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-soft);
+    border-radius: var(--r-lg);
+    padding: 20px 22px 18px 26px;
+    box-shadow: var(--card-shadow);
+  }
+  .report-kpi::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    background: var(--border-soft);
+  }
+  .report-kpi.income::before  { background: var(--color-income); }
+  .report-kpi.expense::before { background: var(--color-expense); }
+  .report-kpi.net::before     { background: var(--peri); }
+  .report-kpi.rate::before    { background: var(--sun); }
+  .kpi-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+  .kpi-value {
+    margin-top: 8px;
+    font-family: var(--font-display);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.03em;
+    font-size: clamp(20px, 2vw, 26px);
+    font-weight: 600;
+    line-height: 1.15;
+    white-space: nowrap;
+    color: var(--text-primary);
+  }
+  .kpi-value.income  { color: var(--color-income); }
+  .kpi-value.expense { color: var(--color-expense); }
+  .kpi-value.positive { color: var(--color-income); }
+  .kpi-value.negative { color: var(--color-expense); }
+  .kpi-sub {
+    margin-top: 7px;
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--text-dim);
+    min-height: 17px;
+  }
+
+  /* ===== Layout ===== */
+  .report-grid,
+  .report-full { max-width: 1200px; margin-left: auto; margin-right: auto; }
+  .report-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.18fr) minmax(0, 0.82fr);
+    gap: 20px;
+    align-items: start;
+  }
+  .report-grid .card { margin-bottom: 0; }
+  .report-full .card { margin-bottom: 20px; }
+
+  .report-chart { position: relative; height: 300px; margin-top: 4px; }
+  .report-chart.tall { height: 330px; }
+  .report-chart canvas { width: 100% !important; height: 100% !important; }
+
+  /* ===== Ranked lists (merchants) ===== */
+  .rank-list { display: flex; flex-direction: column; }
+  .rank-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .rank-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .rank-row:first-child { padding-top: 0; }
+  .rank-num {
+    width: 27px;
+    height: 27px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--surface-alt);
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .rank-main { flex: 1; min-width: 0; }
+  .rank-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .rank-sub { margin-top: 2px; font-size: 12px; color: var(--text-dim); }
+  .rank-amount {
+    flex: none;
+    font-family: var(--font-body);
+    font-variant-numeric: tabular-nums;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .rank-bar {
+    height: 4px;
+    margin-top: 7px;
+    border-radius: 999px;
+    background: var(--surface-alt);
+    overflow: hidden;
+  }
+  .rank-bar > span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--color-expense);
+    opacity: 0.75;
+  }
+
+  /* ===== Budget vs actual ===== */
+  .budget-report-row {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .budget-report-row:first-child { padding-top: 0; }
+  .budget-report-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .budget-report-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .budget-report-cat { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .budget-report-cat span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .budget-report-amount { flex: none; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .report-bar {
+    height: 8px;
+    margin: 9px 0 6px;
+    border-radius: 999px;
+    background: var(--surface-alt);
+    overflow: hidden;
+  }
+  .report-bar > span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--color-income);
+    transition: width 0.35s ease;
+  }
+  .report-bar > span.near { background: var(--color-warning); }
+  .report-bar > span.over { background: var(--color-expense); }
+  .budget-report-foot {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+  .budget-report-foot .over { color: var(--color-expense); font-weight: 600; }
+
+  /* ===== Biggest changes ===== */
+  .change-list { display: flex; flex-direction: column; }
+  .change-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .change-row:first-child { padding-top: 0; }
+  .change-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .change-cat {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .change-cat span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .change-values {
+    flex: none;
+    text-align: right;
+    font-size: 12px;
+    color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.35;
+  }
+  .change-delta {
+    flex: none;
+    min-width: 86px;
+    text-align: right;
+    font-size: 13px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .change-delta.up { color: var(--color-expense); }
+  .change-delta.down { color: var(--color-income); }
+
+  /* ===== Members ===== */
+  .member-report-list { display: flex; flex-direction: column; }
+  .member-report-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .member-report-row:first-child { padding-top: 0; }
+  .member-report-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .member-avatar-report {
+    width: 38px;
+    height: 38px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--surface-alt);
+    color: var(--text-secondary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12.5px;
+    font-weight: 700;
+  }
+  .member-report-main { flex: 1; min-width: 0; }
+  .member-report-name {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    min-width: 0;
+  }
+  .member-report-name > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .member-you {
+    flex: none;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: var(--sun-soft);
+    color: var(--sun-ink);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .member-report-sub { margin-top: 2px; font-size: 12px; color: var(--text-dim); }
+  .member-report-amount { flex: none; text-align: right; }
+  .member-report-amount .expense {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-expense);
+  }
+  .member-report-amount .income {
+    display: block;
+    margin-top: 2px;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-income);
+  }
+
+  /* ===== States ===== */
+  .report-loading {
+    padding: 70px 0;
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+  .report-error {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 46px 20px;
+  }
+  .report-error p { margin-bottom: 16px; color: var(--text-secondary); }
+  .report-empty-link {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--nest-green-mid);
+    text-decoration: none;
+  }
+  .report-empty-link:hover { text-decoration: underline; }
+
+  .print-only { display: none; }
+
+  @media (max-width: 1000px) {
+    .report-grid { grid-template-columns: minmax(0, 1fr); }
+    .report-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  @media (max-width: 600px) {
+    .report-kpis { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+    .report-toolbar { flex-direction: column; align-items: stretch; }
+    .month-nav { width: 100%; justify-content: space-between; }
+    .report-toolbar .btn-ghost { width: 100%; }
+    .report-actions { width: 100%; justify-content: stretch; }
+    .report-actions .btn-ghost,
+    .report-actions .btn-primary-sm { flex: 1 1 100%; }
+    .report-chart { height: 245px; }
+    .report-chart.tall { height: 270px; }
+    .change-values { display: none; }
+  }
+
+  @media print {
+    html[data-theme] {
+      --bg-void: #ffffff;
+      --bg-card: #ffffff;
+      --bg-panel: #ffffff;
+      --surface-alt: #f4f4f4;
+      --text-primary: #111111;
+      --text-secondary: #333333;
+      --text-dim: #555555;
+      --border-soft: #dddddd;
+      --line-lip: #dddddd;
+      --heading-accent: #111111;
+      --card-shadow: none;
+      --input-border: #cccccc;
+      --color-income: #0a6b45;
+      --color-expense: #a52834;
+      --color-warning: #7a4d00;
+      --mint-soft: #eef8f1;
+      --red-soft: #fdeeee;
+      --sun-soft: #fff6dd;
+    }
+    body.dashboard-body { display: block !important; background: #fff !important; padding: 0 !important; }
+    .navbar, .bottom-nav, .bg-grid, .bg-glow, .page-header, .report-actions, .report-toolbar,
+    #app-toast-container, .no-print, .card-visibility-toggle { display: none !important; }
+    .dashboard-main { margin: 0 !important; width: 100% !important; padding: 0 !important; }
+    .print-only { display: block !important; }
+    .print-head { margin-bottom: 22px; border-bottom: 2px solid #ddd; padding-bottom: 14px; }
+    .print-head .print-brand { font-family: 'Unbounded', sans-serif; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: #555; }
+    .print-head h1 { margin: 4px 0 2px; font-family: 'Unbounded', sans-serif; font-size: 24px; color: #111; }
+    .print-head p { font-size: 12px; color: #555; }
+    .card, .report-kpi { break-inside: avoid; box-shadow: none !important; border: 1px solid #ddd !important; background: #fff !important; }
+    .report-chart { height: 230px !important; }
+    .report-kpis { grid-template-columns: repeat(4, 1fr) !important; }
+    .report-grid { grid-template-columns: 1.18fr 0.82fr !important; }
+    a { color: inherit !important; text-decoration: none !important; }
+  }
+</style>
+</head>
+<body class="dashboard-body">
+
+<div class="bg-glow"></div>
+<div class="bg-grid"></div>
+
+<nav class="navbar">
+  <div class="nav-left">
+    <div class="nav-left-header">
+      <a href="dashboard.html" class="brand-mark" id="brand-mark-link" style="text-decoration:none; cursor:pointer;">BudgetNest</a>
+      <button class="nav-toggle" type="button" aria-label="Меню" aria-expanded="false" aria-controls="nav-links">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="nav-links" id="nav-links">
+      <a href="dashboard.html" class="nav-link"><span class="nav-icon" id="nav-icon-dashboard"></span><span data-i18n="nav.dashboard">Табло</span></a>
+      <a href="transactions.html" class="nav-link"><span class="nav-icon" id="nav-icon-transactions"></span><span data-i18n="nav.transactions">Транзакции</span></a>
+      <a href="budgets.html" class="nav-link"><span class="nav-icon" id="nav-icon-budgets"></span><span data-i18n="nav.budgets">Бюджети</span></a>
+      <a href="reports.html" class="nav-link active"><span class="nav-icon" id="nav-icon-reports"></span><span data-i18n="nav.reports">Отчети</span></a>
+      <a href="wallets.html" class="nav-link"><span class="nav-icon" id="nav-icon-wallet"></span><span data-i18n="nav.wallets">Портфейл</span></a>
+      <a href="goals.html" class="nav-link"><span class="nav-icon" id="nav-icon-goals"></span><span data-i18n="nav.goals">Цели</span></a>
+      <a href="recurring.html" class="nav-link"><span class="nav-icon" id="nav-icon-recurring"></span><span data-i18n="nav.recurring">Периодични</span></a>
+      <a href="settle.html" class="nav-link" id="settle-nav-link" style="display:none;"><span class="nav-icon" id="nav-icon-settle"></span><span data-i18n="nav.settle">Споделено</span></a>
+      <a href="reviews.html" class="nav-link"><span class="nav-icon" id="nav-icon-reviews"></span><span data-i18n="nav.reviews">Отзиви</span></a>
+      <a href="settings.html" class="nav-link"><span class="nav-icon" id="nav-icon-settings"></span><span data-i18n="nav.settings">Настройки</span></a>
+      <a href="admin.html" class="nav-link" id="admin-nav-link" style="display:none;"><span class="nav-icon" id="nav-icon-admin"></span><span data-i18n="nav.admin">Админ</span></a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <span class="household-pill" id="household-name">…</span>
+    <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" data-i18n-title="nav.theme_toggle_title" title="Смяна на тема"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-toggle-icon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button>
+    <button class="theme-toggle" id="lang-toggle-btn" onclick="toggleLang()" data-i18n-title="nav.lang_toggle_title" title="Смяна на език">EN</button>
+    <button class="btn-ghost" onclick="handleSignOut()" data-i18n="nav.signout">Изход</button>
+  </div>
+</nav>
+
+<main class="dashboard-main" id="page-main" style="display:none;">
+
+  <div class="print-only print-head">
+    <div class="print-brand">BudgetNest</div>
+    <h1 id="print-title"></h1>
+    <p id="print-meta"></p>
+  </div>
+
+  <div class="page-header">
+    <div>
+      <h1 data-i18n="reports.h1">Отчети</h1>
+      <p class="report-subtitle" data-i18n="reports.subtitle">Месечен преглед на приходите, разходите и бюджетите на домакинството.</p>
+    </div>
+    <div class="report-actions">
+      <button type="button" class="btn-ghost" onclick="exportReportCSV()" data-i18n="reports.export_csv">Изтегли CSV</button>
+      <button type="button" class="btn-ghost" onclick="shareRecap()" data-i18n="reports.share">Сподели обобщение</button>
+      <button type="button" class="btn-primary-sm" onclick="exportReportPDF()" data-i18n="reports.export_pdf">PDF / Печат</button>
+    </div>
+  </div>
+
+  <div class="report-toolbar no-print">
+    <div class="month-nav" role="group" aria-label="Избор на месец">
+      <button type="button" id="month-prev" onclick="shiftMonth(-1)" data-i18n-title="reports.month_prev" aria-label="Предишен месец">←</button>
+      <input type="month" id="report-month" onchange="onMonthInput()" aria-label="Месец на отчета">
+      <button type="button" id="month-next" onclick="shiftMonth(1)" data-i18n-title="reports.month_next" aria-label="Следващ месец">→</button>
+    </div>
+    <button type="button" class="btn-ghost" id="report-today" onclick="goToCurrentMonth()" data-i18n="reports.this_month">Този месец</button>
+  </div>
+
+  <div class="report-loading" id="report-loading" data-i18n="reports.loading">Зареждане на отчета…</div>
+
+  <div class="report-error" id="report-error" style="display:none;">
+    <p id="report-error-text"></p>
+    <button type="button" class="btn-ghost" onclick="loadReport()" data-i18n="reports.retry_btn">Опитай отново</button>
+  </div>
+
+  <div id="report-content" style="display:none;">
+
+    <div class="report-kpis">
+      <div class="report-kpi income">
+        <div class="kpi-label" data-i18n="reports.kpi_income">Приходи</div>
+        <div class="kpi-value income" id="kpi-income">0.00 €</div>
+        <div class="kpi-sub" id="kpi-income-sub"></div>
+      </div>
+      <div class="report-kpi expense">
+        <div class="kpi-label" data-i18n="reports.kpi_expense">Разходи</div>
+        <div class="kpi-value expense" id="kpi-expense">0.00 €</div>
+        <div class="kpi-sub" id="kpi-expense-sub"></div>
+      </div>
+      <div class="report-kpi net">
+        <div class="kpi-label" data-i18n="reports.kpi_net">Спестени</div>
+        <div class="kpi-value" id="kpi-net">0.00 €</div>
+        <div class="kpi-sub" id="kpi-net-sub"></div>
+      </div>
+      <div class="report-kpi rate">
+        <div class="kpi-label" data-i18n="reports.kpi_rate">Норма на спестяване</div>
+        <div class="kpi-value" id="kpi-rate">—</div>
+        <div class="kpi-sub" id="kpi-rate-sub"></div>
+      </div>
+    </div>
+
+    <div class="report-grid">
+      <div class="card">
+        <div class="card-title">
+          <span data-i18n="reports.flow_title">Приходи и разходи</span>
+          <span class="hint" data-i18n="reports.flow_hint">последните 12 месеца</span>
+        </div>
+        <div class="report-chart" id="flow-wrap">
+          <canvas id="flow-chart" role="img" aria-label="Приходи и разходи по месеци"></canvas>
+        </div>
+        <div class="empty-state" id="flow-empty" style="display:none;" data-i18n="reports.flow_empty">Все още няма данни за този период.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span data-i18n="reports.merchants_title">Топ търговци</span>
+          <span class="hint" data-i18n="reports.merchants_hint">по разходи този месец</span>
+        </div>
+        <div class="rank-list" id="merchant-list"></div>
+        <div class="empty-state" id="merchant-empty" style="display:none;" data-i18n="reports.merchants_empty">Няма разходи с описание този месец.</div>
+      </div>
+    </div>
+
+    <div class="report-full" style="margin-top:20px;">
+      <div class="card">
+        <div class="card-title">
+          <span data-i18n="reports.trend_title">Тенденции по категории</span>
+          <span class="hint" data-i18n="reports.trend_hint">топ 5 категории за 12 месеца</span>
+        </div>
+        <div class="type-toggle no-print" id="trend-type-toggle" style="max-width:280px; margin-bottom:14px;">
+          <button type="button" class="type-btn active" data-type="expense" onclick="setTrendType('expense')" data-i18n="reports.type_expense">Разходи</button>
+          <button type="button" class="type-btn" data-type="income" onclick="setTrendType('income')" data-i18n="reports.type_income">Приходи</button>
+        </div>
+        <div class="report-chart tall" id="trend-wrap">
+          <canvas id="trend-chart" role="img" aria-label="Тенденции по категории"></canvas>
+        </div>
+        <div class="empty-state" id="trend-empty" style="display:none;" data-i18n="reports.trend_empty">Няма достатъчно данни за категориите.</div>
+      </div>
+    </div>
+
+    <div class="report-grid" style="margin-top:0;">
+      <div class="card">
+        <div class="card-title">
+          <span data-i18n="reports.budgets_title">Бюджет срещу реални разходи</span>
+          <span class="hint" data-i18n="reports.budgets_hint">за избрания месец</span>
+        </div>
+        <div id="budget-report-list"></div>
+        <div class="empty-state" id="budget-empty" style="display:none;">
+          <div data-i18n="reports.budgets_empty">Все още няма зададени лимити.</div>
+          <a href="budgets.html" class="report-empty-link" data-i18n="reports.budgets_cta">Задай бюджети →</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span data-i18n="reports.changes_title">Най-големи промени</span>
+          <span class="hint" data-i18n="reports.changes_hint">спрямо предходния месец</span>
+        </div>
+        <div class="change-list" id="change-list"></div>
+        <div class="empty-state" id="change-empty" style="display:none;" data-i18n="reports.changes_empty">Няма промени за показване.</div>
+      </div>
+    </div>
+
+    <div class="report-full" style="margin-top:20px;">
+      <div class="card">
+        <div class="card-title">
+          <span data-i18n="reports.members_title">Разходи по член</span>
+          <span class="hint" data-i18n="reports.members_hint">кой е платил</span>
+        </div>
+        <div class="member-report-list" id="member-report-list"></div>
+        <div class="empty-state" id="member-empty" style="display:none;" data-i18n="reports.members_empty">Няма данни за членовете.</div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<div id="app-toast-container" style="position: fixed; top: 24px; right: 24px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; align-items: flex-end;"></div>
+
+<script>
+  function showToast(message, type) {
+    const container = document.getElementById('app-toast-container');
+    if (!container) return;
+    const toast = document.createElement('div');
+    const palette = {
+      error:   { bg: 'var(--toast-error-bg)', border: 'var(--toast-error-border)' },
+      success: { bg: 'var(--toast-success-bg)', border: 'var(--toast-success-border)' },
+      info:    { bg: 'var(--toast-info-bg)', border: 'var(--toast-info-border)' },
+    };
+    const c = palette[type] || palette.info;
+    toast.style.cssText = `background:${c.bg}; border:1px solid ${c.border}; color:var(--toast-text); padding:14px 18px; border-radius:10px; font-family:var(--font-body); font-size:13px; font-weight:500; box-shadow:0 8px 24px rgba(0,0,0,0.35); max-width:340px; line-height:1.45;`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.style.transition = 'opacity 0.3s ease';
+      toast.style.opacity = '0';
+      setTimeout(() => toast.remove(), 300);
+    }, 4200);
+  }
+</script>
+
+<script>
+  // ===== Тъмна тема =====
+  const SUN_ICON_PATH = '<circle cx="12" cy="12" r="4"></circle><line x1="12" y1="2" x2="12" y2="4"></line><line x1="12" y1="20" x2="12" y2="22"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="2" y1="12" x2="4" y2="12"></line><line x1="20" y1="12" x2="22" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+  const MOON_ICON_PATH = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    const btn = document.getElementById('theme-toggle-btn');
+    if (btn) btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-toggle-icon">' + (theme === 'dark' ? SUN_ICON_PATH : MOON_ICON_PATH) + '</svg>';
+    localStorage.setItem('budgetnest-theme', theme);
+  }
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme') || 'light';
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  }
+  (function () {
+    var theme = localStorage.getItem('budgetnest-theme') || 'light';
+    try {
+      var schedule = JSON.parse(localStorage.getItem('budgetnest-theme-schedule') || 'null');
+      if (schedule && schedule.enabled) {
+        var hour = new Date().getHours();
+        theme = (hour >= 7 && hour < 18) ? schedule.day : schedule.night;
+      }
+    } catch (e) {}
+    document.documentElement.setAttribute('data-theme', theme || 'light');
+  })();
+
+  // ===== Supabase конфигурация =====
+  const SUPABASE_URL = 'https://fvorpmajvrsxrwtscmwk.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_KmFRXFvW-wCf5LJXMgHejQ__3CH2PB7';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // Показва връзката "Споделено" в менюто само ако домакинството има повече от 1 член
+  async function updateSettleNavVisibility(userId) {
+    const link = document.getElementById('settle-nav-link');
+    if (!link) return;
+    const { data: myMembership } = await supabaseClient
+      .from('household_members')
+      .select('household_id')
+      .eq('user_id', userId)
+      .limit(1)
+      .maybeSingle();
+    if (!myMembership) { link.style.display = 'none'; return; }
+    const { count } = await supabaseClient
+      .from('household_members')
+      .select('*', { count: 'exact', head: true })
+      .eq('household_id', myMembership.household_id);
+    link.style.display = (count && count > 1) ? 'flex' : 'none';
+  }
+
+  // Само за показване на линка "Админ" — реалната защита е в SQL (is_admin())
+  const ADMIN_EMAILS = ['choko2009vr@gmail.com'];
+
+  let currentUser = null;
+  let currentHouseholdId = null;
+  let memberProfiles = {}; // user_id -> { full_name, email }
+
+  const tr = (key, vars) => window.BudgetNestI18n ? window.BudgetNestI18n.t(key, vars) : key;
+  const getLang = () => window.BudgetNestI18n ? window.BudgetNestI18n.getLang() : 'bg';
+  const locale = () => getLang() === 'bg' ? 'bg-BG' : 'en-IE';
+  const eur = (n) => (Number(n) || 0).toLocaleString(locale(), { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+  const money = (n) => (Number(n) || 0).toLocaleString(locale(), { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const pct = (n, digits) => (Number(n) || 0).toLocaleString(locale(), { minimumFractionDigits: digits === undefined ? 1 : digits, maximumFractionDigits: digits === undefined ? 1 : digits });
+
+  const MONTH_KEYS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+  const FETCH_MONTHS = 13; // 12 for the chart + the previous month for comparisons
+  const CHART_MONTHS = 12;
+
+  let selectedMonth = firstOfMonth(new Date());
+  let trendType = 'expense';
+  let flowChart = null;
+  let trendChart = null;
+  let loadToken = 0;
+
+  const state = {
+    categories: [],
+    budgets: [],
+    categoryMonthly: [],
+    categoryInfo: new Map(),
+    merchants: [],
+    members: [],
+    months: [],
+    current: { income: 0, expense: 0, net: 0, txCount: 0 },
+    previous: { income: 0, expense: 0, net: 0, txCount: 0 },
+    firstTxMonth: null, // earliest transaction ever, so rollover doesn't start before the household did
+    rpcAvailable: null, // null = not tried yet, false = use local fallback this session
+  };
+
+  // ===== Date helpers =====
+  function pad2(n) { return String(n).padStart(2, '0'); }
+  function firstOfMonth(d) { return new Date(d.getFullYear(), d.getMonth(), 1); }
+  function endOfMonth(d) { return new Date(d.getFullYear(), d.getMonth() + 1, 0); }
+  function addMonths(d, delta) { return new Date(d.getFullYear(), d.getMonth() + delta, 1); }
+  function monthKeyOf(d) { return d.getFullYear() + '-' + pad2(d.getMonth() + 1); }
+  function ymd(d) { return monthKeyOf(d) + '-' + pad2(d.getDate()); }
+  function monthWindow(end, count) {
+    const out = [];
+    for (let i = count - 1; i >= 0; i--) out.push(addMonths(end, -i));
+    return out;
+  }
+  function formatMonthLong(d) {
+    return tr('dashboard.month_' + MONTH_KEYS[d.getMonth()]) + ' ' + d.getFullYear();
+  }
+  function formatMonthShort(d) {
+    return tr('dashboard.month_short_' + MONTH_KEYS[d.getMonth()]);
+  }
+  function round2(n) { return Math.round((Number(n) || 0) * 100) / 100; }
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+  function catIcon(emoji, size) {
+    return window.BudgetNestIcons ? window.BudgetNestIcons.renderCatIcon(emoji, size) : escapeHtml(emoji || '');
+  }
+  function categoryInfo(id) {
+    return state.categoryInfo.get(id) || { name: tr('reports.uncategorized'), icon: '💰', type: 'expense' };
+  }
+  function memberName(userId) {
+    const p = memberProfiles[userId] || {};
+    return p.full_name || p.email || tr('reports.unknown_member');
+  }
+  function initials(name) {
+    const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+    if (!parts.length) return '?';
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+
+  // ===== Theme-aware chart colours =====
+  const CHART_FALLBACK = ['#14694C', '#1E9E6A', '#0E9C99', '#1C93A8', '#6E9B33', '#B87C00', '#6B8F71'];
+  function themeVar(name, fallback) {
+    const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    return value || fallback;
+  }
+  function chartPalette() {
+    return CHART_FALLBACK.map((fallback, i) => themeVar('--chart-' + (i + 1), fallback));
+  }
+
+  // ===== Init =====
+  (async function init() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) { window.location.href = 'login.html'; return; }
+    currentUser = session.user;
+    updateSettleNavVisibility(currentUser.id);
+
+    if (ADMIN_EMAILS.map(e => e.toLowerCase()).includes((currentUser.email || '').toLowerCase())) {
+      document.getElementById('admin-nav-link').style.display = 'flex';
+    }
+
+    const { data: memberships, error } = await supabaseClient
+      .from('household_members')
+      .select('household_id, households(name)')
+      .eq('user_id', currentUser.id)
+      .limit(1);
+
+    if (error) { console.error(error); window.location.href = 'dashboard.html'; return; }
+    if (!memberships || !memberships.length) { window.location.href = 'dashboard.html'; return; }
+
+    currentHouseholdId = memberships[0].household_id;
+    const household = memberships[0].households;
+    document.getElementById('household-name').textContent =
+      (household && household.name) || tr('dashboard.invite_default_household');
+    document.getElementById('page-main').style.display = 'block';
+    if (window.BudgetNestBoot) window.BudgetNestBoot.markReady();
+
+    await loadMemberProfiles();
+    initMonthFromUrl();
+    await loadStaticData();
+    await loadReport();
+  })();
+
+  async function loadMemberProfiles() {
+    const { data, error } = await supabaseClient
+      .from('household_members')
+      .select('user_id, profiles(full_name, email)')
+      .eq('household_id', currentHouseholdId);
+    if (error) { console.error(error); return; }
+    memberProfiles = {};
+    (data || []).forEach(m => { memberProfiles[m.user_id] = m.profiles || {}; });
+  }
+
+  async function loadStaticData() {
+    const [catsRes, budgetsRes, firstTxRes] = await Promise.all([
+      supabaseClient.from('categories').select('id, name, icon, type').eq('household_id', currentHouseholdId).order('name'),
+      supabaseClient.from('budgets').select('category_id, monthly_limit, rollover_enabled').eq('household_id', currentHouseholdId),
+      supabaseClient.from('transactions').select('transaction_date')
+        .eq('household_id', currentHouseholdId)
+        .order('transaction_date', { ascending: true })
+        .limit(1),
+    ]);
+    if (catsRes.error) console.error(catsRes.error);
+    if (budgetsRes.error) console.error(budgetsRes.error);
+    if (firstTxRes.error) console.error(firstTxRes.error);
+    state.categories = catsRes.data || [];
+    state.budgets = budgetsRes.data || [];
+    state.firstTxMonth = firstTxRes.data && firstTxRes.data[0]
+      ? String(firstTxRes.data[0].transaction_date).slice(0, 7)
+      : null;
+  }
+
+  function initMonthFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const value = params.get('month');
+    if (value && /^\d{4}-(0[1-9]|1[0-2])$/.test(value)) {
+      const parts = value.split('-').map(Number);
+      selectedMonth = new Date(parts[0], parts[1] - 1, 1);
+    }
+    selectedMonth = clampMonth(selectedMonth);
+    updateMonthUi();
+  }
+
+  function clampMonth(d) {
+    const max = firstOfMonth(new Date());
+    let next = firstOfMonth(d);
+    if (next > max) next = max;
+    if (next.getFullYear() < 2000) next = new Date(2000, 0, 1);
+    return next;
+  }
+
+  function shiftMonth(delta) {
+    setMonth(addMonths(selectedMonth, delta));
+  }
+  function goToCurrentMonth() {
+    setMonth(firstOfMonth(new Date()));
+  }
+  function onMonthInput() {
+    const value = document.getElementById('report-month').value;
+    if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(value)) return;
+    const parts = value.split('-').map(Number);
+    setMonth(new Date(parts[0], parts[1] - 1, 1));
+  }
+  function setMonth(d) {
+    const next = clampMonth(d);
+    if (monthKeyOf(next) === monthKeyOf(selectedMonth)) { updateMonthUi(); return; }
+    selectedMonth = next;
+    updateMonthUi();
+    updateUrl();
+    loadReport();
+  }
+  function updateUrl() {
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set('month', monthKeyOf(selectedMonth));
+      window.history.replaceState(null, '', url.toString());
+    } catch (e) { /* file:// or restricted history */ }
+  }
+  function updateMonthUi() {
+    const key = monthKeyOf(selectedMonth);
+    const input = document.getElementById('report-month');
+    if (input) {
+      input.value = key;
+      input.max = monthKeyOf(new Date());
+      input.min = '2000-01';
+    }
+    const isCurrent = key === monthKeyOf(new Date());
+    const nextBtn = document.getElementById('month-next');
+    const todayBtn = document.getElementById('report-today');
+    if (nextBtn) nextBtn.disabled = isCurrent;
+    if (todayBtn) todayBtn.disabled = isCurrent;
+  }
+
+  // ===== Loading / errors =====
+  function setLoading(loading) {
+    document.getElementById('report-loading').style.display = loading ? 'block' : 'none';
+    document.getElementById('report-content').style.display = loading ? 'none' : 'block';
+    if (loading) document.getElementById('report-error').style.display = 'none';
+  }
+  function showError(err) {
+    document.getElementById('report-loading').style.display = 'none';
+    document.getElementById('report-content').style.display = 'none';
+    const box = document.getElementById('report-error');
+    box.style.display = 'block';
+    document.getElementById('report-error-text').textContent = tr('reports.error_title');
+    if (err) console.error('[BudgetNest reports]', err);
+  }
+
+  async function loadReport() {
+    const token = ++loadToken;
+    setLoading(true);
+    try {
+      await loadReportData();
+      if (token !== loadToken) return;
+      setLoading(false);
+      renderReport();
+    } catch (err) {
+      if (token !== loadToken) return;
+      setLoading(false);
+      showError(err);
+    }
+  }
+
+  async function loadReportData() {
+    state.months = monthWindow(selectedMonth, FETCH_MONTHS);
+    const startISO = ymd(state.months[0]);
+    const endISO = ymd(endOfMonth(selectedMonth));
+    const monthISO = ymd(selectedMonth);
+
+    if (state.rpcAvailable !== false) {
+      const [monthlyRes, merchantsRes, membersRes] = await Promise.all([
+        supabaseClient.rpc('report_category_monthly', {
+          p_household_id: currentHouseholdId, p_month: monthISO, p_months: FETCH_MONTHS,
+        }),
+        supabaseClient.rpc('report_top_merchants', {
+          p_household_id: currentHouseholdId, p_month: monthISO, p_limit: 8,
+        }),
+        supabaseClient.rpc('report_members', {
+          p_household_id: currentHouseholdId, p_month: monthISO,
+        }),
+      ]);
+
+      if (!monthlyRes.error && !merchantsRes.error && !membersRes.error) {
+        state.rpcAvailable = true;
+        state.categoryMonthly = normalizeMonthly(monthlyRes.data);
+        state.merchants = (merchantsRes.data || []).map(r => ({
+          name: r.merchant || tr('reports.uncategorized'),
+          total: Number(r.total) || 0,
+          txCount: Number(r.tx_count) || 0,
+        }));
+        state.members = (membersRes.data || []).map(r => ({
+          userId: r.user_id,
+          paidIncome: Number(r.paid_income) || 0,
+          paidExpense: Number(r.paid_expense) || 0,
+          txCount: Number(r.tx_count) || 0,
+        }));
+        buildCategoryInfo();
+        buildTotals();
+        return;
+      }
+
+      console.warn('[BudgetNest reports] RPC aggregates unavailable, using local fallback.',
+        monthlyRes.error || merchantsRes.error || membersRes.error);
+      state.rpcAvailable = false;
+    }
+
+    await loadReportFallback(startISO, endISO);
+  }
+
+  function normalizeMonthly(rows) {
+    return (rows || []).map(r => ({
+      month: String(r.month_start).slice(0, 10),
+      monthKey: String(r.month_start).slice(0, 7),
+      categoryId: r.category_id,
+      name: r.category_name,
+      icon: r.category_icon,
+      type: r.category_type,
+      total: Number(r.total) || 0,
+      txCount: Number(r.tx_count) || 0,
+    }));
+  }
+
+  async function loadReportFallback(startISO, endISO) {
+    // Supabase връща максимум определен брой редове на заявка (обикновено
+    // 1000). За да не изгубим транзакции в по-голямо домакинство, теглим
+    // историята на страници, докато не стигнем края.
+    const PAGE_SIZE = 500;
+    const txs = [];
+    for (let from = 0; ; from += PAGE_SIZE) {
+      const { data: page, error } = await supabaseClient
+        .from('transactions')
+        .select('id, user_id, category_id, amount, description, transaction_date, categories(name, icon, type)')
+        .eq('household_id', currentHouseholdId)
+        .gte('transaction_date', startISO)
+        .lte('transaction_date', endISO)
+        .order('transaction_date', { ascending: true })
+        .order('id', { ascending: true })
+        .range(from, from + PAGE_SIZE - 1);
+      if (error) throw error;
+      const rows = page || [];
+      rows.forEach(t => txs.push(t));
+      if (rows.length < PAGE_SIZE) break;
+    }
+
+    const currentKey = monthKeyOf(selectedMonth);
+    const monthlyMap = new Map();
+    const merchantMap = new Map();
+    const memberMap = new Map();
+
+    (txs || []).forEach(t => {
+      const cat = t.categories || {};
+      const type = cat.type === 'income' ? 'income' : 'expense';
+      const monthKey = String(t.transaction_date).slice(0, 7);
+      const amount = Number(t.amount) || 0;
+
+      const rowKey = monthKey + '|' + (t.category_id || 'none');
+      const row = monthlyMap.get(rowKey) || {
+        month: monthKey + '-01',
+        monthKey,
+        categoryId: t.category_id,
+        name: cat.name || tr('reports.uncategorized'),
+        icon: cat.icon || '💰',
+        type,
+        total: 0,
+        txCount: 0,
+      };
+      row.total += amount;
+      row.txCount += 1;
+      monthlyMap.set(rowKey, row);
+
+      if (type === 'expense' && monthKey === currentKey) {
+        const label = (t.description || '').trim() || cat.name || tr('reports.uncategorized');
+        const merchantKey = label.toLowerCase();
+        const merchant = merchantMap.get(merchantKey) || { name: label, total: 0, txCount: 0 };
+        merchant.total += amount;
+        merchant.txCount += 1;
+        merchantMap.set(merchantKey, merchant);
+      }
+
+      if (monthKey === currentKey && t.user_id) {
+        const member = memberMap.get(t.user_id) || {
+          userId: t.user_id, paidIncome: 0, paidExpense: 0, txCount: 0,
+        };
+        if (type === 'income') member.paidIncome += amount;
+        else member.paidExpense += amount;
+        member.txCount += 1;
+        memberMap.set(t.user_id, member);
+      }
+    });
+
+    state.categoryMonthly = Array.from(monthlyMap.values());
+    state.merchants = Array.from(merchantMap.values())
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 8);
+
+    const knownMembers = new Set(Object.keys(memberProfiles));
+    memberMap.forEach((_, userId) => knownMembers.add(userId));
+    state.members = Array.from(knownMembers).map(userId => memberMap.get(userId) || {
+      userId, paidIncome: 0, paidExpense: 0, txCount: 0,
+    });
+
+    buildCategoryInfo();
+    buildTotals();
+  }
+
+  function buildCategoryInfo() {
+    state.categoryInfo = new Map();
+    state.categoryMonthly.forEach(r => {
+      if (!state.categoryInfo.has(r.categoryId)) {
+        state.categoryInfo.set(r.categoryId, {
+          id: r.categoryId, name: r.name, icon: r.icon, type: r.type,
+        });
+      }
+    });
+    state.categories.forEach(c => {
+      state.categoryInfo.set(c.id, { id: c.id, name: c.name, icon: c.icon, type: c.type });
+    });
+  }
+
+  function sumMonth(key) {
+    let income = 0, expense = 0, txCount = 0;
+    state.categoryMonthly.forEach(r => {
+      if (r.monthKey !== key) return;
+      if (r.type === 'income') income += r.total;
+      else expense += r.total;
+      txCount += r.txCount;
+    });
+    return { income: round2(income), expense: round2(expense), net: round2(income - expense), txCount };
+  }
+
+  function buildTotals() {
+    state.current = sumMonth(monthKeyOf(selectedMonth));
+    state.previous = sumMonth(monthKeyOf(addMonths(selectedMonth, -1)));
+  }
+
+  // ===== Render =====
+  function renderReport() {
+    updateMonthUi();
+    renderKpis();
+    renderFlowChart();
+    renderTrendChart();
+    renderMerchants();
+    renderBudgets();
+    renderChanges();
+    renderMembers();
+    updatePrintMeta();
+  }
+
+  function signedMoney(n) {
+    const value = round2(n);
+    if (Math.abs(value) < 0.005) return eur(0);
+    return (value > 0 ? '+' : '−') + eur(Math.abs(value));
+  }
+
+  function deltaSub(current, previous) {
+    const delta = round2(current - previous);
+    const change = Math.abs(delta) < 0.005
+      ? tr('reports.same')
+      : signedMoney(delta);
+    return tr('reports.vs_previous', { month: formatMonthLong(addMonths(selectedMonth, -1)) }) + ' · ' + change;
+  }
+
+  function renderKpis() {
+    const cur = state.current;
+    const prev = state.previous;
+    const net = round2(cur.income - cur.expense);
+    const rate = cur.income > 0 ? (net / cur.income) * 100 : null;
+
+    document.getElementById('kpi-income').textContent = eur(cur.income);
+    document.getElementById('kpi-expense').textContent = eur(cur.expense);
+
+    const netEl = document.getElementById('kpi-net');
+    netEl.textContent = eur(net);
+    netEl.classList.toggle('positive', net > 0.005);
+    netEl.classList.toggle('negative', net < -0.005);
+
+    const rateEl = document.getElementById('kpi-rate');
+    rateEl.textContent = rate === null ? '—' : pct(rate) + '%';
+    rateEl.classList.toggle('positive', rate !== null && rate > 0.05);
+    rateEl.classList.toggle('negative', rate !== null && rate < -0.05);
+
+    document.getElementById('kpi-income-sub').textContent = deltaSub(cur.income, prev.income);
+    document.getElementById('kpi-expense-sub').textContent = deltaSub(cur.expense, prev.expense);
+    document.getElementById('kpi-net-sub').textContent = deltaSub(net, round2(prev.income - prev.expense));
+    document.getElementById('kpi-rate-sub').textContent = rate === null
+      ? tr('reports.no_income')
+      : tr('reports.of_income');
+  }
+
+  function destroyChart(chart) {
+    if (chart) { try { chart.destroy(); } catch (e) { /* ignore */ } }
+    return null;
+  }
+
+  function chartTextColor() { return themeVar('--text-secondary', '#5a665e'); }
+  function chartGridColor() { return themeVar('--border-soft', 'rgba(0,0,0,0.08)'); }
+
+  function renderFlowChart() {
+    const wrap = document.getElementById('flow-wrap');
+    const empty = document.getElementById('flow-empty');
+    const canvas = document.getElementById('flow-chart');
+    flowChart = destroyChart(flowChart);
+
+    const months = state.months.slice(-CHART_MONTHS);
+    const income = months.map(m => sumMonth(monthKeyOf(m)).income);
+    const expense = months.map(m => sumMonth(monthKeyOf(m)).expense);
+    const hasData = income.some(v => v > 0) || expense.some(v => v > 0);
+
+    wrap.style.display = hasData ? 'block' : 'none';
+    empty.style.display = hasData ? 'none' : 'block';
+    if (!hasData || typeof Chart === 'undefined') return;
+
+    flowChart = new Chart(canvas, {
+      type: 'bar',
+      data: {
+        labels: months.map(formatMonthShort),
+        datasets: [
+          {
+            label: tr('reports.kpi_income'),
+            data: income,
+            backgroundColor: themeVar('--color-income', '#0E7A4D'),
+            borderRadius: 6,
+            borderSkipped: false,
+            maxBarThickness: 24,
+            categoryPercentage: 0.62,
+            barPercentage: 0.85,
+          },
+          {
+            label: tr('reports.kpi_expense'),
+            data: expense,
+            backgroundColor: themeVar('--color-expense', '#C0394B'),
+            borderRadius: 6,
+            borderSkipped: false,
+            maxBarThickness: 24,
+            categoryPercentage: 0.62,
+            barPercentage: 0.85,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              color: chartTextColor(),
+              usePointStyle: true,
+              pointStyle: 'circle',
+              boxWidth: 8,
+              boxHeight: 8,
+              padding: 16,
+              font: { family: 'Onest', size: 11, weight: '600' },
+            },
+          },
+          tooltip: {
+            titleFont: { family: 'Onest', size: 12, weight: '700' },
+            bodyFont: { family: 'Onest', size: 12 },
+            callbacks: {
+              title: (items) => items.length ? formatMonthLong(months[items[0].dataIndex]) : '',
+              label: (ctx) => ctx.dataset.label + ': ' + eur(ctx.parsed.y),
+            },
+          },
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { color: chartTextColor(), font: { family: 'Onest', size: 10.5, weight: '600' } },
+          },
+          y: {
+            beginAtZero: true,
+            grid: { color: chartGridColor(), drawBorder: false },
+            ticks: {
+              color: chartTextColor(),
+              font: { family: 'Onest', size: 10.5 },
+              callback: (value) => Number(value).toLocaleString(locale(), { maximumFractionDigits: 0 }) + ' €',
+            },
+          },
+        },
+      },
+    });
+  }
+
+  function setTrendType(type) {
+    trendType = type === 'income' ? 'income' : 'expense';
+    document.querySelectorAll('#trend-type-toggle .type-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.type === trendType);
+    });
+    renderTrendChart();
+  }
+
+  function renderTrendChart() {
+    const wrap = document.getElementById('trend-wrap');
+    const empty = document.getElementById('trend-empty');
+    const canvas = document.getElementById('trend-chart');
+    trendChart = destroyChart(trendChart);
+
+    const months = state.months.slice(-CHART_MONTHS);
+    const monthKeys = months.map(monthKeyOf);
+    const totals = new Map();
+
+    state.categoryMonthly.forEach(r => {
+      if (r.type !== trendType || !monthKeys.includes(r.monthKey)) return;
+      const entry = totals.get(r.categoryId) || { id: r.categoryId, total: 0, byMonth: new Map() };
+      entry.total += r.total;
+      entry.byMonth.set(r.monthKey, (entry.byMonth.get(r.monthKey) || 0) + r.total);
+      totals.set(r.categoryId, entry);
+    });
+
+    const top = Array.from(totals.values())
+      .filter(entry => entry.total > 0.005)
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 5);
+
+    wrap.style.display = top.length ? 'block' : 'none';
+    empty.style.display = top.length ? 'none' : 'block';
+    if (!top.length || typeof Chart === 'undefined') return;
+
+    const palette = chartPalette();
+    const datasets = top.map((entry, i) => {
+      const info = categoryInfo(entry.id);
+      return {
+        label: info.name,
+        data: monthKeys.map(key => round2(entry.byMonth.get(key) || 0)),
+        borderColor: palette[i % palette.length],
+        backgroundColor: palette[i % palette.length],
+        borderWidth: 2,
+        pointRadius: 2,
+        pointHoverRadius: 4,
+        pointBackgroundColor: palette[i % palette.length],
+        tension: 0.35,
+        fill: false,
+      };
+    });
+
+    trendChart = new Chart(canvas, {
+      type: 'line',
+      data: { labels: months.map(formatMonthShort), datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              color: chartTextColor(),
+              usePointStyle: true,
+              pointStyle: 'circle',
+              boxWidth: 8,
+              boxHeight: 8,
+              padding: 16,
+              font: { family: 'Onest', size: 11, weight: '600' },
+            },
+          },
+          tooltip: {
+            titleFont: { family: 'Onest', size: 12, weight: '700' },
+            bodyFont: { family: 'Onest', size: 12 },
+            callbacks: {
+              title: (items) => items.length ? formatMonthLong(months[items[0].dataIndex]) : '',
+              label: (ctx) => ctx.dataset.label + ': ' + eur(ctx.parsed.y),
+            },
+          },
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { color: chartTextColor(), font: { family: 'Onest', size: 10.5, weight: '600' } },
+          },
+          y: {
+            beginAtZero: true,
+            grid: { color: chartGridColor(), drawBorder: false },
+            ticks: {
+              color: chartTextColor(),
+              font: { family: 'Onest', size: 10.5 },
+              callback: (value) => Number(value).toLocaleString(locale(), { maximumFractionDigits: 0 }) + ' €',
+            },
+          },
+        },
+      },
+    });
+  }
+
+  function renderMerchants() {
+    const list = document.getElementById('merchant-list');
+    const empty = document.getElementById('merchant-empty');
+    const merchants = state.merchants || [];
+
+    if (!merchants.length) {
+      list.innerHTML = '';
+      list.style.display = 'none';
+      empty.style.display = 'block';
+      return;
+    }
+
+    list.style.display = 'flex';
+    empty.style.display = 'none';
+    const max = Math.max.apply(null, merchants.map(m => m.total)) || 1;
+
+    list.innerHTML = merchants.map((m, i) => {
+      const width = Math.max(4, Math.round((m.total / max) * 100));
+      return `
+        <div class="rank-row">
+          <span class="rank-num">${i + 1}</span>
+          <div class="rank-main">
+            <div class="rank-name">${escapeHtml(m.name)}</div>
+            <div class="rank-sub">${escapeHtml(txCountLabel(m.txCount))}</div>
+            <div class="rank-bar"><span style="width:${width}%"></span></div>
+          </div>
+          <span class="rank-amount">${eur(m.total)}</span>
+        </div>`;
+    }).join('');
+  }
+
+  function txCountLabel(n) {
+    const key = Number(n) === 1 ? 'reports.tx_count_one' : 'reports.tx_count_other';
+    return tr(key, { n: Number(n) || 0 });
+  }
+
+  function computeRollover(categoryId, limit, enabled) {
+    if (!enabled || limit <= 0) return 0;
+    const keys = state.months.map(monthKeyOf);
+    const present = Array.from(new Set(state.categoryMonthly.map(r => r.monthKey))).sort();
+    const earliest = state.firstTxMonth || (present.length ? present[0] : null);
+    if (!earliest) return 0;
+
+    const spend = new Map();
+    state.categoryMonthly.forEach(r => {
+      if (r.categoryId === categoryId) spend.set(r.monthKey, (spend.get(r.monthKey) || 0) + r.total);
+    });
+
+    let rollover = 0;
+    for (let i = 0; i < keys.length - 1; i++) {
+      const key = keys[i];
+      if (key < earliest) continue;
+      rollover = Math.max(0, round2(limit + rollover - (spend.get(key) || 0)));
+    }
+    return round2(rollover);
+  }
+
+  function renderBudgets() {
+    const list = document.getElementById('budget-report-list');
+    const empty = document.getElementById('budget-empty');
+    const currentKey = monthKeyOf(selectedMonth);
+
+    const budgetByCategory = new Map();
+    state.budgets.forEach(b => budgetByCategory.set(b.category_id, b));
+
+    const spentByCategory = new Map();
+    state.categoryMonthly.forEach(r => {
+      if (r.monthKey === currentKey && r.type === 'expense') {
+        spentByCategory.set(r.categoryId, (spentByCategory.get(r.categoryId) || 0) + r.total);
+      }
+    });
+
+    const rows = state.categories
+      .filter(c => c.type === 'expense')
+      .map(c => {
+        const budget = budgetByCategory.get(c.id);
+        const limit = Number(budget && budget.monthly_limit) || 0;
+        if (!budget || limit <= 0) return null;
+        const rollover = computeRollover(c.id, limit, !!budget.rollover_enabled);
+        const effective = round2(limit + rollover);
+        const spent = round2(spentByCategory.get(c.id) || 0);
+        const usedPct = effective > 0 ? (spent / effective) * 100 : 0;
+        return { category: c, limit, rollover, effective, spent, usedPct };
+      })
+      .filter(Boolean)
+      .sort((a, b) => b.usedPct - a.usedPct);
+
+    if (!rows.length) {
+      list.innerHTML = '';
+      list.style.display = 'none';
+      empty.style.display = 'block';
+      return;
+    }
+
+    list.style.display = 'block';
+    empty.style.display = 'none';
+
+    list.innerHTML = rows.map(row => {
+      const over = row.spent > row.effective + 0.005;
+      const near = !over && row.usedPct >= 80;
+      const barClass = over ? 'over' : (near ? 'near' : '');
+      const width = Math.min(100, Math.max(0, row.usedPct));
+      const footLeft = tr('reports.budget_used', { percent: pct(row.usedPct, 0) });
+      const footRight = over
+        ? tr('reports.budget_over', { amount: eur(row.spent - row.effective) })
+        : tr('reports.budget_left', { amount: eur(row.effective - row.spent) });
+      const rolloverHint = row.rollover > 0.005
+        ? `<div class="budget-report-foot"><span>${escapeHtml(tr('reports.budget_rollover', { amount: eur(row.rollover) }))}</span></div>`
+        : '';
+
+      return `
+        <div class="budget-report-row">
+          <div class="budget-report-head">
+            <div class="budget-report-cat">${catIcon(row.category.icon, 17)}<span>${escapeHtml(row.category.name)}</span></div>
+            <span class="budget-report-amount">${eur(row.spent)} / ${eur(row.effective)}</span>
+          </div>
+          <div class="report-bar"><span class="${barClass}" style="width:${width}%"></span></div>
+          <div class="budget-report-foot">
+            <span>${escapeHtml(footLeft)}</span>
+            <span class="${over ? 'over' : ''}">${escapeHtml(footRight)}</span>
+          </div>
+          ${rolloverHint}
+        </div>`;
+    }).join('');
+  }
+
+  function categoryTotalsForMonth(type, monthKey) {
+    const map = new Map();
+    state.categoryMonthly.forEach(r => {
+      if (r.monthKey === monthKey && r.type === type) {
+        map.set(r.categoryId, (map.get(r.categoryId) || 0) + r.total);
+      }
+    });
+    return map;
+  }
+
+  function getChanges() {
+    const currentKey = monthKeyOf(selectedMonth);
+    const prevKey = monthKeyOf(addMonths(selectedMonth, -1));
+    const cur = categoryTotalsForMonth('expense', currentKey);
+    const prev = categoryTotalsForMonth('expense', prevKey);
+    const ids = new Set([...cur.keys(), ...prev.keys()]);
+    const rows = [];
+
+    ids.forEach(id => {
+      const now = round2(cur.get(id) || 0);
+      const before = round2(prev.get(id) || 0);
+      const delta = round2(now - before);
+      if (Math.abs(delta) < 0.005) return;
+      const info = categoryInfo(id);
+      rows.push({
+        id, name: info.name, icon: info.icon,
+        current: now, previous: before, delta,
+        percent: before > 0.005 ? (delta / before) * 100 : null,
+      });
+    });
+
+    return rows.sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta)).slice(0, 6);
+  }
+
+  function renderChanges() {
+    const list = document.getElementById('change-list');
+    const empty = document.getElementById('change-empty');
+    const rows = getChanges();
+
+    if (!rows.length) {
+      list.innerHTML = '';
+      list.style.display = 'none';
+      empty.style.display = 'block';
+      return;
+    }
+
+    list.style.display = 'flex';
+    empty.style.display = 'none';
+
+    list.innerHTML = rows.map(row => {
+      const up = row.delta > 0;
+      const percentLabel = row.percent === null
+        ? tr('reports.change_new')
+        : (up ? '+' : '−') + pct(Math.abs(row.percent)) + '%';
+      return `
+        <div class="change-row">
+          <div class="change-cat">${catIcon(row.icon, 16)}<span>${escapeHtml(row.name)}</span></div>
+          <div class="change-values">
+            <div>${eur(row.current)}</div>
+            <div>${tr('reports.change_prev', { amount: eur(row.previous) })}</div>
+          </div>
+          <div class="change-delta ${up ? 'up' : 'down'}">${up ? '↑' : '↓'} ${signedMoney(row.delta)}<br><span style="font-size:11px;font-weight:600;">${escapeHtml(percentLabel)}</span></div>
+        </div>`;
+    }).join('');
+  }
+
+  function renderMembers() {
+    const list = document.getElementById('member-report-list');
+    const empty = document.getElementById('member-empty');
+    const members = (state.members || []).slice().sort((a, b) => b.paidExpense - a.paidExpense);
+
+    if (!members.length) {
+      list.innerHTML = '';
+      list.style.display = 'none';
+      empty.style.display = 'block';
+      return;
+    }
+
+    list.style.display = 'flex';
+    empty.style.display = 'none';
+    const max = Math.max.apply(null, members.map(m => m.paidExpense).concat([0])) || 1;
+
+    list.innerHTML = members.map(m => {
+      const name = memberName(m.userId);
+      const isYou = currentUser && m.userId === currentUser.id;
+      const width = m.paidExpense > 0
+        ? Math.max(4, Math.round((m.paidExpense / max) * 100))
+        : 0;
+      const incomeLabel = m.paidIncome > 0.005
+        ? `<span class="income">${escapeHtml(tr('reports.member_income'))}: ${eur(m.paidIncome)}</span>`
+        : '';
+      return `
+        <div class="member-report-row">
+          <div class="member-avatar-report">${escapeHtml(initials(name))}</div>
+          <div class="member-report-main">
+            <div class="member-report-name">
+              <span>${escapeHtml(name)}</span>
+              ${isYou ? `<span class="member-you">${escapeHtml(tr('reports.member_you'))}</span>` : ''}
+            </div>
+            <div class="member-report-sub">${escapeHtml(tr('reports.member_paid'))} · ${escapeHtml(txCountLabel(m.txCount))}</div>
+            <div class="rank-bar"><span style="width:${width}%"></span></div>
+          </div>
+          <div class="member-report-amount">
+            <span class="expense">${eur(m.paidExpense)}</span>
+            ${incomeLabel}
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function updatePrintMeta() {
+    const title = document.getElementById('print-title');
+    const meta = document.getElementById('print-meta');
+    if (title) title.textContent = tr('reports.h1') + ' · ' + formatMonthLong(selectedMonth);
+    if (meta) {
+      const today = new Date().toLocaleDateString(getLang() === 'bg' ? 'bg-BG' : 'en-GB');
+      meta.textContent = tr('reports.print_generated', { date: today });
+    }
+  }
+
+  // ===== Export / share =====
+  function exportReportPDF() {
+    updatePrintMeta();
+    window.print();
+  }
+
+  function csvEscape(value) {
+    const s = String(value === null || value === undefined ? '' : value);
+    return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  }
+
+  function exportReportCSV() {
+    const cur = state.current;
+    const prev = state.previous;
+    const net = round2(cur.income - cur.expense);
+    const prevNet = round2(prev.income - prev.expense);
+    const rate = cur.income > 0 ? (net / cur.income) * 100 : null;
+    const prevRate = prev.income > 0 ? (prevNet / prev.income) * 100 : null;
+
+    const rows = [];
+    rows.push([
+      tr('reports.csv_section'),
+      tr('reports.csv_label'),
+      tr('reports.csv_amount'),
+      tr('reports.csv_previous'),
+      tr('reports.csv_change'),
+      tr('reports.csv_details'),
+    ]);
+
+    rows.push([tr('reports.csv_summary'), tr('reports.kpi_income'), money(cur.income), money(prev.income), money(cur.income - prev.income), '']);
+    rows.push([tr('reports.csv_summary'), tr('reports.kpi_expense'), money(cur.expense), money(prev.expense), money(cur.expense - prev.expense), '']);
+    rows.push([tr('reports.csv_summary'), tr('reports.kpi_net'), money(net), money(prevNet), money(net - prevNet), '']);
+    rows.push([
+      tr('reports.csv_summary'), tr('reports.kpi_rate'),
+      rate === null ? '' : pct(rate) + '%',
+      prevRate === null ? '' : pct(prevRate) + '%',
+      rate === null || prevRate === null ? '' : pct(rate - prevRate) + '%',
+      '',
+    ]);
+
+    const currentKey = monthKeyOf(selectedMonth);
+    const prevKey = monthKeyOf(addMonths(selectedMonth, -1));
+    const catCur = categoryTotalsForMonth('expense', currentKey);
+    const catPrev = categoryTotalsForMonth('expense', prevKey);
+    const catIds = new Set([...catCur.keys(), ...catPrev.keys()]);
+    Array.from(catIds)
+      .sort((a, b) => (catCur.get(b) || 0) - (catCur.get(a) || 0))
+      .forEach(id => {
+        const info = categoryInfo(id);
+        const now = round2(catCur.get(id) || 0);
+        const before = round2(catPrev.get(id) || 0);
+        if (now < 0.005 && before < 0.005) return;
+        rows.push([
+          tr('reports.csv_categories'), info.name, money(now), money(before), money(now - before),
+          tr('reports.csv_type_expense'),
+        ]);
+      });
+
+    const budgetByCategory = new Map();
+    state.budgets.forEach(b => budgetByCategory.set(b.category_id, b));
+    const spentCur = categoryTotalsForMonth('expense', currentKey);
+    state.categories
+      .filter(c => c.type === 'expense')
+      .forEach(c => {
+        const budget = budgetByCategory.get(c.id);
+        const limit = Number(budget && budget.monthly_limit) || 0;
+        if (!budget || limit <= 0) return;
+        const rollover = computeRollover(c.id, limit, !!budget.rollover_enabled);
+        const effective = round2(limit + rollover);
+        const spent = round2(spentCur.get(c.id) || 0);
+        const used = effective > 0 ? (spent / effective) * 100 : 0;
+        let details = tr('reports.csv_details_budget', { limit: money(effective), percent: pct(used) });
+        if (rollover > 0.005) details += ' ' + tr('reports.csv_details_rollover', { amount: money(rollover) });
+        rows.push([tr('reports.csv_budgets'), c.name, money(spent), '', '', details]);
+      });
+
+    (state.merchants || []).forEach(m => {
+      rows.push([
+        tr('reports.csv_merchants'), m.name, money(m.total), '', '',
+        txCountLabel(m.txCount),
+      ]);
+    });
+
+    (state.members || []).slice().sort((a, b) => b.paidExpense - a.paidExpense).forEach(m => {
+      const name = memberName(m.userId);
+      rows.push([
+        tr('reports.csv_members'), name, money(m.paidExpense), '', '',
+        tr('reports.csv_details_member', { income: money(m.paidIncome), tx: txCountLabel(m.txCount) }),
+      ]);
+    });
+
+    const csv = '\uFEFF' + rows.map(r => r.map(csvEscape).join(',')).join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'budgetnest-report-' + monthKeyOf(selectedMonth) + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast(tr('reports.csv_exported'), 'success');
+  }
+
+  async function copyText(text) {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch (e) { /* fall through */ }
+
+    try {
+      const area = document.createElement('textarea');
+      area.value = text;
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      const ok = document.execCommand('copy');
+      document.body.removeChild(area);
+      return ok;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  async function shareRecap() {
+    const cur = state.current;
+    const net = round2(cur.income - cur.expense);
+    const rate = cur.income > 0 ? (net / cur.income) * 100 : null;
+    const curKey = monthKeyOf(selectedMonth);
+    const expenseTotals = categoryTotalsForMonth('expense', curKey);
+    let topCategory = null;
+    expenseTotals.forEach((total, id) => {
+      if (!topCategory || total > topCategory.total) {
+        topCategory = { id, total, name: categoryInfo(id).name };
+      }
+    });
+    const topMerchant = (state.merchants || [])[0] || null;
+    const biggestChange = getChanges()[0] || null;
+
+    const lines = [
+      tr('reports.share_heading', { month: formatMonthLong(selectedMonth) }),
+      tr('reports.share_income', { amount: eur(cur.income) }),
+      tr('reports.share_expense', { amount: eur(cur.expense) }),
+      tr('reports.share_net', { amount: eur(net) }),
+    ];
+    if (rate !== null) lines.push(tr('reports.share_rate', { percent: pct(rate) }));
+    if (topCategory) lines.push(tr('reports.share_top_category', { name: topCategory.name, amount: eur(topCategory.total) }));
+    if (topMerchant) lines.push(tr('reports.share_top_merchant', { name: topMerchant.name, amount: eur(topMerchant.total) }));
+    if (biggestChange) lines.push(tr('reports.share_change', { name: biggestChange.name, delta: signedMoney(biggestChange.delta) }));
+
+    let link = window.location.href.split('?')[0] + '?month=' + curKey;
+    lines.push('');
+    lines.push(link);
+    const text = lines.join('\n');
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: tr('reports.share_title'), text, url: link });
+        return;
+      } catch (e) {
+        if (e && e.name === 'AbortError') return;
+      }
+    }
+
+    const copied = await copyText(text);
+    showToast(copied ? tr('reports.share_copied') : tr('reports.share_failed'), copied ? 'success' : 'error');
+  }
+
+  // ===== Misc =====
+  async function handleSignOut() {
+    await supabaseClient.auth.signOut();
+    window.location.href = 'login.html';
+  }
+
+  window.onLanguageChange = function () {
+    updateMonthUi();
+    updatePrintMeta();
+    renderReport();
+  };
+
+  document.addEventListener('budgetnest:themechange', function () {
+    if (state.categoryMonthly.length) {
+      renderFlowChart();
+      renderTrendChart();
+    }
+  });
+</script>
+
+</body>
+</html>

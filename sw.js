@@ -1,9 +1,10 @@
-const CACHE_NAME = 'budgetnest-v8';
+const CACHE_NAME = 'budgetnest-v9';
 const ASSETS = [
   './',
   './dashboard.html',
   './transactions.html',
   './budgets.html',
+  './reports.html',
   './wallets.html',
   './goals.html',
   './recurring.html',

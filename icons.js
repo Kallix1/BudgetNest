@@ -28,6 +28,7 @@
     navDashboard: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1.5"></rect><rect x="13" y="3" width="8" height="5" rx="1.5"></rect><rect x="13" y="10" width="8" height="11" rx="1.5"></rect><rect x="3" y="13" width="8" height="8" rx="1.5"></rect></svg>',
     navTransactions: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h13l-3-3M20 17H7l3 3"></path></svg>',
     navBudgets: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 9 9h-9V3Z"></path><path d="M15.5 3.5A9 9 0 0 1 20.5 8.5H15.5V3.5Z"></path></svg>',
+    navReports: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20v-6"></path><path d="M10 20V6"></path><path d="M16 20v-9"></path><path d="M22 20H2"></path></svg>',
     navWallet: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h13A1.5 1.5 0 0 1 19 7.5V9H4.5"></path><path d="M3 7.5V18a1.5 1.5 0 0 0 1.5 1.5h15A1.5 1.5 0 0 0 21 18v-7A1.5 1.5 0 0 0 19.5 9.5H16a2 2 0 1 0 0 4"></path></svg>',
     navGoals: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"></circle><circle cx="12" cy="12" r="5"></circle><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"></circle></svg>',
     navRecurring: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.3-6.4L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-15.3 6.4L3 16"></path><path d="M3 21v-5h5"></path></svg>',
@@ -196,7 +197,8 @@
   function populateNavIcons() {
     const map = {
       'nav-icon-dashboard': 'navDashboard', 'nav-icon-transactions': 'navTransactions',
-      'nav-icon-budgets': 'navBudgets', 'nav-icon-wallet': 'navWallet',
+      'nav-icon-budgets': 'navBudgets', 'nav-icon-reports': 'navReports',
+      'nav-icon-wallet': 'navWallet',
       'nav-icon-goals': 'navGoals', 'nav-icon-recurring': 'navRecurring',
       'nav-icon-settle': 'navSettle', 'nav-icon-reviews': 'navReviews',
       'nav-icon-settings': 'navSettings', 'nav-icon-admin': 'navAdmin',
