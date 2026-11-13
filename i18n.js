@@ -481,7 +481,7 @@
       'settings.theme_off_hint': 'Автоматичната смяна е изключена — използва се {theme}.',
       'settings.theme_light': 'Светла',
       'settings.theme_dark': 'Тъмна',
-      'settings.theme_halloween': 'Хелуин',
+      'settings.theme_amber': 'Кехлибар',
       'settings.theme_lagoon': 'Лагуна',
 
       // ===== Админ панел (admin.html) =====
@@ -1258,7 +1258,7 @@
       'settings.theme_off_hint': 'Automatic switching is off — using {theme}.',
       'settings.theme_light': 'Light',
       'settings.theme_dark': 'Dark',
-      'settings.theme_halloween': 'Halloween',
+      'settings.theme_amber': 'Amber',
       'settings.theme_lagoon': 'Lagoon',
 
       // ===== Admin panel (admin.html) =====

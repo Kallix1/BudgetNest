@@ -2,7 +2,7 @@
    BudgetNest — превключвател на тема
 
    Един бутон обикаля четири теми:
-     светла → тъмна → Хелуин → Лагуна → светла
+     светла → тъмна → Кехлибар → Лагуна → светла
 
    Изборът се пази в localStorage под същия ключ, който страниците
    вече използват ('budgetnest-theme'), така че старите избори
@@ -24,9 +24,13 @@
 
   var STORAGE_KEY = 'budgetnest-theme';
   var SCHEDULE_KEY = 'budgetnest-theme-schedule';
-  var THEMES = ['light', 'dark', 'halloween', 'lagoon'];
-  var DARK_THEMES = ['dark', 'halloween'];
+  var THEMES = ['light', 'dark', 'amber', 'lagoon'];
+  var DARK_THEMES = ['dark', 'amber'];
   var DEFAULT_THEME = 'light';
+
+  // Стари избори, които вече не са валидни теми, се пренасочват, за да не
+  // изгуби потребителят темата си след премахването на Хелуин.
+  var LEGACY_THEMES = { halloween: 'amber' };
 
   var DAY_START_HOUR = 7;   // 07:00 — начало на дневната тема
   var NIGHT_START_HOUR = 18; // 18:00 — начало на нощната тема
@@ -35,21 +39,19 @@
 
   var SUN_ICON_PATH = '<circle cx="12" cy="12" r="4"></circle><line x1="12" y1="2" x2="12" y2="4"></line><line x1="12" y1="20" x2="12" y2="22"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="2" y1="12" x2="4" y2="12"></line><line x1="20" y1="12" x2="22" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
   var MOON_ICON_PATH = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
-  // Тиква-фенерче: следващата тема след тъмната е Хелуин.
-  var PUMPKIN_ICON_PATH =
-    '<path d="M12 6.2c-.9-1.1-2.4-1.6-3.8-1.3C5.9 5.6 4.7 7.7 5.1 9.9c.2 1.1.8 2 1.6 2.8-.9.7-1.4 1.8-1.4 2.9 0 2.3 2 4 4.4 3.6 1-.2 1.9-.7 2.5-1.4.6.7 1.5 1.2 2.5 1.4 2.4.4 4.4-1.3 4.4-3.6 0-1.1-.5-2.2-1.4-2.9.8-.8 1.4-1.7 1.6-2.8.4-2.2-.8-4.3-3.1-5-1.4-.3-2.9.2-3.8 1.3z"></path>' +
-    '<path d="M12 6.2V4.3"></path>' +
-    '<path d="M9.2 11.6h1.4"></path><path d="M13.4 11.6h1.4"></path>' +
-    '<path d="M9.5 15.1l2.5 2.3 2.5-2.3"></path>';
-  // Капка: следващата тема след Хелуин е Лагуна.
+  // Кехлибар: следващата тема след тъмната е Кехлибар.
+  var SPARKLE_ICON_PATH =
+    '<path d="M12 3.2l1.9 5.1 5.1 1.9-5.1 1.9L12 17.2l-1.9-5.1L5 10.2l5.1-1.9z"></path>' +
+    '<path d="M18.5 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"></path>';
+  // Капка: следващата тема след Кехлибар е Лагуна.
   var DROPLET_ICON_PATH =
     '<path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C5 11.1 4 13 4 15a7 7 0 0 0 7 7z"></path>';
 
   // Иконата показва СЛЕДВАЩАТА тема (както досега слънце/луна).
   var ICON_BY_CURRENT_THEME = {
     light: MOON_ICON_PATH,
-    dark: PUMPKIN_ICON_PATH,
-    halloween: DROPLET_ICON_PATH,
+    dark: SPARKLE_ICON_PATH,
+    amber: DROPLET_ICON_PATH,
     lagoon: SUN_ICON_PATH
   };
 
@@ -57,29 +59,34 @@
   var THEME_COLORS = {
     light: '#E8F4D7',
     dark: '#0A2A2A',
-    halloween: '#2F1033',
+    amber: '#330714',
     lagoon: '#D9F5FA'
   };
 
   var TITLES = {
     bg: {
       light: 'Смяна на тема (следваща: тъмна)',
-      dark: 'Смяна на тема (следваща: Хелуин)',
-      halloween: 'Смяна на тема (следваща: Лагуна)',
+      dark: 'Смяна на тема (следваща: Кехлибар)',
+      amber: 'Смяна на тема (следваща: Лагуна)',
       lagoon: 'Смяна на тема (следваща: светла)',
       scheduled: 'Смяна на тема (изключва автоматичната смяна)'
     },
     en: {
       light: 'Toggle theme (next: dark)',
-      dark: 'Toggle theme (next: Halloween)',
-      halloween: 'Toggle theme (next: Lagoon)',
+      dark: 'Toggle theme (next: Amber)',
+      amber: 'Toggle theme (next: Lagoon)',
       lagoon: 'Toggle theme (next: light)',
       scheduled: 'Toggle theme (turns off automatic switching)'
     }
   };
 
+  function resolveTheme(theme) {
+    if (LEGACY_THEMES[theme]) theme = LEGACY_THEMES[theme];
+    return THEMES.indexOf(theme) !== -1 ? theme : null;
+  }
+
   function normalize(theme) {
-    return THEMES.indexOf(theme) !== -1 ? theme : DEFAULT_THEME;
+    return resolveTheme(theme) || DEFAULT_THEME;
   }
 
   // ===== Автоматична смяна на темата по часовник =====
@@ -87,8 +94,8 @@
     input = input || {};
     return {
       enabled: input.enabled === true,
-      day: THEMES.indexOf(input.day) !== -1 ? input.day : DEFAULT_SCHEDULE.day,
-      night: THEMES.indexOf(input.night) !== -1 ? input.night : DEFAULT_SCHEDULE.night
+      day: resolveTheme(input.day) || DEFAULT_SCHEDULE.day,
+      night: resolveTheme(input.night) || DEFAULT_SCHEDULE.night
     };
   }
 

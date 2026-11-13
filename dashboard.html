@@ -413,7 +413,7 @@
     document.documentElement.setAttribute('data-theme', theme || 'light');
   })();
 
-  // Theme.js сменя темата (светла → тъмна → Хелуин) и излъчва това събитие.
+  // Theme.js сменя темата (светла → тъмна → Кехлибар) и излъчва това събитие.
   // Chart.js не се пребоядисва сам, затова прерисуваме диаграмите тук.
   document.addEventListener('budgetnest:themechange', function () {
     if (typeof currentHouseholdId !== 'undefined' && currentHouseholdId) loadTrend();

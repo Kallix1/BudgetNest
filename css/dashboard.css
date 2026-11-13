@@ -1156,7 +1156,7 @@ table.admin-table tbody tr:hover td { background: var(--surface-alt); }
     padding: 4px 8px;
   }
   /* --nest-green-mid е достатъчно тъмно в светлата тема за 11px текст,
-     а в тъмната и Хелуин е ярко; --nest-gold беше твърде светло зелено. */
+     а в тъмната и Кехлибар е ярко; --nest-gold беше твърде светло зелено. */
   .bottom-nav-item.active { color: var(--nest-green-mid); }
 }
 
