@@ -9,7 +9,7 @@
      светла   → слънчева градина: сметана → жълто-зелено → мента → аква
      тъмна    → горска нощ: нощен индиго → бор → аврора → дълбоко зелено
      Кехлибар → сметана, вино и кехлибар: сметана → кехлибар → вино
-     Лагуна   → лагуна и бонбон: облачно бяло → лагуна → бонбонено розово
+     Лагуна   → нощна лагуна: дълбока лагуна → лагуна → бонбонено розово
 
    Старите имена (--nest-gold и т.н.) са запазени нарочно, защото се
    ползват в inline стиловете на страниците. --nest-gold е ЗЕЛЕН акцент
@@ -388,37 +388,38 @@
 }
 
 /* ============================================================
-   ЛАГУНА — лагуна и бонбон
+   ЛАГУНА — нощна лагуна и бонбон
    Три цвята: лагуна #7BDFF2 · облачно бяло #FCFFFF · бонбон #F2B5D4
-   Светла тема: облачно бяло е основата, лагуната е основният акцент,
-   а бонбоненото розово — вторият (в брой, активно меню, избор).
+   Тъмна тема: дълбоката лагуна е основата, облачно бялото — текстът,
+   лагуната е основният акцент (бутони, активно меню, избор), а
+   бонбоненото розово — вторият (в брой, предупреждения, графики).
    ============================================================ */
 [data-theme="lagoon"] {
-  color-scheme: light;
+  color-scheme: dark;
 
-  --gradient-page: linear-gradient(135deg, #FCFFFF 0%, #F2FCFE 24%, #DDF5FA 50%, #EAF7FC 76%, #FCEAF4 100%);
-  --gradient-brand: linear-gradient(150deg, #083A46 0%, #0B4D5C 34%, #0E6577 66%, #147A8E 88%, #1B92A6 100%);
+  --gradient-page: linear-gradient(150deg, #04161C 0%, #06232B 28%, #08323C 52%, #0A4150 76%, #0D5464 100%);
+  --gradient-brand: linear-gradient(155deg, #04171D 0%, #072832 34%, #0A3A46 64%, #0D4C5C 86%, #116475 100%);
 
-  --bg-void: #EAF7FB;
-  --bg-panel: rgba(252, 255, 255, 0.90);
-  --bg-card: rgba(252, 255, 255, 0.93);
-  --bg-surface: rgba(252, 255, 255, 0.96);
-  --border-soft: rgba(14, 113, 131, 0.17);
-  --line-lip: #BFE3EA;
-  --surface-alt: rgba(214, 245, 250, 0.72);
-  --input-bg: rgba(252, 255, 255, 0.96);
-  --input-border: #9FD8E3;
-  --track-bg: #D9F0F6;
-  --panel-sheen: linear-gradient(155deg, rgba(255, 255, 255, 0.60) 0%, rgba(255, 255, 255, 0) 44%, rgba(242, 181, 212, 0.18) 100%);
-  --popover-shadow: 0 18px 36px rgba(10, 63, 75, 0.18);
-  --overlay-bg: rgba(7, 45, 54, 0.52);
+  --bg-void: #051A21;
+  --bg-panel: rgba(7, 34, 42, 0.86);
+  --bg-card: rgba(9, 38, 47, 0.89);
+  --bg-surface: rgba(8, 35, 44, 0.95);
+  --border-soft: rgba(123, 223, 242, 0.20);
+  --line-lip: #021015;
+  --surface-alt: rgba(12, 52, 63, 0.62);
+  --input-bg: rgba(5, 24, 31, 0.90);
+  --input-border: rgba(123, 223, 242, 0.32);
+  --track-bg: rgba(14, 62, 74, 0.70);
+  --panel-sheen: linear-gradient(155deg, rgba(123, 223, 242, 0.10) 0%, rgba(0, 0, 0, 0) 45%, rgba(242, 181, 212, 0.09) 100%);
+  --popover-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+  --overlay-bg: rgba(2, 12, 16, 0.70);
 
-  --nest-green-dark: #0A3540;
-  --nest-green-mid: #0E6B7D;
-  --nest-green-light: #1E93A8;
-  --nest-gold: #D77BAE;
-  --nest-gold-accent: #B9558C;
-  --on-brand: #FCFFFF;
+  --nest-green-dark: #04161C;
+  --nest-green-mid: #7BDFF2;
+  --nest-green-light: #A9ECF7;
+  --nest-gold: #F2B5D4;
+  --nest-gold-accent: #F8CFE5;
+  --on-brand: #041A20;
 
   --sprout: #7BDFF2;
   --sprout-2: #A9ECF7;
@@ -427,83 +428,83 @@
 
   --sun: #F2B5D4;
   --sun-2: #F8CFE5;
-  --sun-soft: linear-gradient(150deg, rgba(242, 181, 212, 0.34), rgba(252, 255, 255, 0.55));
-  --sun-ink: #8A3E68;
-  --on-sun: #3C142A;
-  --coin-pale: #FCE2EF;
+  --sun-soft: linear-gradient(150deg, rgba(242, 181, 212, 0.24), rgba(242, 181, 212, 0.06));
+  --sun-ink: #FBD9EA;
+  --on-sun: #33101F;
+  --coin-pale: #FBD9EA;
 
-  --peri: #0E6B7D;
-  --peri-soft: linear-gradient(150deg, rgba(14, 113, 131, 0.16), rgba(214, 245, 250, 0.34));
+  --peri: #D6F5FB;
+  --peri-soft: linear-gradient(150deg, rgba(214, 245, 251, 0.20), rgba(214, 245, 251, 0.06));
 
-  --mint-soft: linear-gradient(150deg, rgba(123, 223, 242, 0.22), rgba(214, 245, 250, 0.38));
-  --red-soft: linear-gradient(150deg, rgba(193, 59, 76, 0.13), rgba(255, 212, 216, 0.32));
+  --mint-soft: linear-gradient(150deg, rgba(111, 231, 192, 0.18), rgba(111, 231, 192, 0.05));
+  --red-soft: linear-gradient(150deg, rgba(255, 138, 154, 0.20), rgba(255, 138, 154, 0.06));
 
-  --text-primary: #12343D;
-  --text-secondary: #3A606B;
-  --text-dim: #52757E;
+  --text-primary: #FCFFFF;
+  --text-secondary: #C6E9F0;
+  --text-dim: #8FBAC5;
 
-  --color-income: #0E7A5F;
-  --color-expense: #C0394B;
-  --color-warning: #8A5600;
-  --on-expense: #FFFFFF;
+  --color-income: #6FE7C0;
+  --color-expense: #FF8A9A;
+  --color-warning: #F2B5D4;
+  --on-expense: #2A0610;
 
   --hero-ink: #FCFFFF;
-  --hero-muted: rgba(252, 255, 255, 0.80);
-  --hero-line: rgba(255, 255, 255, 0.10);
+  --hero-muted: rgba(252, 255, 255, 0.78);
+  --hero-line: rgba(255, 255, 255, 0.08);
 
   --nav-ink: #FCFFFF;
-  --nav-ink-dim: #C6E9F0;
-  --nav-hover-bg: rgba(255, 255, 255, 0.12);
-  --nav-active-ink: #3C142A;
-  --nav-pill-bg: rgba(255, 255, 255, 0.12);
-  --nav-pill-border: rgba(255, 255, 255, 0.22);
+  --nav-ink-dim: #B9DDE6;
+  --nav-hover-bg: rgba(123, 223, 242, 0.14);
+  --nav-active-ink: #062B33;
+  --nav-pill-bg: rgba(123, 223, 242, 0.12);
+  --nav-pill-border: rgba(123, 223, 242, 0.30);
 
-  --card-shadow: 0 3px 0 var(--line-lip), 0 10px 24px rgba(10, 84, 99, 0.06);
+  --card-shadow: 0 3px 0 var(--line-lip), 0 12px 30px rgba(0, 0, 0, 0.36), 0 0 28px rgba(123, 223, 242, 0.05);
   --btn-shadow: 0 4px 0 var(--sprout-lip);
-  --lift-shadow: 0 3px 0 rgba(14, 100, 115, 0.18);
-  --heading-accent: #0B4A57;
-  --focus-ring: #0E6B7D;
+  --lift-shadow: 0 3px 0 rgba(0, 0, 0, 0.42);
+  --heading-accent: #A9ECF7;
+  --focus-ring: #7BDFF2;
 
-  --chart-1: #0E6B7D;
-  --chart-2: #1E93A8;
-  --chart-3: #7BDFF2;
-  --chart-4: #D77BAE;
-  --chart-5: #F2B5D4;
-  --chart-6: #B9558C;
-  --chart-7: #6E9BA6;
-  --chart-border: #FCFFFF;
+  --chart-1: #7BDFF2;
+  --chart-2: #A9ECF7;
+  --chart-3: #F2B5D4;
+  --chart-4: #F8CFE5;
+  --chart-5: #6FE7C0;
+  --chart-6: #D6F5FB;
+  --chart-7: #4FA7B8;
+  --chart-border: #06232B;
 
   --toast-text: #FCFFFF;
-  --toast-error-bg: #8E2436;
-  --toast-error-border: #D14A5C;
-  --toast-success-bg: #0E5A4D;
-  --toast-success-border: #2FA48F;
-  --toast-info-bg: #0E4E5C;
+  --toast-error-bg: #4A0E1A;
+  --toast-error-border: #FF8A9A;
+  --toast-success-bg: #08382E;
+  --toast-success-border: #6FE7C0;
+  --toast-info-bg: #062B36;
   --toast-info-border: #7BDFF2;
 
-  --sky-base: #E6F7FB;
+  --sky-base: #06222A;
   --sky-image:
-    radial-gradient(46% 40% at 88% 2%, rgba(242, 181, 212, 0.40), rgba(242, 181, 212, 0.12) 46%, transparent 72%),
-    radial-gradient(40% 38% at 2% 100%, rgba(123, 223, 242, 0.45), transparent 72%),
-    radial-gradient(52% 42% at 48% 116%, rgba(123, 223, 242, 0.22), transparent 74%),
-    radial-gradient(30% 26% at 6% 2%, rgba(252, 255, 255, 0.75), transparent 74%),
+    radial-gradient(46% 40% at 88% 2%, rgba(242, 181, 212, 0.26), rgba(242, 181, 212, 0.08) 46%, transparent 72%),
+    radial-gradient(40% 38% at 2% 100%, rgba(123, 223, 242, 0.24), transparent 72%),
+    radial-gradient(52% 42% at 48% 116%, rgba(123, 223, 242, 0.14), transparent 74%),
+    radial-gradient(30% 26% at 6% 2%, rgba(214, 245, 251, 0.10), transparent 74%),
     var(--gradient-page);
   --sky-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
   --sky-repeat: no-repeat;
   --grain-image:
-    radial-gradient(circle at 20% 30%, rgba(123, 223, 242, 0.45) 0 1px, transparent 1.6px),
-    radial-gradient(circle at 70% 68%, rgba(242, 181, 212, 0.42) 0 0.9px, transparent 1.5px),
-    radial-gradient(circle at 44% 12%, rgba(14, 113, 131, 0.20) 0 0.8px, transparent 1.4px);
+    radial-gradient(circle at 20% 30%, rgba(123, 223, 242, 0.55) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 70% 68%, rgba(242, 181, 212, 0.50) 0 0.9px, transparent 1.5px),
+    radial-gradient(circle at 44% 12%, rgba(252, 255, 255, 0.40) 0 0.8px, transparent 1.4px);
   --grain-size: 240px 240px;
   --grain-opacity: 0.55;
 
-  --navbar-bg: #0A3F4B;
+  --navbar-bg: #041A21;
   --navbar-image:
-    radial-gradient(circle at 16% -6%, rgba(242, 181, 212, 0.26), transparent 46%),
-    radial-gradient(circle at 92% 108%, rgba(123, 223, 242, 0.28), transparent 58%),
+    radial-gradient(circle at 16% -6%, rgba(242, 181, 212, 0.22), transparent 46%),
+    radial-gradient(circle at 92% 108%, rgba(123, 223, 242, 0.24), transparent 58%),
     var(--gradient-brand);
 
-  --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233A606B' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23C6E9F0' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
 }
 
 /* Фонът идва от --sky-* (различен за всяка тема). .bg-grid го рисува
@@ -534,8 +535,9 @@ body {
   pointer-events: none;
 }
 
-/* Мъждукащи светулки в горската нощ */
-[data-theme="dark"] .bg-grid::after {
+/* Мъждукащи светулки в нощното небе */
+[data-theme="dark"] .bg-grid::after,
+[data-theme="lagoon"] .bg-grid::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -555,7 +557,8 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-theme="dark"] .bg-grid::after { animation: none; opacity: 0.45; }
+  [data-theme="dark"] .bg-grid::after,
+  [data-theme="lagoon"] .bg-grid::after { animation: none; opacity: 0.45; }
 }
 
 /* Лека "стъклена" светлина върху панелите, за да се усеща градиентът */
@@ -591,4 +594,5 @@ body {
 
 /* Началната страница вече има луна в нощното небе — скриваме
    оранжевото "слънце" зад hero секцията, за да не се застъпват. */
-[data-theme="dark"] .hero::before { display: none; }
+[data-theme="dark"] .hero::before,
+[data-theme="lagoon"] .hero::before { display: none; }

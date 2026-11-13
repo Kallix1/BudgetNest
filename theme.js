@@ -25,7 +25,7 @@
   var STORAGE_KEY = 'budgetnest-theme';
   var SCHEDULE_KEY = 'budgetnest-theme-schedule';
   var THEMES = ['light', 'dark', 'amber', 'lagoon'];
-  var DARK_THEMES = ['dark'];
+  var DARK_THEMES = ['dark', 'lagoon'];
   var DEFAULT_THEME = 'light';
 
   // Стари избори, които вече не са валидни теми, се пренасочват, за да не
@@ -60,7 +60,7 @@
     light: '#E8F4D7',
     dark: '#0A2A2A',
     amber: '#F6E4CE',
-    lagoon: '#D9F5FA'
+    lagoon: '#06222A'
   };
 
   var TITLES = {
