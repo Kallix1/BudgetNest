@@ -25,7 +25,7 @@
   var STORAGE_KEY = 'budgetnest-theme';
   var SCHEDULE_KEY = 'budgetnest-theme-schedule';
   var THEMES = ['light', 'dark', 'amber', 'lagoon'];
-  var DARK_THEMES = ['dark', 'amber'];
+  var DARK_THEMES = ['dark'];
   var DEFAULT_THEME = 'light';
 
   // Стари избори, които вече не са валидни теми, се пренасочват, за да не
@@ -59,7 +59,7 @@
   var THEME_COLORS = {
     light: '#E8F4D7',
     dark: '#0A2A2A',
-    amber: '#330714',
+    amber: '#F6E4CE',
     lagoon: '#D9F5FA'
   };
 

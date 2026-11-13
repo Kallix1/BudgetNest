@@ -8,7 +8,7 @@
 
      светла   → слънчева градина: сметана → жълто-зелено → мента → аква
      тъмна    → горска нощ: нощен индиго → бор → аврора → дълбоко зелено
-     Кехлибар → вино и кехлибар: мараска → вино → кехлибар
+     Кехлибар → сметана, вино и кехлибар: сметана → кехлибар → вино
      Лагуна   → лагуна и бонбон: облачно бяло → лагуна → бонбонено розово
 
    Старите имена (--nest-gold и т.н.) са запазени нарочно, защото се
@@ -268,37 +268,38 @@
 }
 
 /* ============================================================
-   КЕХЛИБАР — вино и кехлибар
-   Три цвята: вино #731328 · кехлибар #FEC40B · сметана #FDEFD6
-   Тъмна тема: виното е основата и марката, кехлибарът е основният
-   акцент (бутони, активно меню, избор), а сметаната — текстът.
+   КЕХЛИБАР — сметана, вино и кехлибар
+   Три цвята: сметана #FDEFD6 · вино #731328 · кехлибар #FEC40B
+   Светла тема: сметаната е основата (фон и повърхности), виното е
+   основният акцент (текст, марка, активно меню, избор), а кехлибарът —
+   вторият (основен бутон, монети, предупреждения, графики).
    ============================================================ */
 [data-theme="amber"] {
-  color-scheme: dark;
+  color-scheme: light;
 
-  --gradient-page: linear-gradient(155deg, #23040D 0%, #330714 26%, #440A1A 50%, #5A0F20 74%, #731328 92%, #8A1A30 100%);
-  --gradient-brand: linear-gradient(155deg, #2B0611 0%, #400A18 34%, #560E20 64%, #6E1226 86%, #8B1A31 100%);
+  --gradient-page: linear-gradient(135deg, #FDEFD6 0%, #FBE9CF 26%, #F7E0C6 52%, #F3D9C4 76%, #FBEFDD 100%);
+  --gradient-brand: linear-gradient(150deg, #3E0817 0%, #4E0C1D 34%, #601024 66%, #731328 88%, #8A1A30 100%);
 
-  --bg-void: #26050E;
-  --bg-panel: rgba(58, 8, 21, 0.86);
-  --bg-card: rgba(64, 10, 24, 0.89);
-  --bg-surface: rgba(60, 9, 22, 0.95);
-  --border-soft: rgba(254, 196, 11, 0.20);
-  --line-lip: #150209;
-  --surface-alt: rgba(88, 15, 34, 0.62);
-  --input-bg: rgba(38, 5, 15, 0.90);
-  --input-border: rgba(254, 196, 11, 0.32);
-  --track-bg: rgba(103, 18, 39, 0.70);
-  --panel-sheen: linear-gradient(155deg, rgba(254, 196, 11, 0.10) 0%, rgba(0, 0, 0, 0) 45%, rgba(253, 239, 214, 0.08) 100%);
-  --popover-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
-  --overlay-bg: rgba(10, 1, 4, 0.72);
+  --bg-void: #F3E1C9;
+  --bg-panel: rgba(255, 249, 240, 0.90);
+  --bg-card: rgba(255, 249, 240, 0.93);
+  --bg-surface: rgba(255, 251, 244, 0.96);
+  --border-soft: rgba(115, 19, 40, 0.16);
+  --line-lip: #E6D2BA;
+  --surface-alt: rgba(246, 231, 213, 0.74);
+  --input-bg: rgba(255, 253, 247, 0.95);
+  --input-border: #E0C6AC;
+  --track-bg: #EFDCC4;
+  --panel-sheen: linear-gradient(155deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 44%, rgba(254, 196, 11, 0.14) 100%);
+  --popover-shadow: 0 18px 36px rgba(74, 11, 27, 0.18);
+  --overlay-bg: rgba(58, 10, 22, 0.55);
 
-  --nest-green-dark: #2A0510;
-  --nest-green-mid: #FEC40B;
-  --nest-green-light: #FFD54A;
-  --nest-gold: #FEC40B;
-  --nest-gold-accent: #FFD24D;
-  --on-brand: #2A0510;
+  --nest-green-dark: #3E0817;
+  --nest-green-mid: #731328;
+  --nest-green-light: #9A1E38;
+  --nest-gold: #E0A800;
+  --nest-gold-accent: #96680A;
+  --on-brand: #FDEFD6;
 
   --sprout: #FEC40B;
   --sprout-2: #FFD65C;
@@ -306,84 +307,84 @@
   --on-sprout: #2A0510;
 
   --sun: #FEC40B;
-  --sun-2: #FFDA6B;
-  --sun-soft: linear-gradient(150deg, rgba(254, 196, 11, 0.22), rgba(254, 196, 11, 0.06));
-  --sun-ink: #FFE6A8;
-  --on-sun: #2B0A00;
-  --coin-pale: #FFEDB8;
+  --sun-2: #FFD65C;
+  --sun-soft: linear-gradient(150deg, rgba(254, 196, 11, 0.32), rgba(255, 241, 199, 0.55));
+  --sun-ink: #6B4A00;
+  --on-sun: #3A2600;
+  --coin-pale: #FFE9A8;
 
-  --peri: #F0A8B8;
-  --peri-soft: linear-gradient(150deg, rgba(240, 168, 184, 0.20), rgba(240, 168, 184, 0.06));
+  --peri: #8A1A30;
+  --peri-soft: linear-gradient(150deg, rgba(138, 26, 48, 0.15), rgba(246, 226, 205, 0.40));
 
-  --mint-soft: linear-gradient(150deg, rgba(126, 214, 140, 0.16), rgba(126, 214, 140, 0.05));
-  --red-soft: linear-gradient(150deg, rgba(255, 122, 133, 0.20), rgba(255, 122, 133, 0.06));
+  --mint-soft: linear-gradient(150deg, rgba(14, 122, 77, 0.15), rgba(206, 240, 220, 0.36));
+  --red-soft: linear-gradient(150deg, rgba(176, 34, 52, 0.14), rgba(255, 214, 218, 0.34));
 
-  --text-primary: #FDEFD6;
-  --text-secondary: #EBD6BC;
-  --text-dim: #CDB093;
+  --text-primary: #3B0A18;
+  --text-secondary: #6B3A44;
+  --text-dim: #8A6168;
 
-  --color-income: #7ED68C;
-  --color-expense: #FF7A85;
-  --color-warning: #FEC40B;
-  --on-expense: #2B0509;
+  --color-income: #0E7A4D;
+  --color-expense: #B02234;
+  --color-warning: #8A5600;
+  --on-expense: #FFFFFF;
 
   --hero-ink: #FDEFD6;
-  --hero-muted: rgba(253, 239, 214, 0.78);
-  --hero-line: rgba(255, 255, 255, 0.07);
+  --hero-muted: rgba(253, 239, 214, 0.80);
+  --hero-line: rgba(255, 255, 255, 0.10);
 
   --nav-ink: #FDEFD6;
-  --nav-ink-dim: #E4C9AE;
-  --nav-hover-bg: rgba(254, 196, 11, 0.14);
+  --nav-ink-dim: #EBCBB4;
+  --nav-hover-bg: rgba(255, 255, 255, 0.12);
   --nav-active-ink: #2A0510;
-  --nav-pill-bg: rgba(254, 196, 11, 0.12);
-  --nav-pill-border: rgba(254, 196, 11, 0.30);
+  --nav-pill-bg: rgba(255, 255, 255, 0.12);
+  --nav-pill-border: rgba(255, 255, 255, 0.22);
 
-  --card-shadow: 0 3px 0 var(--line-lip), 0 12px 30px rgba(0, 0, 0, 0.36), 0 0 28px rgba(254, 196, 11, 0.05);
+  --card-shadow: 0 3px 0 var(--line-lip), 0 10px 24px rgba(74, 11, 27, 0.06);
   --btn-shadow: 0 4px 0 var(--sprout-lip);
-  --lift-shadow: 0 3px 0 rgba(0, 0, 0, 0.42);
-  --heading-accent: #FFE3A3;
-  --focus-ring: #FEC40B;
+  --lift-shadow: 0 3px 0 rgba(115, 19, 40, 0.18);
+  --heading-accent: #731328;
+  --focus-ring: #731328;
 
-  --chart-1: #FEC40B;
-  --chart-2: #FFD65C;
-  --chart-3: #F0A8B8;
-  --chart-4: #D4566F;
-  --chart-5: #7ED68C;
-  --chart-6: #FDEFD6;
-  --chart-7: #B0748A;
-  --chart-border: #2A0510;
+  --chart-1: #731328;
+  --chart-2: #A8324E;
+  --chart-3: #FEC40B;
+  --chart-4: #C89500;
+  --chart-5: #0E7A4D;
+  --chart-6: #B0748A;
+  --chart-7: #D9A66B;
+  --chart-border: #FFF9F0;
 
-  --toast-text: #FDEFD6;
-  --toast-error-bg: #4A0A14;
-  --toast-error-border: #FF7A85;
-  --toast-success-bg: #12351F;
-  --toast-success-border: #7ED68C;
-  --toast-info-bg: #3A1A24;
-  --toast-info-border: #F0A8B8;
+  --toast-text: #FFF9F0;
+  --toast-error-bg: #8E2436;
+  --toast-error-border: #D14A5C;
+  --toast-success-bg: #0E5A3D;
+  --toast-success-border: #2FA474;
+  --toast-info-bg: #4A0B1B;
+  --toast-info-border: #E0A800;
 
-  --sky-base: #330714;
+  --sky-base: #F6E4CE;
   --sky-image:
-    radial-gradient(42% 38% at 84% 4%, rgba(254, 196, 11, 0.20), transparent 72%),
-    radial-gradient(40% 36% at 4% 98%, rgba(115, 19, 40, 0.55), transparent 74%),
-    radial-gradient(36% 32% at 62% 44%, rgba(253, 239, 214, 0.10), transparent 74%),
-    radial-gradient(70% 44% at 50% 112%, rgba(254, 196, 11, 0.10), transparent 74%),
+    radial-gradient(46% 40% at 88% 2%, rgba(254, 196, 11, 0.35), rgba(254, 196, 11, 0.10) 46%, transparent 72%),
+    radial-gradient(40% 38% at 2% 100%, rgba(115, 19, 40, 0.16), transparent 72%),
+    radial-gradient(52% 42% at 48% 116%, rgba(254, 196, 11, 0.18), transparent 74%),
+    radial-gradient(30% 26% at 6% 2%, rgba(255, 255, 255, 0.65), transparent 74%),
     var(--gradient-page);
   --sky-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
   --sky-repeat: no-repeat;
   --grain-image:
-    radial-gradient(circle at 30% 18%, rgba(253, 239, 214, 0.60) 0 1px, transparent 1.8px),
-    radial-gradient(circle at 82% 44%, rgba(254, 196, 11, 0.50) 0 0.9px, transparent 1.6px),
-    radial-gradient(circle at 58% 78%, rgba(240, 168, 184, 0.42) 0 0.9px, transparent 1.6px);
-  --grain-size: 280px 280px;
+    radial-gradient(circle at 20% 30%, rgba(115, 19, 40, 0.18) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 70% 68%, rgba(224, 168, 0, 0.28) 0 0.9px, transparent 1.5px),
+    radial-gradient(circle at 44% 12%, rgba(138, 97, 104, 0.16) 0 0.8px, transparent 1.4px);
+  --grain-size: 240px 240px;
   --grain-opacity: 0.55;
 
-  --navbar-bg: #2A0510;
+  --navbar-bg: #40091A;
   --navbar-image:
-    radial-gradient(circle at 18% -8%, rgba(254, 196, 11, 0.20), transparent 46%),
-    radial-gradient(circle at 88% 108%, rgba(240, 168, 184, 0.16), transparent 58%),
+    radial-gradient(circle at 16% -6%, rgba(254, 196, 11, 0.26), transparent 46%),
+    radial-gradient(circle at 92% 108%, rgba(253, 239, 214, 0.18), transparent 58%),
     var(--gradient-brand);
 
-  --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FDEFD6' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B3A44' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
 }
 
 /* ============================================================
@@ -534,8 +535,7 @@ body {
 }
 
 /* Мъждукащи светулки в горската нощ */
-[data-theme="dark"] .bg-grid::after,
-[data-theme="amber"] .bg-grid::after {
+[data-theme="dark"] .bg-grid::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -555,8 +555,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-theme="dark"] .bg-grid::after,
-  [data-theme="amber"] .bg-grid::after { animation: none; opacity: 0.45; }
+  [data-theme="dark"] .bg-grid::after { animation: none; opacity: 0.45; }
 }
 
 /* Лека "стъклена" светлина върху панелите, за да се усеща градиентът */
@@ -592,5 +591,4 @@ body {
 
 /* Началната страница вече има луна в нощното небе — скриваме
    оранжевото "слънце" зад hero секцията, за да не се застъпват. */
-[data-theme="dark"] .hero::before,
-[data-theme="amber"] .hero::before { display: none; }
+[data-theme="dark"] .hero::before { display: none; }
