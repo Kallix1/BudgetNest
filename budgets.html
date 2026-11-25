@@ -17,6 +17,7 @@
 <script src="icons.js?v=3" defer></script>
 <script src="boot.js?v=2"></script>
 <script src="vendor/supabase-js-2.117.3.min.js"></script>
+<script src="auth.js?v=1"></script>
 
 <style>
   body.dashboard-body {
@@ -217,8 +218,12 @@
 
   // ===== Init flow =====
   (async function init() {
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    if (!session) { window.location.href = 'login.html'; return; }
+    // Възстановяваме сесията с повторни опити — моментен проблем с мрежата
+    // (особено на телефон) не трябва да изхвърля потребителя към login.
+    const session = window.BudgetNestAuth
+      ? await window.BudgetNestAuth.resolveSession(supabaseClient)
+      : (await supabaseClient.auth.getSession()).data.session;
+    if (!session) { window.location.replace('login.html'); return; }
     currentUser = session.user;
     updateSettleNavVisibility(currentUser.id);
 

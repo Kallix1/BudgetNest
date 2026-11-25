@@ -15,6 +15,7 @@
 <script src="analytics.js?v=1" defer></script>
 <script src="boot.js?v=2"></script>
 <script src="vendor/supabase-js-2.117.3.min.js"></script>
+<script src="auth.js?v=1"></script>
 </head>
 <body>
 
@@ -256,10 +257,16 @@
   }
 
   // ===== Ако вече е логнат, пренасочи директно =====
+  // Изчакваме възстановяването на сесията (с повторни опити), за да не
+  // изпращаме потребителя към формата при моментен проблем с мрежата.
   (async () => {
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    if (session) {
-      window.location.href = 'dashboard.html';
+    try {
+      const session = window.BudgetNestAuth
+        ? await window.BudgetNestAuth.resolveSession(supabaseClient, { timeoutMs: 10000 })
+        : (await supabaseClient.auth.getSession()).data.session;
+      if (session) window.location.replace('dashboard.html');
+    } catch (e) {
+      // Оставаме на формата за вход.
     }
   })();
 </script>

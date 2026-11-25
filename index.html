@@ -15,6 +15,51 @@
 <script src="theme.js?v=4" defer></script>
 <script src="analytics.js?v=1" defer></script>
 <script src="icons.js?v=3" defer></script>
+<script src="vendor/supabase-js-2.117.3.min.js" defer></script>
+<script src="auth.js?v=1" defer></script>
+<style>html.bn-auth-checking body{visibility:hidden}</style>
+<script>
+  // ===== Автоматичен вход =====
+  // Ако има запазена валидна сесия, отваряме директно таблото — на компютър
+  // и на телефон. Страницата остава скрита за миг, за да не „мига“ лендингът
+  // пред вече влезлите потребители. При липса на сесия показваме лендинга.
+  (function () {
+    var root = document.documentElement;
+    root.classList.add('bn-auth-checking');
+    var revealed = false;
+    function reveal() {
+      if (revealed) return;
+      revealed = true;
+      root.classList.remove('bn-auth-checking');
+    }
+    // Никога не оставяме страницата скрита, ако проверката се забави.
+    setTimeout(reveal, 3000);
+    function check() {
+      (async function () {
+        try {
+          var auth = window.BudgetNestAuth;
+          if (!auth) return;
+          var client = auth.client();
+          if (!client) return;
+          await auth.redirectIfSignedIn(client, 'dashboard.html', {
+            timeoutMs: 6000,
+            callTimeoutMs: 4000
+          });
+        } catch (e) {
+          // При грешка просто показваме лендинга.
+        } finally {
+          reveal();
+        }
+      })();
+    }
+    // Изчакваме deferred скриптовете (Supabase + auth.js) да се заредят.
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', check, { once: true });
+    } else {
+      check();
+    }
+  })();
+</script>
 <link rel="stylesheet" href="css/tokens.css?v=28">
 <link rel="stylesheet" href="css/landing.css?v=24">
 </head>

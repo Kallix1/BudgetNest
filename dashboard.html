@@ -21,6 +21,7 @@
 <script src="icons.js?v=3" defer></script>
 <script src="boot.js?v=2"></script>
 <script src="vendor/supabase-js-2.117.3.min.js"></script>
+<script src="auth.js?v=1"></script>
 <script src="vendor/chart-4.6.1.umd.min.js"></script>
 <script>
   if ('serviceWorker' in navigator) {
@@ -609,13 +610,14 @@
 
   (async function init() {
     try {
-      const { data: { session } } = await withTimeout(
-        supabaseClient.auth.getSession(),
-        10000,
-        'auth.getSession() timed out'
-      );
+      // Възстановяваме сесията с повторни опити, за да не изхвърляме
+      // потребителя към login при кратък мрежов проблем.
+      const auth = window.BudgetNestAuth;
+      const session = auth
+        ? await auth.resolveSession(supabaseClient, { timeoutMs: 15000 })
+        : (await withTimeout(supabaseClient.auth.getSession(), 10000, 'auth.getSession() timed out')).data.session;
       if (!session) {
-        window.location.href = 'login.html';
+        window.location.replace('login.html');
         return;
       }
       currentUser = session.user;
