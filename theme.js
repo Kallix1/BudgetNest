@@ -89,6 +89,28 @@
     return resolveTheme(theme) || DEFAULT_THEME;
   }
 
+  // Плавна смяна на темата чрез View Transitions API (ако браузърът го
+  // поддържа и потребителят не е изключил движението). При липса на
+  // поддръжка просто изпълняваме смяната веднага.
+  function prefersReducedMotion() {
+    try {
+      return !!(window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function withViewTransition(fn) {
+    if (document.startViewTransition && !prefersReducedMotion()) {
+      try {
+        document.startViewTransition(fn);
+        return;
+      } catch (e) { /* fall through */ }
+    }
+    fn();
+  }
+
   // ===== Автоматична смяна на темата по часовник =====
   function normalizeSchedule(input) {
     input = input || {};
@@ -190,7 +212,7 @@
 
     var current = normalize(document.documentElement.getAttribute('data-theme'));
     var next = THEMES[(THEMES.indexOf(current) + 1) % THEMES.length];
-    applyTheme(next, true);
+    withViewTransition(function () { applyTheme(next, true); });
 
     if (wasScheduled) dispatchScheduleChange(schedule);
     return next;
@@ -209,10 +231,12 @@
     writeSchedule(next);
 
     if (next.enabled) {
-      applyTheme(themeForTime(next), false);
+      withViewTransition(function () { applyTheme(themeForTime(next), false); });
     } else {
       // Изключване: оставаме на текущата тема и я запазваме като ръчен избор.
-      applyTheme(normalize(document.documentElement.getAttribute('data-theme')), true);
+      withViewTransition(function () {
+        applyTheme(normalize(document.documentElement.getAttribute('data-theme')), true);
+      });
     }
 
     dispatchScheduleChange(next);
@@ -228,7 +252,8 @@
       writeSchedule(schedule);
     }
 
-    var applied = applyTheme(theme, true);
+    var applied = normalize(theme);
+    withViewTransition(function () { applyTheme(applied, true); });
     if (wasScheduled) dispatchScheduleChange(schedule);
     return applied;
   }

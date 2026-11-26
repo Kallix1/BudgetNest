@@ -1,0 +1,423 @@
+/* ============================================================
+   BudgetNest — движение, преходи и микровзаимодействия
+
+   Един общ слой за целия сайт:
+     • плавно скролиране и отстъп за лепкавите ленти;
+     • поява на съдържанието при скрол (data-reveal);
+     • входни анимации за началото и входа/регистрацията;
+     • меки повдигания при hover и „натиск“ при бутоните;
+     • плавна смяна на темата чрез View Transitions (където има);
+     • индикатори за зареждане и toast анимации.
+
+   Всичко уважава prefers-reduced-motion. Цветовете идват от
+   tokens.css — тук няма твърдо зададени теми.
+   ============================================================ */
+
+:root {
+  --bn-ease-out: cubic-bezier(.22, 1, .36, 1);
+  --bn-ease-spring: cubic-bezier(.2, .9, .3, 1.15);
+  --bn-dur-fast: 140ms;
+  --bn-dur: 260ms;
+  --bn-dur-slow: 520ms;
+}
+
+/* ===== Плавно скролиране ===== */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 92px;
+}
+body.dashboard-body { scroll-padding-top: 78px; }
+[id] { scroll-margin-top: 92px; }
+
+@media (max-width: 900px) {
+  html { scroll-padding-top: 76px; }
+  body.dashboard-body { scroll-padding-top: 70px; }
+  [id] { scroll-margin-top: 76px; }
+}
+
+/* ===== Вход на страницата ===== */
+@keyframes bn-page-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+body { animation: bn-page-in .28s var(--bn-ease-out) backwards; }
+
+/* Излизане при вътрешна навигация (само ако няма View Transition) */
+html.bn-leaving body {
+  animation: none;
+  opacity: 0.32;
+  transition: opacity .16s ease;
+}
+
+/* ===== Индикатори за зареждане ===== */
+.bn-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  z-index: 10050;
+  pointer-events: none;
+  border-radius: 0 3px 3px 0;
+  background: linear-gradient(90deg, var(--sprout), var(--sun), var(--sprout-2));
+  box-shadow: 0 0 12px color-mix(in srgb, var(--sprout) 55%, transparent);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  opacity: 0;
+  transition: transform .45s var(--bn-ease-out), opacity .3s ease;
+}
+.bn-progress.bn-active { opacity: 1; }
+.bn-progress.bn-done {
+  opacity: 0;
+  transition: transform .25s ease, opacity .35s ease .08s;
+}
+
+.bn-scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 60;
+  pointer-events: none;
+  background: linear-gradient(90deg, var(--sprout), var(--sun));
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  will-change: transform;
+}
+
+/* ===== Поява при скрол ===== */
+html.bn-js [data-reveal]:not(.bn-revealed) {
+  opacity: 0;
+  transform: translateY(18px);
+}
+html.bn-js [data-reveal].bn-revealed {
+  animation: bn-reveal-in .6s var(--bn-ease-out) backwards;
+  animation-delay: calc(var(--bn-reveal-i, 0) * 70ms);
+}
+@keyframes bn-reveal-in {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ===== Начална страница: вход на hero секцията ===== */
+@keyframes bn-rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes bn-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+html.bn-page-visible .hero-badge  { animation: bn-rise .55s var(--bn-ease-out) .04s backwards; }
+html.bn-page-visible .hero h1     { animation: bn-rise .65s var(--bn-ease-out) .10s backwards; }
+html.bn-page-visible .hero p      { animation: bn-rise .65s var(--bn-ease-out) .16s backwards; }
+html.bn-page-visible .hero-cta    { animation: bn-rise .65s var(--bn-ease-out) .22s backwards; }
+
+/* Вход / регистрация: лявата „корица“ се появява стъпаловидно */
+html.bn-page-visible .brand-headline { animation: bn-rise .60s var(--bn-ease-out) .12s backwards; }
+html.bn-page-visible .brand-sub      { animation: bn-rise .60s var(--bn-ease-out) .18s backwards; }
+html.bn-page-visible .brand-stat     { animation: bn-rise .60s var(--bn-ease-out) .24s backwards; }
+
+/* Прегледът на приложението на началната страница */
+html.bn-page-visible .preview        { animation: bn-rise .8s var(--bn-ease-out) .12s backwards; }
+html.bn-page-visible .preview-window { animation: bn-fade .8s ease .12s backwards; }
+
+html.bn-page-visible .stat-card { animation: bn-rise .55s var(--bn-ease-out) backwards; }
+html.bn-page-visible .stat-card:nth-child(1) { animation-delay: .30s; }
+html.bn-page-visible .stat-card:nth-child(2) { animation-delay: .36s; }
+html.bn-page-visible .stat-card:nth-child(3) { animation-delay: .42s; }
+
+html.bn-page-visible .bar-fill {
+  animation: bn-bar-grow .9s var(--bn-ease-out) backwards;
+  transform-origin: left center;
+}
+html.bn-page-visible .bar-row:nth-child(1) .bar-fill { animation-delay: .48s; }
+html.bn-page-visible .bar-row:nth-child(2) .bar-fill { animation-delay: .58s; }
+html.bn-page-visible .bar-row:nth-child(3) .bar-fill { animation-delay: .68s; }
+html.bn-page-visible .bar-row:nth-child(4) .bar-fill { animation-delay: .78s; }
+
+@keyframes bn-bar-grow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* Слънцето диша съвсем леко */
+@media (prefers-reduced-motion: no-preference) {
+  .hero::before { animation: bn-sun-breathe 9s ease-in-out infinite alternate; }
+}
+@keyframes bn-sun-breathe {
+  from { transform: scale(1); }
+  to   { transform: scale(1.045) translateY(-6px); }
+}
+
+/* ===== Hover микровзаимодействия ===== */
+.feature-icon,
+.step-num,
+.nav-icon {
+  transition: transform .35s var(--bn-ease-spring);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .feature {
+    transition: transform .3s var(--bn-ease-out), box-shadow .3s var(--bn-ease-out);
+  }
+  .feature:hover { transform: translateY(-5px); }
+  .feature:hover .feature-icon { transform: translateY(-3px) rotate(-5deg) scale(1.06); }
+
+  .step:hover .step-num { transform: translateY(-3px) scale(1.05); }
+
+  .preview-window {
+    transition: transform .5s var(--bn-ease-out), box-shadow .5s var(--bn-ease-out);
+  }
+  .preview-window:hover { transform: rotate(-.4deg) translateY(-4px); }
+
+  .nav-link:hover .nav-icon { transform: translateX(2px) scale(1.05); }
+  .nav-link.active .nav-icon { transform: scale(1.08); }
+
+  .theme-toggle:hover svg { transform: rotate(-12deg) scale(1.05); }
+
+  .summary-card[onclick],
+  .wallet-card,
+  .goal-card,
+  .review-card {
+    transition:
+      transform .25s var(--bn-ease-out),
+      box-shadow .25s var(--bn-ease-out),
+      border-color .25s ease;
+  }
+  .summary-card[onclick]:hover,
+  .wallet-card:hover,
+  .goal-card:hover,
+  .review-card:hover { transform: translateY(-3px); }
+
+  .card { transition: border-color .25s ease, box-shadow .25s ease; }
+  .card:hover { border-color: color-mix(in srgb, var(--nest-green-mid) 28%, var(--border-soft)); }
+
+  .tx-row:hover { transform: translateX(2px); }
+}
+
+/* Леко свиване на горната лента при скрол */
+body > header {
+  transition: padding .3s var(--bn-ease-out), box-shadow .3s ease, border-color .3s ease;
+}
+body > header.is-scrolled {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  box-shadow: 0 12px 28px -18px rgba(0, 0, 0, .35);
+}
+
+/* ===== Приложението: вход на картите, когато съдържанието се покаже ===== */
+html.bn-js body.dashboard-body .dashboard-main .card,
+html.bn-js body.dashboard-body .dashboard-main .summary-card {
+  opacity: 0;
+}
+html.bn-js body.dashboard-body .dashboard-main.bn-app-ready .card,
+html.bn-js body.dashboard-body .dashboard-main.bn-app-ready .summary-card {
+  opacity: 1;
+}
+
+html.bn-js body.dashboard-body .dashboard-main.bn-app-ready .card {
+  animation: bn-card-in .5s var(--bn-ease-out) backwards;
+  animation-delay: calc(var(--bn-i, 0) * 55ms);
+}
+html.bn-js body.dashboard-body .dashboard-main.bn-app-ready .summary-card {
+  animation: bn-card-in .5s var(--bn-ease-spring) backwards;
+}
+html.bn-js body.dashboard-body .dashboard-main.bn-app-ready .summary-card:nth-child(2) { animation-delay: .05s; }
+html.bn-js body.dashboard-body .dashboard-main.bn-app-ready .summary-card:nth-child(3) { animation-delay: .10s; }
+html.bn-js body.dashboard-body .dashboard-main.bn-app-ready .summary-card:nth-child(4) { animation-delay: .15s; }
+html.bn-js body.dashboard-body .dashboard-main.bn-app-ready .summary-card:nth-child(5) { animation-delay: .20s; }
+html.bn-js body.dashboard-body .dashboard-main.bn-app-ready .summary-card:nth-child(6) { animation-delay: .25s; }
+html.bn-js body.dashboard-body .dashboard-main.bn-app-ready .summary-card:nth-child(7) { animation-delay: .30s; }
+
+html.bn-js body.dashboard-body .dashboard-main.bn-app-ready .wallet-card,
+html.bn-js body.dashboard-body .dashboard-main.bn-app-ready .goal-card,
+html.bn-js body.dashboard-body .dashboard-main.bn-app-ready .review-card {
+  animation: bn-card-in .5s var(--bn-ease-out) backwards;
+}
+
+@keyframes bn-card-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Редовете на транзакциите влизат леко стъпаловидно */
+@keyframes bn-row-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+.tx-list .tx-row { animation: bn-row-in .34s var(--bn-ease-out) backwards; }
+.tx-list .tx-row:nth-child(2) { animation-delay: .035s; }
+.tx-list .tx-row:nth-child(3) { animation-delay: .070s; }
+.tx-list .tx-row:nth-child(4) { animation-delay: .105s; }
+.tx-list .tx-row:nth-child(5) { animation-delay: .140s; }
+.tx-list .tx-row:nth-child(6) { animation-delay: .175s; }
+.tx-list .tx-row:nth-child(7) { animation-delay: .210s; }
+.tx-list .tx-row:nth-child(8) { animation-delay: .245s; }
+
+/* ===== Модални прозорци и toast ===== */
+.overlay { animation: bn-fade .22s ease backwards; }
+
+#app-toast-container > div { animation: bn-toast-in .38s var(--bn-ease-spring); }
+@keyframes bn-toast-in {
+  from { opacity: 0; transform: translateY(-12px) scale(.96); }
+  to   { opacity: 1; transform: none; }
+}
+
+#toast { animation: bn-toast-up .32s var(--bn-ease-out); }
+@keyframes bn-toast-up {
+  from { opacity: 0; transform: translate(-50%, 10px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* ===== Мобилна долна навигация ===== */
+.bottom-nav {
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 -10px 30px -22px rgba(0, 0, 0, .5);
+}
+.bottom-nav-item {
+  position: relative;
+  transition: color .2s ease, transform .15s ease;
+}
+.bottom-nav-item:active { transform: scale(.9); }
+.bottom-nav-item.active::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  width: 24px;
+  height: 3px;
+  margin-left: -12px;
+  border-radius: 0 0 3px 3px;
+  background: currentColor;
+  opacity: .9;
+}
+
+@media (max-width: 768px) {
+  .bottom-nav-item { animation: bn-tab-in .4s var(--bn-ease-out) backwards; }
+  .bottom-nav-item:nth-child(2) { animation-delay: .04s; }
+  .bottom-nav-item:nth-child(3) { animation-delay: .08s; }
+  .bottom-nav-item:nth-child(4) { animation-delay: .12s; }
+  .bottom-nav-item:nth-child(5) { animation-delay: .16s; }
+}
+@keyframes bn-tab-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Плаващият бутон „+“ */
+#fab-add {
+  animation: bn-fab-in .35s var(--bn-ease-spring);
+  transition: transform .15s ease, filter .2s ease;
+}
+#fab-add:hover { filter: brightness(1.06); }
+#fab-add:active { transform: scale(.9); }
+@keyframes bn-fab-in {
+  from { opacity: 0; transform: scale(.7); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ===== Ripple върху бутони ===== */
+.bn-ripple-host {
+  position: relative;
+  overflow: hidden;
+}
+.bn-ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: .18;
+  pointer-events: none;
+  transform: scale(0);
+  animation: bn-ripple .55s ease-out forwards;
+}
+@keyframes bn-ripple {
+  to { transform: scale(2.6); opacity: 0; }
+}
+
+/* ===== Скриване на фокуса (skip link) ===== */
+.bn-skip-link {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 10001;
+  padding: 10px 16px;
+  border-radius: var(--r-md);
+  border: 1.5px solid var(--input-border);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: var(--popover-shadow);
+  transform: translateY(-160%);
+  transition: transform .2s var(--bn-ease-out);
+}
+.bn-skip-link:focus { transform: none; }
+
+/* ===== Скролбари (само при мишка) ===== */
+@media (hover: hover) and (pointer: fine) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--nest-green-mid) 38%, transparent) transparent;
+  }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--nest-green-mid) 34%, transparent);
+    background-clip: padding-box;
+    border: 2px solid transparent;
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--nest-green-mid) 52%, transparent);
+    background-clip: padding-box;
+  }
+}
+
+/* ===== Плавна смяна на темата (View Transitions) ===== */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: .32s;
+  animation-timing-function: var(--bn-ease-out);
+}
+::view-transition-old(root) { animation-name: bn-vt-out; }
+::view-transition-new(root) { animation-name: bn-vt-in; }
+@keyframes bn-vt-out { to { opacity: 0; } }
+@keyframes bn-vt-in { from { opacity: 0; } }
+
+/* ===== Достъпност: по-малко движение ===== */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto !important; }
+
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+
+  html.bn-js [data-reveal]:not(.bn-revealed) {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .bn-progress,
+  .bn-scroll-progress,
+  .bn-ripple,
+  .bn-skip-link { display: none !important; }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) { animation: none !important; }
+}
+
+@media print {
+  .bn-progress,
+  .bn-scroll-progress,
+  .bn-skip-link,
+  .bn-ripple { display: none !important; }
+}
